@@ -1,19 +1,19 @@
 start_game:
     path:     /start-game
-    defaults: { _controller: 'controller.game:startAction', _format: 'json' }
+    defaults: { _controller: 'Tchess\Controller\GameController::startAction', _format: 'json' }
     methods:  [POST]
 
 stop_game:
     path:     /stop-game
-    defaults: { _controller: 'controller.game:stopAction', _format: 'json' }
+    defaults: { _controller: 'Tchess\Controller\GameController::stopAction', _format: 'json' }
     methods:  [POST]
 
 restart_game:
     path:     /restart-game
-    defaults: { _controller: 'controller.game:restartAction', _format: 'json' }
+    defaults: { _controller: 'Tchess\Controller\GameController::restartAction', _format: 'json' }
     methods:  [POST]
 
 piece_move:
     path:     /piece-move
-    defaults: { _controller: 'controller.game:moveAction', _format: 'json' }
+    defaults: { _controller: 'Tchess\Controller\GameController::moveAction', _format: 'json' }
     methods:  [POST]

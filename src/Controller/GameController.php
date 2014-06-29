@@ -5,16 +5,10 @@ namespace Tchess\Controller;
 //use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\DependencyInjection\ContainerAware;
 
-class GameController
+class GameController extends ContainerAware
 {
-
-    private $framework;
-
-    public function __construct(HttpKernelInterface $framework)
-    {
-        $this->framework = $framework;
-    }
 
     /**
      * Start game.
@@ -63,15 +57,15 @@ class GameController
         if ($session->get('started')) {
             $stop_sub_request = Request::create('/stop-game');
             $stop_sub_request->setSession($session);
-            $this->framework->handle($stop_sub_request, HttpKernelInterface::SUB_REQUEST);
+            $this->container->get('framework')->handle($stop_sub_request, HttpKernelInterface::SUB_REQUEST);
 
             $start_sub_request = Request::create('/start-game');
             $start_sub_request->setSession($session);
-            $this->framework->handle($start_sub_request, HttpKernelInterface::SUB_REQUEST);
+            $this->container->get('framework')->handle($start_sub_request, HttpKernelInterface::SUB_REQUEST);
         } else {
             $sub_request = Request::create('/start-game');
             $sub_request->setSession($session);
-            $this->framework->handle($sub_request, HttpKernelInterface::SUB_REQUEST);
+            $this->container->get('framework')->handle($sub_request, HttpKernelInterface::SUB_REQUEST);
         }
 
         if ($session->get('started')) {

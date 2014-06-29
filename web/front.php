@@ -3,17 +3,18 @@
 require_once __DIR__ . '/../vendor/autoload.php';
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 $sc = include __DIR__ . '/../src/container.php';
 
 $request = Request::createFromGlobals();
 
 // Prepare session.
-//if (!$request->getSession()) {
-//    $session = new Session();
-//    $session->start();
-//    $request->setSession($session);
-//}
+if (!$request->getSession()) {
+    $session = new Session();
+    $session->start();
+    $request->setSession($session);
+}
 
 $sc->get('context')->fromRequest($request);
 

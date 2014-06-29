@@ -36,8 +36,8 @@ class GameControllerTest extends PHPUnit_Framework_TestCase
         $response = $this->sc->get('framework')->handle($request);
 
         $content = json_decode($response->getContent());
-        $this->assertEquals(500, $content->code);
-        $this->assertEquals('Game already started', $content->message);
+        $this->assertEquals(1, $content->code);
+        $this->assertEquals('Something went wrong! (Game already started, try to stop game first.)', $content->message);
     }
 
     /**
@@ -50,9 +50,7 @@ class GameControllerTest extends PHPUnit_Framework_TestCase
 
         $response = $this->sc->get('framework')->handle($request);
 
-        $content = json_decode($response->getContent());
-        $this->assertEquals(200, $content->code);
-        $this->assertEquals('Game started', $content->message);
+        $this->assertEquals('Game started', $response->getContent());
     }
 
     /**
@@ -66,8 +64,8 @@ class GameControllerTest extends PHPUnit_Framework_TestCase
         $response = $this->sc->get('framework')->handle($request);
 
         $content = json_decode($response->getContent());
-        $this->assertEquals(500, $content->code);
-        $this->assertEquals('Game is not started', $content->message);
+        $this->assertEquals(2, $content->code);
+        $this->assertEquals('Something went wrong! (Game is not started, try to start game first.)', $content->message);
     }
 
     /**
@@ -80,9 +78,7 @@ class GameControllerTest extends PHPUnit_Framework_TestCase
 
         $response = $this->sc->get('framework')->handle($request);
 
-        $content = json_decode($response->getContent());
-        $this->assertEquals(200, $content->code);
-        $this->assertEquals('Game stopped', $content->message);
+        $this->assertEquals('Game stopped', $response->getContent());
     }
 
     /**
@@ -95,9 +91,7 @@ class GameControllerTest extends PHPUnit_Framework_TestCase
 
         $response = $this->sc->get('framework')->handle($request);
 
-        $content = json_decode($response->getContent());
-        $this->assertEquals(200, $content->code);
-        $this->assertEquals('Game re-started', $content->message);
+        $this->assertEquals('Game re-started', $response->getContent());
     }
 
     /**
@@ -110,9 +104,7 @@ class GameControllerTest extends PHPUnit_Framework_TestCase
 
         $response = $this->sc->get('framework')->handle($request);
 
-        $content = json_decode($response->getContent());
-        $this->assertEquals(200, $content->code);
-        $this->assertEquals('Game re-started', $content->message);
+        $this->assertEquals('Game re-started', $response->getContent());
     }
 
 }
