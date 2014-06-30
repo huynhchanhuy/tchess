@@ -12,6 +12,7 @@ class GameControllerTest extends PHPUnit_Framework_TestCase
 
     public function setUp()
     {
+        $env = 'test';
         $this->sc = include __DIR__ . '/../src/container.php';
     }
 
