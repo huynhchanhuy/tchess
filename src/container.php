@@ -24,10 +24,13 @@ $db_parameters = $sc->get('yaml_parser')->parse(file_get_contents(__DIR__ . "/..
 $db_parameters['parameters']['path'] = str_replace('%root_dir%', $sc->getParameter('root_dir'), $db_parameters['parameters']['path']);
 $sc->setParameter('db_parameters', $db_parameters['parameters']);
 
+$sc->register('array_cache', 'Doctrine\Common\Cache\ArrayCache');
+
 $sc->register('entity_config')
         ->setFactoryClass('Doctrine\ORM\Tools\Setup')
         ->setFactoryMethod('createConfiguration')
-        ->addMethodCall('setMetadataDriverImpl', array(new Reference('annotation_driver')));
+        ->addMethodCall('setMetadataDriverImpl', array(new Reference('annotation_driver')))
+        ->addMethodCall('setMetadataCacheImpl', array(new Reference('array_cache')));
 
 $sc->register('annotation_reader', 'Doctrine\Common\Annotations\AnnotationReader');
 

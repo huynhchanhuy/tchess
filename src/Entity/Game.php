@@ -5,7 +5,7 @@ namespace Tchess\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="Tchess\EntityRepository\GameRepository")
  * @ORM\Table(name="game")
  */
 class Game
@@ -27,4 +27,61 @@ class Game
      * @ORM\Column(type="text")
      */
     protected $state;
+
+
+    /**
+     * Get id
+     *
+     * @return integer
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * Set state
+     *
+     * @param string $state
+     * @return Game
+     */
+    public function setState($state)
+    {
+        $this->state = $state;
+
+        return $this;
+    }
+
+    /**
+     * Get state
+     *
+     * @return string
+     */
+    public function getState()
+    {
+        return $this->state;
+    }
+
+    /**
+     * Set room
+     *
+     * @param \Tchess\Entity\Room $room
+     * @return Game
+     */
+    public function setRoom(\Tchess\Entity\Room $room = null)
+    {
+        $this->room = $room;
+
+        return $this;
+    }
+
+    /**
+     * Get room
+     *
+     * @return \Tchess\Entity\Room
+     */
+    public function getRoom()
+    {
+        return $this->room;
+    }
 }

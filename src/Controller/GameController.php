@@ -70,10 +70,31 @@ class GameController extends ContainerAware
 
         if ($session->get('started')) {
             return 'Game re-started';
-        }
-        else {
+        } else {
             return 'There is unknown error while re-starting game';
         }
+    }
+
+    /**
+     * Join game.
+     *
+     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @return string
+     */
+    public function joinAction(Request $request)
+    {
+        $session = $request->getSession();
+        $sid = $session->getId();
+
+        $room = $this->container->get('entity_manager')->getRepository('Tchess\Entity\Room')
+                ->findOpenRoom($sid);
+
+        if (empty($room)) {
+            $room = $this->container->get('entity_manager')->getRepository('Tchess\Entity\Room')
+                    ->createRoom($sid);
+        }
+
+        return 'User has join room with id: ' . $room->getId();
     }
 
 }
