@@ -21,12 +21,22 @@ class GameController extends ContainerAware
      */
     public function startAction(Request $request)
     {
+        $em = $this->container->get('entity_manager');
         $session = $request->getSession();
-        if ($session->get('started')) {
-            throw new \LogicException('Game already started, try to stop game first.', 1);
+        $sid = $session->getId();
+
+        $player = $em->getRepository('Tchess\Entity\Player')->findOneBy(array('sid' => $sid));
+
+        if (!empty($player) && $player->getStarted()) {
+            throw new \LogicException('Game has been already started.', 1);
         }
 
-        $session->set('started', true);
+        if (empty($player)) {
+            throw new \LogicException('Player did not join a room.', 3);
+        }
+
+        $player->setStarted(true);
+        $em->flush();
         return 'Game started';
     }
 
