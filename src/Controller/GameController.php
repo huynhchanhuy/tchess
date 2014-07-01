@@ -75,9 +75,17 @@ class GameController extends ContainerAware
      */
     public function restartAction(Request $request)
     {
+        $em = $this->container->get('entity_manager');
         $session = $request->getSession();
+        $sid = $session->getId();
 
-        if ($session->get('started')) {
+        $player = $em->getRepository('Tchess\Entity\Player')->findOneBy(array('sid' => $sid));
+
+        if (empty($player)) {
+            throw new \LogicException('Player did not join a room.', 3);
+        }
+
+        if ($player->getStarted()) {
             $stop_sub_request = Request::create('/stop-game');
             $stop_sub_request->setSession($session);
             $this->container->get('framework')->handle($stop_sub_request, HttpKernelInterface::SUB_REQUEST);
@@ -91,7 +99,8 @@ class GameController extends ContainerAware
             $this->container->get('framework')->handle($sub_request, HttpKernelInterface::SUB_REQUEST);
         }
 
-        if ($session->get('started')) {
+        $player = $em->getRepository('Tchess\Entity\Player')->findOneBy(array('sid' => $sid));
+        if ($player->getStarted()) {
             return 'Game re-started';
         } else {
             return 'There is unknown error while re-starting game';
