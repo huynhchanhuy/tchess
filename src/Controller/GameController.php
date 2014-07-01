@@ -27,12 +27,12 @@ class GameController extends ContainerAware
 
         $player = $em->getRepository('Tchess\Entity\Player')->findOneBy(array('sid' => $sid));
 
-        if (!empty($player) && $player->getStarted()) {
-            throw new \LogicException('Game has been already started.', 1);
-        }
-
         if (empty($player)) {
             throw new \LogicException('Player did not join a room.', 3);
+        }
+
+        if ($player->getStarted()) {
+            throw new \LogicException('Game has been already started.', 1);
         }
 
         $player->setStarted(true);
@@ -44,16 +44,26 @@ class GameController extends ContainerAware
      * Stop game.
      *
      * @param \Symfony\Component\HttpFoundation\Request $request
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return string
      */
     public function stopAction(Request $request)
     {
+        $em = $this->container->get('entity_manager');
         $session = $request->getSession();
-        if (!$session->get('started')) {
-            throw new \LogicException('Game is not started, try to start game first.', 2);
+        $sid = $session->getId();
+
+        $player = $em->getRepository('Tchess\Entity\Player')->findOneBy(array('sid' => $sid));
+
+        if (empty($player)) {
+            throw new \LogicException('Player did not join a room.', 3);
         }
 
-        $session->set('started', false);
+        if (!$player->getStarted()) {
+            throw new \LogicException('Game is not started.', 1);
+        }
+
+        $player->setStarted(false);
+        $em->flush();
         return 'Game stopped';
     }
 
