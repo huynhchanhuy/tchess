@@ -18,20 +18,22 @@ class Room
     protected $id;
 
     /**
-     * @ORM\Column(type="string", nullable=true)
+     * @ORM\OneToMany(targetEntity="Player", mappedBy="room")
      */
-    protected $white;
-
-    /**
-     * @ORM\Column(type="string", nullable=true)
-     */
-    protected $black;
+    protected $players;
 
     /**
      * @ORM\OneToOne(targetEntity="Game")
      */
     protected $game;
 
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->players = new \Doctrine\Common\Collections\ArrayCollection();
+    }
 
     /**
      * Get id
@@ -44,49 +46,36 @@ class Room
     }
 
     /**
-     * Set white
+     * Add players
      *
-     * @param string $white
+     * @param \Tchess\Entity\Player $players
      * @return Room
      */
-    public function setWhite($white)
+    public function addPlayer(\Tchess\Entity\Player $players)
     {
-        $this->white = $white;
+        $this->players[] = $players;
 
         return $this;
     }
 
     /**
-     * Get white
+     * Remove players
      *
-     * @return string
+     * @param \Tchess\Entity\Player $players
      */
-    public function getWhite()
+    public function removePlayer(\Tchess\Entity\Player $players)
     {
-        return $this->white;
+        $this->players->removeElement($players);
     }
 
     /**
-     * Set black
+     * Get players
      *
-     * @param string $black
-     * @return Room
+     * @return \Doctrine\Common\Collections\Collection
      */
-    public function setBlack($black)
+    public function getPlayers()
     {
-        $this->black = $black;
-
-        return $this;
-    }
-
-    /**
-     * Get black
-     *
-     * @return string
-     */
-    public function getBlack()
-    {
-        return $this->black;
+        return $this->players;
     }
 
     /**

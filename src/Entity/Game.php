@@ -28,6 +28,11 @@ class Game
      */
     protected $state;
 
+    /**
+     * @ORM\Column(type="string")
+     */
+    protected $currentTurn;
+
 
     /**
      * Get id
@@ -60,6 +65,29 @@ class Game
     public function getState()
     {
         return $this->state;
+    }
+
+    /**
+     * Set currentTurn
+     *
+     * @param string $currentTurn
+     * @return Game
+     */
+    public function setCurrentTurn($currentTurn)
+    {
+        $this->currentTurn = $currentTurn;
+
+        return $this;
+    }
+
+    /**
+     * Get currentTurn
+     *
+     * @return string
+     */
+    public function getCurrentTurn()
+    {
+        return $this->currentTurn;
     }
 
     /**

@@ -7,6 +7,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\DependencyInjection\ContainerAware;
 
+use Tchess\Entity\Player;
+use Tchess\Entity\Room;
+
 class GameController extends ContainerAware
 {
 
@@ -83,16 +86,41 @@ class GameController extends ContainerAware
      */
     public function joinAction(Request $request)
     {
+        $em = $this->container->get('entity_manager');
         $session = $request->getSession();
         $sid = $session->getId();
 
-        $room = $this->container->get('entity_manager')->getRepository('Tchess\Entity\Room')
-                ->findOpenRoom($sid);
+        $player = $em->getRepository('Tchess\Entity\Player')->findOneBy(array('sid' => $sid));
+
+        if (!empty($player) && !empty($player->getRoom())) {
+            return 'Player has join a room.';
+        }
+
+        if (empty($player)) {
+            $player = new Player();
+            $player->setSid($sid);
+            $player->setStarted(false);
+            // Default color for all player, will be updated later.
+            $player->setColor('white');
+            $em->persist($player);
+        }
+
+        $room = $em->getRepository('Tchess\Entity\Room')
+                ->findOpenRoom();
 
         if (empty($room)) {
-            $room = $this->container->get('entity_manager')->getRepository('Tchess\Entity\Room')
-                    ->createRoom($sid);
+            $room = new Room();
+            $room->addPlayer($player);
+            $em->persist($room);
         }
+        else {
+            $players = $room->getPlayers();
+            if (count($players) == 1 && $players[0]->getColor() == 'white' && $players[0]->getSid() != $player->getSid()) {
+                $player->setColor('black');
+                $room->addPlayer($player);
+            }
+        }
+        $em->flush();
 
         return 'User has join room with id: ' . $room->getId();
     }
