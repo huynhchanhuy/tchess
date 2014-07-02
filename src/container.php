@@ -61,9 +61,8 @@ $sc->register('listener.exception', 'Symfony\Component\HttpKernel\EventListener\
         ->setArguments(array('Tchess\\Controller\\ErrorController::exceptionAction'))
 ;
 $sc->register('listener.response.string', 'Tchess\EventListener\StringResponseListener');
-$sc->register('listener.controller', 'Tchess\EventListener\ControllerListener')
-        ->setArguments(array(new Reference('matcher')))
-;
+$sc->register('listener.controller', 'Tchess\EventListener\ControllerListener');
+$sc->register('listener.game', 'Tchess\EventListener\GameListener');
 
 $sc->register('dispatcher', 'Symfony\Component\EventDispatcher\EventDispatcher')
         ->addMethodCall('addSubscriber', array(new Reference('listener.router')))
@@ -71,6 +70,7 @@ $sc->register('dispatcher', 'Symfony\Component\EventDispatcher\EventDispatcher')
         ->addMethodCall('addSubscriber', array(new Reference('listener.exception')))
         ->addMethodCall('addSubscriber', array(new Reference('listener.response.string')))
         ->addMethodCall('addSubscriber', array(new Reference('listener.controller')))
+        ->addMethodCall('addSubscriber', array(new Reference('listener.game')))
 ;
 $sc->register('framework', 'Tchess\Framework')
         ->setArguments(array(new Reference('dispatcher'), new Reference('resolver')))

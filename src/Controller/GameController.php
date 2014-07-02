@@ -9,6 +9,8 @@ use Symfony\Component\DependencyInjection\ContainerAware;
 
 use Tchess\Entity\Player;
 use Tchess\Entity\Room;
+use Tchess\GameEvents;
+use Tchess\Event\GameEvent;
 
 class GameController extends ContainerAware
 {
@@ -37,6 +39,8 @@ class GameController extends ContainerAware
 
         $player->setStarted(true);
         $em->flush();
+
+        $this->container->get('dispatcher')->dispatch(GameEvents::START, new GameEvent($player, $em));
         return 'Game started';
     }
 
@@ -64,6 +68,8 @@ class GameController extends ContainerAware
 
         $player->setStarted(false);
         $em->flush();
+
+        $this->container->get('dispatcher')->dispatch(GameEvents::STOP, new GameEvent($player, $em));
         return 'Game stopped';
     }
 
@@ -101,6 +107,8 @@ class GameController extends ContainerAware
 
         $player = $em->getRepository('Tchess\Entity\Player')->findOneBy(array('sid' => $sid));
         if ($player->getStarted()) {
+
+            $this->container->get('dispatcher')->dispatch(GameEvents::RESTART, new GameEvent($player, $em));
             return 'Game re-started';
         } else {
             return 'There is unknown error while re-starting game';
