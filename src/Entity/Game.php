@@ -24,15 +24,26 @@ class Game
     protected $room;
 
     /**
+     * @ORM\Column(type="string")
+     */
+    protected $turn;
+
+    /**
      * @ORM\Column(type="text")
+     *
+     * Serialization of board.
      */
     protected $state;
 
     /**
-     * @ORM\Column(type="string")
+     * Tchess\Entity\Board
      */
-    protected $currentTurn;
+    protected $board;
 
+    public function __construct()
+    {
+        $this->board = new Board();
+    }
 
     /**
      * Get id
@@ -68,14 +79,14 @@ class Game
     }
 
     /**
-     * Set currentTurn
+     * Set turn
      *
-     * @param string $currentTurn
+     * @param string $turn
      * @return Game
      */
-    public function setCurrentTurn($currentTurn)
+    public function setTurn($turn)
     {
-        $this->currentTurn = $currentTurn;
+        $this->turn = $turn;
 
         return $this;
     }
@@ -85,9 +96,9 @@ class Game
      *
      * @return string
      */
-    public function getCurrentTurn()
+    public function getTurn()
     {
-        return $this->currentTurn;
+        return $this->turn;
     }
 
     /**

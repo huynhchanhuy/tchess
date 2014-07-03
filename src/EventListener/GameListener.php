@@ -3,6 +3,7 @@
 namespace Tchess\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Doctrine\ORM\EntityManagerInterface
 
 use Tchess\GameEvents;
 use Tchess\Event\GameEvent;
@@ -10,6 +11,13 @@ use Tchess\Entity\Game;
 
 class GameListener implements EventSubscriberInterface
 {
+
+    private $em;
+
+    public function __construct(EntityManagerInterface $em)
+    {
+        $this->em = $em;
+    }
 
     public function onGameStart(GameEvent $event)
     {
@@ -22,10 +30,9 @@ class GameListener implements EventSubscriberInterface
 
         if ($players[0]->getStarted() && $players[1]->getStarted()) {
             $game = new Game();
-            $game->setCurrentTurn('white');
+            $game->setTurn('white');
             $game->setRoom($room);
-            // @todo - Need update init board state here.
-            $game->setState('');
+            $em->flush();
         }
     }
 

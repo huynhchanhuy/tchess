@@ -62,7 +62,8 @@ $sc->register('listener.exception', 'Symfony\Component\HttpKernel\EventListener\
 ;
 $sc->register('listener.response.string', 'Tchess\EventListener\StringResponseListener');
 $sc->register('listener.controller', 'Tchess\EventListener\ControllerListener');
-$sc->register('listener.game', 'Tchess\EventListener\GameListener');
+$sc->register('listener.game', 'Tchess\EventListener\GameListener')
+        ->setArguments(array(new Reference('entity_manager')));
 
 $sc->register('dispatcher', 'Symfony\Component\EventDispatcher\EventDispatcher')
         ->addMethodCall('addSubscriber', array(new Reference('listener.router')))
