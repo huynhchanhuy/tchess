@@ -64,6 +64,18 @@ $sc->register('listener.response.string', 'Tchess\EventListener\StringResponseLi
 $sc->register('listener.controller', 'Tchess\EventListener\ControllerListener');
 $sc->register('listener.game', 'Tchess\EventListener\GameListener')
         ->setArguments(array(new Reference('entity_manager')));
+$sc->register('rules.basic', 'Tchess\Rule\BasicRules')
+        ->setArguments(array(new Reference('entity_manager')));
+$sc->register('rules.pawn', 'Tchess\Rule\PawnRules')
+        ->setArguments(array(new Reference('entity_manager')));
+$sc->register('rules.bishop', 'Tchess\Rule\BishopRules')
+        ->setArguments(array(new Reference('entity_manager')));
+$sc->register('rules.king', 'Tchess\Rule\KingRules')
+        ->setArguments(array(new Reference('entity_manager')));
+$sc->register('rules.knight', 'Tchess\Rule\KnightRules')
+        ->setArguments(array(new Reference('entity_manager')));
+$sc->register('rules.rook', 'Tchess\Rule\RookRules')
+        ->setArguments(array(new Reference('entity_manager')));
 
 $sc->register('dispatcher', 'Symfony\Component\EventDispatcher\EventDispatcher')
         ->addMethodCall('addSubscriber', array(new Reference('listener.router')))
@@ -72,6 +84,12 @@ $sc->register('dispatcher', 'Symfony\Component\EventDispatcher\EventDispatcher')
         ->addMethodCall('addSubscriber', array(new Reference('listener.response.string')))
         ->addMethodCall('addSubscriber', array(new Reference('listener.controller')))
         ->addMethodCall('addSubscriber', array(new Reference('listener.game')))
+        ->addMethodCall('addSubscriber', array(new Reference('rules.basic')))
+        ->addMethodCall('addSubscriber', array(new Reference('rules.pawn')))
+        ->addMethodCall('addSubscriber', array(new Reference('rules.bishop')))
+        ->addMethodCall('addSubscriber', array(new Reference('rules.king')))
+        ->addMethodCall('addSubscriber', array(new Reference('rules.knight')))
+        ->addMethodCall('addSubscriber', array(new Reference('rules.rook')))
 ;
 $sc->register('framework', 'Tchess\Framework')
         ->setArguments(array(new Reference('dispatcher'), new Reference('resolver')))

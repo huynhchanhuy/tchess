@@ -8,6 +8,7 @@ use Symfony\Component\EventDispatcher\Event;
 
 class GameEvent extends Event
 {
+
     private $player;
     private $em;
 
@@ -36,4 +37,5 @@ class GameEvent extends Event
     {
         $this->em = $em;
     }
+
 }

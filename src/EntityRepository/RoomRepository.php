@@ -17,14 +17,14 @@ class RoomRepository extends EntityRepository
 //                        ->setMaxResults(1)
 //                        ->getSingleResult();
         return $this->getEntityManager()->createQueryBuilder()
-                ->select('r')
-                ->from("Tchess\Entity\Room", 'r')
-                ->leftJoin('r.players', 'p')
-                ->addGroupBy('r.id')
-                ->having('COUNT(DISTINCT p.id) < 2')
-                ->setMaxResults(1)
-                ->getQuery()
-                ->getSingleResult();
+                        ->select('r')
+                        ->from("Tchess\Entity\Room", 'r')
+                        ->leftJoin('r.players', 'p')
+                        ->addGroupBy('r.id')
+                        ->having('COUNT(DISTINCT p.id) < 2')
+                        ->setMaxResults(1)
+                        ->getQuery()
+                        ->getSingleResult();
     }
 
 }

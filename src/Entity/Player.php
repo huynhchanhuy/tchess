@@ -10,6 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Player
 {
+
     /**
      * @ORM\Column(type="integer")
      * @ORM\Id
@@ -37,7 +38,6 @@ class Player
      * @ORM\Column(type="boolean")
      */
     protected $started;
-
 
     /**
      * Get id

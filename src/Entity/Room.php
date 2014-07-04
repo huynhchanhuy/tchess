@@ -10,6 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Room
 {
+
     /**
      * @ORM\Column(type="integer")
      * @ORM\Id
@@ -100,4 +101,5 @@ class Room
     {
         return $this->game;
     }
+
 }

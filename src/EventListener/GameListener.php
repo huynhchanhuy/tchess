@@ -3,8 +3,7 @@
 namespace Tchess\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Doctrine\ORM\EntityManagerInterface
-
+use Doctrine\ORM\EntityManagerInterface;
 use Tchess\GameEvents;
 use Tchess\Event\GameEvent;
 use Tchess\Entity\Game;
@@ -32,7 +31,8 @@ class GameListener implements EventSubscriberInterface
             $game = new Game();
             $game->setTurn('white');
             $game->setRoom($room);
-            $em->flush();
+            $game->setStarted(true);
+            $this->em->flush();
         }
     }
 

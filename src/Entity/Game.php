@@ -10,6 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Game
 {
+
     /**
      * @ORM\Column(type="integer")
      * @ORM\Id
@@ -39,6 +40,11 @@ class Game
      * Tchess\Entity\Board
      */
     protected $board;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    protected $started;
 
     public function __construct()
     {
@@ -123,4 +129,51 @@ class Game
     {
         return $this->room;
     }
+
+    /**
+     * Set board
+     *
+     * @param \Tchess\Entity\Board $board
+     * @return Game
+     */
+    public function setBoard(Board $board = null)
+    {
+        $this->board = $board;
+
+        return $this;
+    }
+
+    /**
+     * Get board
+     *
+     * @return \Tchess\Entity\Board
+     */
+    public function getBoard()
+    {
+        return $this->board;
+    }
+
+    /**
+     * Set started
+     *
+     * @param boolean $started
+     * @return Player
+     */
+    public function setStarted($started)
+    {
+        $this->started = $started;
+
+        return $this;
+    }
+
+    /**
+     * Get started
+     *
+     * @return boolean
+     */
+    public function getStarted()
+    {
+        return $this->started;
+    }
+
 }

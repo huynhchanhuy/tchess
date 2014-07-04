@@ -6,11 +6,13 @@ namespace Tchess\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\DependencyInjection\ContainerAware;
-
 use Tchess\Entity\Player;
 use Tchess\Entity\Room;
 use Tchess\GameEvents;
 use Tchess\Event\GameEvent;
+use Tchess\MoveEvents;
+use Tchess\Event\MoveEvent;
+use Tchess\Entity\Piece\Move;
 
 class GameController extends ContainerAware
 {
@@ -29,7 +31,7 @@ class GameController extends ContainerAware
 
         $player = $em->getRepository('Tchess\Entity\Player')->findOneBy(array('sid' => $sid));
 
-        if (empty($player)) {
+        if (empty($player) || !$player instanceof Player) {
             throw new \LogicException('Player did not join a room.', 3);
         }
 
@@ -58,7 +60,7 @@ class GameController extends ContainerAware
 
         $player = $em->getRepository('Tchess\Entity\Player')->findOneBy(array('sid' => $sid));
 
-        if (empty($player)) {
+        if (empty($player) || !$player instanceof Player) {
             throw new \LogicException('Player did not join a room.', 3);
         }
 
@@ -87,7 +89,7 @@ class GameController extends ContainerAware
 
         $player = $em->getRepository('Tchess\Entity\Player')->findOneBy(array('sid' => $sid));
 
-        if (empty($player)) {
+        if (empty($player) || !$player instanceof Player) {
             throw new \LogicException('Player did not join a room.', 3);
         }
 
@@ -129,8 +131,8 @@ class GameController extends ContainerAware
 
         $player = $em->getRepository('Tchess\Entity\Player')->findOneBy(array('sid' => $sid));
 
-        if (!empty($player) && !empty($player->getRoom())) {
-            return 'Player has join a room.';
+        if (!empty($player) && $player instanceof Player && !empty($player->getRoom())) {
+            throw new \LogicException('Player has already joined a room.', 3);
         }
 
         if (empty($player)) {
@@ -149,8 +151,7 @@ class GameController extends ContainerAware
             $room = new Room();
             $room->addPlayer($player);
             $em->persist($room);
-        }
-        else {
+        } else {
             $players = $room->getPlayers();
             if (count($players) == 1 && $players[0]->getColor() == 'white' && $players[0]->getSid() != $player->getSid()) {
                 $player->setColor('black');
@@ -160,6 +161,57 @@ class GameController extends ContainerAware
         $em->flush();
 
         return 'User has join room with id: ' . $room->getId();
+    }
+
+    /**
+     * Move a piece.
+     *
+     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @return string
+     */
+    public function moveAction(Request $request)
+    {
+        $em = $this->container->get('entity_manager');
+        $session = $request->getSession();
+        $sid = $session->getId();
+
+        $player = $em->getRepository('Tchess\Entity\Player')->findOneBy(array('sid' => $sid));
+
+        if (empty($player) || ($player instanceof Player && empty($player->getRoom()))) {
+            throw new \LogicException('Player did not join a room', 3);
+        }
+
+        $game = $player->getRoom()->getGame();
+
+        if (empty($game) || ($game instanceof Game && !$game->getStarted())) {
+            throw new \LogicException('Opponent Player did not started', 4);
+        } else {
+            $move = new Move($request->request->get('move'));
+            $color = $request->request->get('color');
+            if (!in_array($color, array('white', 'black'))) {
+                throw new \InvalidArgumentException('Color is invalid. It must be "white" or "black".');
+            }
+            if (!$this->isValidMove($game, $move, $color)) {
+                throw new \LogicException('Your move is not valid', 4);
+            } else {
+                $this->performMove($game, $move);
+            }
+        }
+
+        return 'Move has been performed. Waiting for you opponent.';
+    }
+
+    /**
+     * Get started
+     *
+     * @return boolean
+     */
+    public function isValidMove(Game $game, $move, $color)
+    {
+        $dispatcher = $this->container->get('dispatcher');
+        $event = new MoveEvent($game, $move, $color);
+        $dispatcher->dispatch(MoveEvents::CHECH_MOVE, $event);
+        return $event->isValidMove();
     }
 
 }

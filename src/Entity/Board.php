@@ -12,21 +12,31 @@ class Board
         $this->initialize();
     }
 
+    /**
+     * Get piece
+     *
+     * @return \Tchess\Entity\Piece|null
+     */
+    public function getPiece($row, $column)
+    {
+        return $this->pieces[$row][$column];
+    }
+
     public function initialize()
     {
-        for($x = 0; $x < 8; $x++) {
-            for($y = 0; $y < 8; $y++) {
-                $this->pieces[$y][$x] = null;
+        for ($x = 0; $x < 8; $x++) {
+            for ($y = 0; $y < 8; $y++) {
+                $this->pieces[$x][$y] = null;
             }
         }
 
         // White pawns
-        for($x = 0; $x < 8; $x++) {
+        for ($x = 0; $x < 8; $x++) {
             $this->pieces[1][$x] = new Pawn("white");
         }
 
         // Black pawns
-        for($x = 0; $x < 8; $x++){
+        for ($x = 0; $x < 8; $x++) {
             $this->pieces[6][x] = new Pawn("black");
         }
 
@@ -55,43 +65,6 @@ class Board
         //Kings
         $this->pieces[0][4] = new King("white");
         $this->pieces[7][4] = new King("black");
-    }
-
-    /**
-     * Parses the user's string input for a move
-     * @param string move
-     * @return An int array of size 4 with the initial x, y positions and the final x, y positions in that order
-     */
-    public function parseInput($move) {
-        $returnArray = array();
-
-        $split = explode(' ', $move);
-        $returnArray[1] = $this->charToInt(strtolower($split[0][0])); // Initial x.
-        $returnArray[0] = (int) ($split[0][1]) - 1; // Initial y.
-
-        $returnArray[3] = $this->charToInt(strtolower($split[1][0])); // Final x.
-        $returnArray[2] = (int) ($split[1][1]) - 1; // Final y.
-        return $returnArray;
-
-    }
-
-    /**
-     * Returns an integer corresponding to the user input
-     */
-    public function charToInt($ch) {
-        switch($ch) {
-            case 'a': return 0;
-            case 'b': return 1;
-            case 'c': return 2;
-            case 'd': return 3;
-            case 'e': return 4;
-            case 'f': return 5;
-            case 'g': return 6;
-            case 'h': return 7;
-            default:
-                throw new InvalidArgumentException('Invalid column letter. It must be one of these letter (a, b, c, d, e, f, g ,h).');
-                break;
-        }
     }
 
 }
