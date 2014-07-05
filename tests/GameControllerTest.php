@@ -87,10 +87,11 @@ class GameControllerTest extends TchessTestBase
      */
     public function testRestartGameThatHasNotStarted()
     {
-        $request = $this->getRequest('/restart-game', 'POST');
-        $request->getSession()->set('started', false);
+        $request = $this->getRequest('/join-game', 'POST');
+        parent::$sc->get('framework')->handle($request);
 
-        $response = $this->sc->get('framework')->handle($request);
+        $request = $this->getRequest('/restart-game', 'POST', array(), $request->getSession());
+        $response = parent::$sc->get('framework')->handle($request);
 
         $this->assertEquals('Game re-started', $response->getContent());
     }
@@ -100,10 +101,14 @@ class GameControllerTest extends TchessTestBase
      */
     public function testRestartGameThatHasStarted()
     {
-        $request = $this->getRequest('/restart-game', 'POST');
-        $request->getSession()->set('started', true);
+        $request = $this->getRequest('/join-game', 'POST');
+        parent::$sc->get('framework')->handle($request);
 
-        $response = $this->sc->get('framework')->handle($request);
+        $request = $this->getRequest('/start-game', 'POST', array(), $request->getSession());
+        parent::$sc->get('framework')->handle($request);
+
+        $request = $this->getRequest('/restart-game', 'POST', array(), $request->getSession());
+        $response = parent::$sc->get('framework')->handle($request);
 
         $this->assertEquals('Game re-started', $response->getContent());
     }
