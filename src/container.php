@@ -64,18 +64,14 @@ $sc->register('listener.response.string', 'Tchess\EventListener\StringResponseLi
 $sc->register('listener.controller', 'Tchess\EventListener\ControllerListener');
 $sc->register('listener.game', 'Tchess\EventListener\GameListener')
         ->setArguments(array(new Reference('entity_manager')));
-$sc->register('rules.basic', 'Tchess\Rule\BasicRules')
-        ->setArguments(array(new Reference('entity_manager')));
-$sc->register('rules.pawn', 'Tchess\Rule\PawnRules')
-        ->setArguments(array(new Reference('entity_manager')));
-$sc->register('rules.bishop', 'Tchess\Rule\BishopRules')
-        ->setArguments(array(new Reference('entity_manager')));
-$sc->register('rules.king', 'Tchess\Rule\KingRules')
-        ->setArguments(array(new Reference('entity_manager')));
-$sc->register('rules.knight', 'Tchess\Rule\KnightRules')
-        ->setArguments(array(new Reference('entity_manager')));
-$sc->register('rules.rook', 'Tchess\Rule\RookRules')
-        ->setArguments(array(new Reference('entity_manager')));
+$sc->register('rules.basic', 'Tchess\Rule\BasicRules');
+$sc->register('rules.pawn', 'Tchess\Rule\PawnRules');
+$sc->register('rules.bishop', 'Tchess\Rule\BishopRules');
+$sc->register('rules.king', 'Tchess\Rule\KingRules');
+$sc->register('rules.knight', 'Tchess\Rule\KnightRules');
+$sc->register('rules.rook', 'Tchess\Rule\RookRules');
+$sc->register('rules.in_check', 'Tchess\Rule\InCheckRules')
+        ->setArguments(array(new Reference('dispatcher')));
 
 $sc->register('dispatcher', 'Symfony\Component\EventDispatcher\EventDispatcher')
         ->addMethodCall('addSubscriber', array(new Reference('listener.router')))

@@ -10,20 +10,12 @@ use Tchess\Entity\Piece\Pawn;
 
 class PawnRules implements EventSubscriberInterface
 {
-
-    private $em;
-
-    public function __construct(EntityManagerInterface $em)
-    {
-        $this->em = $em;
-    }
-
     public function onMoveChecking(MoveEvent $event)
     {
-        $board = &$event->getGame()->getBoard();
+        $board = $event->getGame()->getBoard();
         $move = $event->getMove();
         $color = $event->getColor();
-        $piece = &$board->getPiece($move->getCurrentRow(), $move->getCurrentColumn());
+        $piece = $board->getPiece($move->getCurrentRow(), $move->getCurrentColumn());
         if (!$piece instanceof Pawn) {
             return;
         }

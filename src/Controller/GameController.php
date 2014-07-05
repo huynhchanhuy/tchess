@@ -13,6 +13,7 @@ use Tchess\Event\GameEvent;
 use Tchess\MoveEvents;
 use Tchess\Event\MoveEvent;
 use Tchess\Entity\Piece\Move;
+use Tchess\Entity\Board;
 
 class GameController extends ContainerAware
 {
@@ -191,10 +192,10 @@ class GameController extends ContainerAware
             if (!in_array($color, array('white', 'black'))) {
                 throw new \InvalidArgumentException('Color is invalid. It must be "white" or "black".');
             }
-            if (!$this->isValidMove($game, $move, $color)) {
+            if (!$this->isValidMove($game->getBoard(), $move, $color)) {
                 throw new \LogicException('Your move is not valid', 4);
             } else {
-                $this->performMove($game, $move);
+                $this->performMove($game->getBoard(), $move, $color);
             }
         }
 
@@ -202,16 +203,26 @@ class GameController extends ContainerAware
     }
 
     /**
-     * Get started
+     * Check for valid move.
      *
      * @return boolean
      */
-    public function isValidMove(Game $game, $move, $color)
+    public function isValidMove(Board $board, $move, $color)
     {
         $dispatcher = $this->container->get('dispatcher');
-        $event = new MoveEvent($game, $move, $color);
+        $event = new MoveEvent($board, $move, $color);
         $dispatcher->dispatch(MoveEvents::CHECH_MOVE, $event);
         return $event->isValidMove();
+    }
+
+    /**
+     * Actually move.
+     */
+    public function performMove(Board $board, $move, $color)
+    {
+        $dispatcher = $this->container->get('dispatcher');
+        $event = new MoveEvent($board, $move, $color);
+        $dispatcher->dispatch(MoveEvents::MOVE, $event);
     }
 
 }

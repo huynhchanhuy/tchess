@@ -1,6 +1,7 @@
 <?php
 
 namespace Tchess\Entity;
+use Tchess\Entity\Piece\Move;
 
 class Board
 {
@@ -13,7 +14,7 @@ class Board
     }
 
     /**
-     * Get piece
+     * Get piece.
      *
      * @return \Tchess\Entity\Piece|null
      */
@@ -65,6 +66,18 @@ class Board
         //Kings
         $this->pieces[0][4] = new King("white");
         $this->pieces[7][4] = new King("black");
+    }
+
+    /**
+     * Move a piece.
+     *
+     * @return \Tchess\Entity\Piece|null
+     */
+    public function movePiece(Move $move)
+    {
+        //Switch the two spots on the board.
+        $this->pieces[$move->getNewRow()][$move->getNewColumn()] = $this->pieces[$move->getCurrentRow()][$move->getCurrentColumn()];
+        $this->pieces[$move->getCurrentRow()][$move->getCurrentColumn()];
     }
 
 }

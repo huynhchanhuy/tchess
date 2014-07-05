@@ -12,18 +12,20 @@ class Move
     protected $newRow;
     protected $newColumn;
 
-    public function __construct($move)
+    public function __construct($move = '')
     {
-        $this->move = $move;
-        $parts = explode(' ', $move);
-        if (count($parts) != 2) {
-            throw new \InvalidArgumentException('Move must be 2 parts connected by a space e.g. "a1 b2".');
+        if (!empty($move)) {
+            $this->move = $move;
+            $parts = explode(' ', $move);
+            if (count($parts) != 2) {
+                throw new \InvalidArgumentException('Move must be 2 parts connected by a space e.g. "a1 b2".');
+            }
+            list($this->source, $this->target) = $parts;
+            $this->currentRow = $this->getRow($this->source[1]);
+            $this->currentColumn = $this->getColumn($this->source[0]);
+            $this->newRow = $this->getRow($this->target[1]);
+            $this->newColumn = $this->getColumn($this->target[0]);
         }
-        list($this->source, $this->target) = $parts;
-        $this->currentRow = $this->getRow($this->source[1]);
-        $this->currentColumn = $this->getColumn($this->source[0]);
-        $this->newRow = $this->getRow($this->target[1]);
-        $this->newColumn = $this->getColumn($this->target[0]);
     }
 
     /**

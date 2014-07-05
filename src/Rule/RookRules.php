@@ -11,20 +11,12 @@ use Tchess\Entity\Piece\Queen;
 
 class BishopRules implements EventSubscriberInterface
 {
-
-    private $em;
-
-    public function __construct(EntityManagerInterface $em)
-    {
-        $this->em = $em;
-    }
-
     public function onMoveChecking(MoveEvent $event)
     {
-        $board = &$event->getGame()->getBoard();
+        $board = $event->getBoard();
         $move = $event->getMove();
         $color = $event->getColor();
-        $piece = &$board->getPiece($move->getCurrentRow(), $move->getCurrentColumn());
+        $piece = $board->getPiece($move->getCurrentRow(), $move->getCurrentColumn());
         if (!$piece instanceof Bishop && !$piece instanceof Queen) {
             return;
         }

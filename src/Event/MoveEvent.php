@@ -2,35 +2,35 @@
 
 namespace Tchess\Event;
 
-use Tchess\Entity\Game;
+use Tchess\Entity\Board;
 use Symfony\Component\EventDispatcher\Event;
 use Tchess\Entity\Piece\Move;
 
 class MoveEvent extends Event
 {
 
-    private $game;
+    private $board;
     private $move;
     private $validMove;
     private $message;
     private $color;
 
-    public function __construct(Game $game, $move, $color)
+    public function __construct(Board $board, $move, $color)
     {
-        $this->setGame($game);
+        $this->setBoard($board);
         $this->setMove($move);
         $this->setColor($color);
         $this->validMove = false;
     }
 
-    public function getGame()
+    public function getBoard()
     {
-        return $this->game;
+        return $this->board;
     }
 
-    public function setGame($game)
+    public function setBoard($board)
     {
-        $this->game = $game;
+        $this->board = $board;
     }
 
     public function getMove()
