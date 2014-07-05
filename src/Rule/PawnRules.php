@@ -24,75 +24,65 @@ class PawnRules implements EventSubscriberInterface
         }
 
         if ($color == "white") {
-            if ($move->getCurrentRow() > $move->getNewRow()) {
+            if ($move->getCurrentRow() >= $move->getNewRow()) {
                 $event->setValidMove(false);
-                $event->stopPropagation();
                 return;
             }
         } else {
-            if ($move->getNewRow() > $move->getCurrentRow()) {
+            if ($move->getNewRow() >= $move->getCurrentRow()) {
                 $event->setValidMove(false);
-                $event->stopPropagation();
                 return;
             }
         }
 
         if ($move->getCurrentColumn() == $move->getNewColumn()) {
-            // Not taking a piece
+            // Not taking a piece.
             if ($color == "white") {
                 if ($board->getPiece($move->getCurrentRow() + 1, $move->getCurrentColumn()) != null) {
                     $event->setValidMove(false);
-                    $event->stopPropagation();
                     return;
                 }
             } else {
                 if ($board->getPiece($move->getCurrentRow() - 1, $move->getCurrentColumn()) != null) {
                     $event->setValidMove(false);
-                    $event->stopPropagation();
                     return;
                 }
             }
 
             if (abs($move->getNewRow() - $move->getCurrentRow()) > 2) {
                 $event->setValidMove(false);
-                $event->stopPropagation();
                 return;
             } else if (abs($move->getNewRow() - $move->getCurrentRow()) == 2) {
-                // Advancing two spaces at beginning
+                // Advancing two spaces at beginning.
                 if ($piece->isMoved()) {
                     $event->setValidMove(false);
-                    $event->stopPropagation();
                     return;
                 }
 
                 if ($piece->getColor() == 'white') {
                     if($board->getPiece($move->getCurrentRow() + 2, $move->getCurrentColumn()) != null) {
                         $event->setValidMove(false);
-                        $event->stopPropagation();
                         return;
                     }
                 } else {
                     if($board->getPiece($move->getCurrentRow() - 2, $move->getCurrentColumn()) != null) {
                         $event->setValidMove(false);
-                        $event->stopPropagation();
                         return;
                     }
                 }
 
                 // En passante
-                // We do not check this rule. It's too complex.
+                // @todo - Checking and doing en passante.
             }
         } else {
-            //Taking a piece
+            // Taking a piece.
             if (abs($move->getNewColumn() - $move->getCurrentColumn()) != 1 || abs($move->getNewRow() - $move->getCurrentRow()) != 1) {
                 $event->setValidMove(false);
-                $event->stopPropagation();
                 return;
             }
 
             if($board->getPiece($move->getNewRow(), $move->getNewColumn()) == null) {
                 $event->setValidMove(false);
-                $event->stopPropagation();
                 return;
             }
         }
@@ -100,7 +90,7 @@ class PawnRules implements EventSubscriberInterface
         $event->setValidMove(true);
     }
 
-    public function onMoveDoPromotion(MoveEvent $event)
+    public function onMoveDoQueening(MoveEvent $event)
     {
         $board = &$event->getBoard();
         $move = $event->getMove();
@@ -110,7 +100,6 @@ class PawnRules implements EventSubscriberInterface
             return;
         }
 
-        // @todo - How to replace with Knigh or Bishop
         if (($color == 'white' && $move->getNewRow() == 7) || ($color == 'black' && $move->getNewRow() == 0)) {
             switch ($move->getPromotion()) {
                 case 'Q':
@@ -139,7 +128,7 @@ class PawnRules implements EventSubscriberInterface
     {
         return array(
             MoveEvents::CHECH_MOVE => array(array('onMoveChecking', 0)),
-            MoveEvents::MOVE => array(array('onMoveDoPromotion', 0)),
+            MoveEvents::MOVE => array(array('onMoveDoQueening', 0)),
         );
     }
 

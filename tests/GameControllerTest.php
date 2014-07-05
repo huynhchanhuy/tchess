@@ -201,10 +201,36 @@ class GameControllerTest extends TchessTestBase
         parent::$sc->get('framework')->handle($request);
 
         $request = $this->getRequest('/start-game', 'POST', array(), $request->getSession());
-        $response = parent::$sc->get('framework')->handle($request);
+        parent::$sc->get('framework')->handle($request);
 
         $request = $this->getRequest('/piece-move', 'POST', array(
             'move' => 'a2 a3'
+        ), $request->getSession());
+        $response = parent::$sc->get('framework')->handle($request);
+    }
+
+    /**
+     * @group move
+     * @expectedException \LogicException
+     * @expectedExceptionMessage Move is not valid
+     * @expectedExceptionCode \Tchess\ExceptionCodes::PLAYER
+     */
+    public function testInvalidMove()
+    {
+        $request_opponent = $this->getRequest('/join-game', 'POST');
+        parent::$sc->get('framework')->handle($request_opponent);
+
+        $request_opponent = $this->getRequest('/start-game', 'POST', array(), $request_opponent->getSession());
+        parent::$sc->get('framework')->handle($request_opponent);
+
+        $request = $this->getRequest('/join-game', 'POST');
+        parent::$sc->get('framework')->handle($request);
+
+        $request = $this->getRequest('/start-game', 'POST', array(), $request->getSession());
+        parent::$sc->get('framework')->handle($request);
+
+        $request = $this->getRequest('/piece-move', 'POST', array(
+            'move' => 'b2 b7'
         ), $request->getSession());
         $response = parent::$sc->get('framework')->handle($request);
     }

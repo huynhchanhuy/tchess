@@ -14,7 +14,6 @@ class BishopRules implements EventSubscriberInterface
     {
         $board = $event->getBoard();
         $move = $event->getMove();
-        $color = $event->getColor();
         $piece = $board->getPiece($move->getCurrentRow(), $move->getCurrentColumn());
         if (!$piece instanceof Bishop && !$piece instanceof Queen) {
             return;
@@ -22,15 +21,13 @@ class BishopRules implements EventSubscriberInterface
 
 
         if ($move->getCurrentRow() == $move->getNewRow() || $move->getCurrentColumn() == $move->getNewColumn()) {
-            //Did not move diagonally
+            // Did not move diagonally.
             $event->setValidMove(false);
-            $event->stopPropagation();
             return;
         }
 
         if (abs($move->getNewRow() - $move->getCurrentRow()) != abs($move->getNewColumn() - $move->getCurrentColumn())) {
             $event->setValidMove(false);
-            $event->stopPropagation();
             return;
         }
 
@@ -50,7 +47,6 @@ class BishopRules implements EventSubscriberInterface
         for($x = $move->getCurrentRow() + $rowOffset; $x != $move->getNewRow(); $x += $rowOffset) {
             if($board->getPiece($x, $y) != null) {
                 $event->setValidMove(false);
-                $event->stopPropagation();
                 return;
             }
 

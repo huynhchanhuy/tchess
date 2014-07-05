@@ -15,7 +15,6 @@ class KingRules implements EventSubscriberInterface
     {
         $board = $event->getBoard();
         $move = $event->getMove();
-        $color = $event->getColor();
         $piece = &$board->getPiece($move->getCurrentRow(), $move->getCurrentColumn());
         if (!$piece instanceof King) {
             return;
@@ -26,30 +25,38 @@ class KingRules implements EventSubscriberInterface
 
             if ($piece->isMoved()) {
                 $event->setValidMove(false);
-                $event->stopPropagation();
                 return;
             }
 
             if (abs($move->getNewColumn() - $move->getCurrentColumn()) != 2 || $move->getCurrentRow() != $move->getNewRow()) {
                 $event->setValidMove(false);
-                $event->stopPropagation();
                 return;
             }
 
             // Do castling logic here.
             if ($move->getNewColumn() - $move->getCurrentColumn() == 2) {
                 // Castle kingside.
-                if ($board->getPiece($move->getNewRow(), $move->getCurrentColumn() + 1) != null || $board->getPiece($move->getNewRow(), $move->getCurrentColumn() + 2) != null) {
-                    $piece->setCastled(false);
+                $rook = $board->getPiece($move->getNewRow(), $move->getNewColumn() + 3);
+                if (!$rook instanceof Rook || $rook->isMoved()) {
                     $event->setValidMove(false);
-                    $event->stopPropagation();
+                    return;
+                }
+
+                if ($board->getPiece($move->getNewRow(), $move->getCurrentColumn() + 1) != null || $board->getPiece($move->getNewRow(), $move->getCurrentColumn() + 2) != null) {
+                    $event->setValidMove(false);
                     return;
                 }
             } else if ($move->getNewColumn() - $move->getCurrentColumn() == -2) {
-                if ($board->getPiece($move->getNewRow(), $move->getCurrentColumn() - 1) != null || $board->getPiece($move->getNewRow(), $move->getCurrentColumn() - 2) != null) {
-                    $piece->setCastled(false);
+                // Queenside.
+                $rook = $board->getPiece($move->getNewRow(), $move->getNewColumn() - 4);
+                if (!$rook instanceof Rook || $rook->isMoved()) {
                     $event->setValidMove(false);
-                    $event->stopPropagation();
+                    return;
+                }
+
+                // There are 3 squares between the king and the queenside rook.
+                if ($board->getPiece($move->getNewRow(), $move->getCurrentColumn() - 1) != null || $board->getPiece($move->getNewRow(), $move->getCurrentColumn() - 2) != null || $board->getPiece($move->getNewRow(), $move->getCurrentColumn() - 3) != null) {
+                    $event->setValidMove(false);
                     return;
                 }
             }
@@ -59,7 +66,6 @@ class KingRules implements EventSubscriberInterface
             $piece->setCastled(true);
         }
 
-        // $piece->setHasMoved(true);
         $event->setValidMove(true);
     }
 
@@ -67,7 +73,6 @@ class KingRules implements EventSubscriberInterface
     {
         $board = &$event->getBoard();
         $move = $event->getMove();
-        $color = $event->getColor();
         $piece = &$board->getPiece($move->getNewRow(), $move->getNewColumn());
         if (!$piece instanceof King) {
             return;
@@ -76,7 +81,7 @@ class KingRules implements EventSubscriberInterface
         if ($piece->isCastled()) {
             // Move rook.
             if ($move->getNewColumn() - $move->getCurrentColumn() == 2) {
-                $rook = &$board->getPiece($move->getNewRow(), $move->getNewColumn() + 1);
+                $rook = $board->getPiece($move->getNewRow(), $move->getNewColumn() + 1);
                 if (!$rook instanceof Rook || $rook->isMoved()) {
                     return;
                 }
@@ -90,7 +95,7 @@ class KingRules implements EventSubscriberInterface
 
                 $board->movePiece($rook_move);
             } else {
-                $rook = &$board->getPiece($move->getNewRow(), $move->getNewColumn() - 2);
+                $rook = $board->getPiece($move->getNewRow(), $move->getNewColumn() - 2);
                 if (!$rook instanceof Rook || $rook->isMoved()) {
                     return;
                 }

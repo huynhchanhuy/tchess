@@ -175,6 +175,7 @@ class GameController extends ContainerAware
     public function moveAction(Request $request)
     {
         $em = $this->container->get('entity_manager');
+        $dispatcher = $this->container->get('dispatcher');
         $session = $request->getSession();
         $sid = $session->getId();
 
@@ -189,44 +190,18 @@ class GameController extends ContainerAware
         if (empty($game) || ($game instanceof Game && !$game->getStarted())) {
             throw new \LogicException('Opponent player did not start the game', ExceptionCodes::PLAYER);
         } else {
+            $board = $game->getBoard();
             $move = new Move($request->request->get('move'));
-            $color = $request->request->get('color');
-            if (!in_array($color, array('white', 'black'))) {
-                throw new \InvalidArgumentException('Color is invalid. It must be "white" or "black".');
-            }
-            if (!$this->isValidMove($game->getBoard(), $move, $color)) {
-                throw new \LogicException('Your move is not valid', 4);
+            $color = $player->getColor();
+
+            if ($dispatcher->dispatch(MoveEvents::CHECH_MOVE, new MoveEvent($board, $move, $color))->isValidMove()) {
+                $dispatcher->dispatch(MoveEvents::MOVE, new MoveEvent($board, $move, $color));
             } else {
-                $this->performMove($game->getBoard(), $move, $color);
+                throw new \LogicException('Move is not valid', ExceptionCodes::PLAYER);
             }
         }
 
         return 'Move has been performed. Waiting for you opponent.';
-    }
-
-    /**
-     * Check for valid move.
-     *
-     * @return boolean
-     */
-    private function isValidMove(Board $board, $move, $color)
-    {
-        $dispatcher = $this->container->get('dispatcher');
-        $event = new MoveEvent($board, $move, $color);
-        $dispatcher->dispatch(MoveEvents::CHECH_MOVE, $event);
-        return $event->isValidMove();
-    }
-
-    /**
-     * Actually move.
-     */
-    private function performMove(Board $board, $move, $color)
-    {
-        $board->movePiece($move);
-
-        $dispatcher = $this->container->get('dispatcher');
-        $event = new MoveEvent($board, $move, $color);
-        $dispatcher->dispatch(MoveEvents::MOVE, $event);
     }
 
 }

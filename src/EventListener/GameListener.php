@@ -32,6 +32,10 @@ class GameListener implements EventSubscriberInterface
             $game->setTurn('white');
             $game->setRoom($room);
             $game->setStarted(true);
+            $game->setState('');
+            $this->em->persist($game);
+
+            $room->setGame($game);
             $this->em->flush();
         }
     }

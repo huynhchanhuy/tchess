@@ -38,7 +38,6 @@ class InCheckRules implements EventSubscriberInterface
             if ($this->isInCheck($new_board, $color)) {
                 // The king is still in check.
                 $event->setValidMove(false);
-                $event->stopPropagation();
                 return;
             }
         }
@@ -59,9 +58,9 @@ class InCheckRules implements EventSubscriberInterface
         list($row, $col) = $kingPos;
 
         for ($x = 0; $x < 8; $x++) {
-            for ($y = 0; $y< 8; $y++) {
-                $piece = $board->getPiece($x, $x);
-                if ($piece != null && $piece instanceof Piece && $piece->getColor() != $color) {
+            for ($y = 0; $y < 8; $y++) {
+                $piece = $board->getPiece($x, $y);
+                if ($piece instanceof Piece && $piece->getColor() != $color) {
                     $move = new Move();
                     $move->setCurrentRow($x);
                     $move->setCurrentColumn($y);
@@ -69,8 +68,7 @@ class InCheckRules implements EventSubscriberInterface
                     $move->setNewColumn($col);
 
                     $event = new MoveEvent($board, $move, $piece->getColor());
-                    $this->dispatcher->dispatch(MoveEvents::CHECH_MOVE, $event);
-                    if ($event->isValidMove()) {
+                    if ($this->dispatcher->dispatch(MoveEvents::CHECH_MOVE, $event)->isValidMove()) {
                         return true;
                     }
                 }
@@ -86,12 +84,11 @@ class InCheckRules implements EventSubscriberInterface
 
         for ($x = 0; $x < 8; $x++) {
             for ($y = 0; $y < 8; $y++) {
-                if($board->getPiece($x, $x) != null){
-                    if($board->getPiece($x, $x) instanceof King && $board->getPiece($x, $x)->getColor() == $color){
-                        $row = $x;
-                        $col = $y;
-                        break 2;
-                    }
+                $piece = $board->getPiece($x, $y);
+                if($piece instanceof King && $piece->getColor() == $color){
+                    $row = $x;
+                    $col = $y;
+                    break 2;
                 }
             }
         }

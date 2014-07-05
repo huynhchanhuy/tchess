@@ -13,7 +13,6 @@ class KnightRules implements EventSubscriberInterface
     {
         $board = $event->getBoard();
         $move = $event->getMove();
-        $color = $event->getColor();
         $piece = $board->getPiece($move->getCurrentRow(), $move->getCurrentColumn());
         if (!$piece instanceof Knight) {
             return;
@@ -30,8 +29,6 @@ class KnightRules implements EventSubscriberInterface
         }
 
         $event->setValidMove(false);
-        $event->stopPropagation();
-        return;
     }
 
     public static function getSubscribedEvents()

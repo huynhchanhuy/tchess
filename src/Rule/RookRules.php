@@ -5,7 +5,7 @@ namespace Tchess\Rule;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Tchess\MoveEvents;
 use Tchess\Event\MoveEvent;
-use Tchess\Entity\Piece\Bishop;
+use Tchess\Entity\Piece\Rook;
 use Tchess\Entity\Piece\Queen;
 
 class RookRules implements EventSubscriberInterface
@@ -14,20 +14,18 @@ class RookRules implements EventSubscriberInterface
     {
         $board = $event->getBoard();
         $move = $event->getMove();
-        $color = $event->getColor();
         $piece = $board->getPiece($move->getCurrentRow(), $move->getCurrentColumn());
-        if (!$piece instanceof Bishop && !$piece instanceof Queen) {
+        if (!$piece instanceof Rook && !$piece instanceof Queen) {
             return;
         }
 
         if ($move->getCurrentRow() != $move->getNewRow() && $move->getCurrentColumn() != $move->getNewColumn()) {
-            //Did not move along one rank/file
+            // Did not move along one rank/file.
             $event->setValidMove(false);
-            $event->stopPropagation();
             return;
         }
 
-        //First I will assumed the Rook is moving along the rows.
+        // First I will assumed the Rook is moving along the rows.
         if ($move->getCurrentRow() != $move->getNewRow()) {
             if ($move->getCurrentRow() < $move->getNewRow()) {
                 $offset = 1;
@@ -36,16 +34,15 @@ class RookRules implements EventSubscriberInterface
             }
 
             for($x = $move->getCurrentRow() + $offset; $x != $move->getNewRow(); $x += $offset) {
-                //Go from currentRow to newRow, and check every space
+                // Go from currentRow to newRow, and check every space.
                 if($board->getPiece($x, $move->getCurrentColumn()) != null) {
                     $event->setValidMove(false);
-                    $event->stopPropagation();
                     return;
                 }
             }
         }
 
-        //Now do the same for columns
+        // Now do the same for columns.
         if ($move->getCurrentColumn() != $move->getNewColumn()) {
             if ($move->getCurrentColumn() < $move->getNewColumn()) {
                 $offset = 1;
@@ -54,10 +51,9 @@ class RookRules implements EventSubscriberInterface
             }
 
             for($x = $move->getCurrentColumn() + $offset; $x != $move->getNewColumn(); $x += $offset) {
-                //Go from currentCol to newCol, and check every space
+                // Go from currentCol to newCol, and check every space.
                 if($board->getPiece($move->getCurrentRow(), $x) != null) {
                     $event->setValidMove(false);
-                    $event->stopPropagation();
                     return;
                 }
             }

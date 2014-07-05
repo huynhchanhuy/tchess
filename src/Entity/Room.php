@@ -24,7 +24,7 @@ class Room
     protected $players;
 
     /**
-     * @ORM\OneToOne(targetEntity="Game")
+     * @ORM\OneToOne(targetEntity="Game", mappedBy="room")
      */
     protected $game;
 
@@ -85,7 +85,7 @@ class Room
      * @param \Tchess\Entity\Game $game
      * @return Room
      */
-    public function setBoard(\Tchess\Entity\Game $game = null)
+    public function setGame(\Tchess\Entity\Game $game = null)
     {
         $this->game = $game;
 

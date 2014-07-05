@@ -6,6 +6,9 @@ use Tchess\Entity\Piece\King;
 use Tchess\Entity\Piece\Rook;
 use Tchess\Entity\Piece\Pawn;
 use Tchess\Entity\Piece\Piece;
+use Tchess\Entity\Piece\Knight;
+use Tchess\Entity\Piece\Bishop;
+use Tchess\Entity\Piece\Queen;
 
 class Board
 {
@@ -50,7 +53,7 @@ class Board
 
         // Black pawns
         for ($x = 0; $x < 8; $x++) {
-            $this->pieces[6][x] = new Pawn("black");
+            $this->pieces[6][$x] = new Pawn("black");
         }
 
         //Rooks

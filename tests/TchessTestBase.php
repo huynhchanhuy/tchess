@@ -39,9 +39,9 @@ class TchessTestBase extends PHPUnit_Framework_TestCase
         $schema_tool->createSchema($metadatas);
     }
 
-    protected function getRequest($path, $method = 'GET', $content = null, $session = null)
+    protected function getRequest($path, $method = 'GET', $parameters = array(), $session = null)
     {
-        $request = Request::create($path, $method, array(), array(), array(), array(), $content);
+        $request = Request::create($path, $method, $parameters);
 
         if (empty($session)) {
           $session = new Session(new MockArraySessionStorage());

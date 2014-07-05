@@ -5,6 +5,7 @@ namespace Tchess\Rule;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Tchess\MoveEvents;
 use Tchess\Event\MoveEvent;
+use Tchess\Entity\Piece\Piece;
 
 class BasicRules implements EventSubscriberInterface
 {
@@ -13,19 +14,25 @@ class BasicRules implements EventSubscriberInterface
         $board = $event->getBoard();
         $move = $event->getMove();
         $color = $event->getColor();
+        $source_piece = $board->getPiece($move->getCurrentRow(), $move->getCurrentColumn());
+        $target_piece = $board->getPiece($move->getNewRow(), $move->getNewColumn());
 
-        if ($board->getPiece($move->getCurrentRow(), $move->getCurrentColumn()) == null) {
-            throw new \LogicException('There is no piece to move at ' . $move->getSource());
+        if ($source_piece == null) {
+            $event->setValidMove(false);
+            $event->setMessage('There is no piece to move at ' . $move->getSource());
+            return;
         }
 
-        if ($board->getPiece($move->getCurrentRow(), $move->getCurrentColumn())->getColor() != $color) {
-            throw new \LogicException('Can not move opponent piece at ' . $move->getSource());
+        if (!$source_piece instanceof Piece || $source_piece->getColor() != $color) {
+            $event->setValidMove(false);
+            $event->setMessage('Can not move opponent piece at ' . $move->getSource());
+            return;
         }
 
-        if ($board->getPiece($move->getNewRow(), $move->getNewColumn()) != null) {
-            if ($board->getPiece($move->getNewRow(), $move->getNewColumn())->getColor() == $color) {
-                throw new \LogicException('There is already your piece at ' . $move->getTarget());
-            }
+        if ($target_piece instanceof Piece && $target_piece->getColor() == $color) {
+            $event->setValidMove(false);
+            $event->setMessage('There is already your piece at ' . $move->getTarget());
+            return;
         }
 
         $event->setValidMove(true);
