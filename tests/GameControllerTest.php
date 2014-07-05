@@ -52,17 +52,17 @@ class GameControllerTest extends TchessTestBase
 
     /**
      * @group stop
+     * @expectedException \LogicException
+     * @expectedExceptionMessage Game is not started.
+     * @expectedExceptionCode 1
      */
     public function testStopGameThatHasNotStarted()
     {
-        $request = $this->getRequest('/stop-game', 'POST');
-        $request->getSession()->set('started', false);
+        $request = $this->getRequest('/join-game', 'POST');
+        parent::$sc->get('framework')->handle($request);
 
-        $response = $this->sc->get('framework')->handle($request);
-
-        $content = json_decode($response->getContent());
-        $this->assertEquals(2, $content->code);
-        $this->assertEquals('Something went wrong! (Game is not started, try to start game first.)', $content->message);
+        $request = $this->getRequest('/stop-game', 'POST', array(), $request->getSession());
+        parent::$sc->get('framework')->handle($request);
     }
 
     /**
@@ -70,10 +70,14 @@ class GameControllerTest extends TchessTestBase
      */
     public function testStopGameThatHasStarted()
     {
-        $request = $this->getRequest('/stop-game', 'POST');
-        $request->getSession()->set('started', true);
+        $request = $this->getRequest('/join-game', 'POST');
+        parent::$sc->get('framework')->handle($request);
 
-        $response = $this->sc->get('framework')->handle($request);
+        $request = $this->getRequest('/start-game', 'POST', array(), $request->getSession());
+        parent::$sc->get('framework')->handle($request);
+
+        $request = $this->getRequest('/stop-game', 'POST', array(), $request->getSession());
+        $response = parent::$sc->get('framework')->handle($request);
 
         $this->assertEquals('Game stopped', $response->getContent());
     }
