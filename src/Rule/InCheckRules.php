@@ -28,7 +28,7 @@ class InCheckRules implements EventSubscriberInterface
         $color = $event->getColor();
 
         // Still valid after all rules.
-        if ($event->isValidMove() && $this->isInCheck($board, $color)) {
+        if ($event->isValidMove()) {
             $new_board = clone $board;
             $new_board->movePiece($move);
 
