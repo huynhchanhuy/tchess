@@ -73,8 +73,6 @@ class KingRules implements EventSubscriberInterface
             return;
         }
 
-        $piece->setHasMoved(true);
-
         if ($piece->isCastled()) {
             // Move rook.
             if ($move->getNewColumn() - $move->getCurrentColumn() == 2) {

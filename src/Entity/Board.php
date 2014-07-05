@@ -4,6 +4,8 @@ namespace Tchess\Entity;
 use Tchess\Entity\Piece\Move;
 use Tchess\Entity\Piece\King;
 use Tchess\Entity\Piece\Rook;
+use Tchess\Entity\Piece\Pawn;
+use Tchess\Entity\Piece\Piece;
 
 class Board
 {
@@ -23,6 +25,14 @@ class Board
     public function getPiece($row, $column)
     {
         return $this->pieces[$row][$column];
+    }
+
+    /**
+     * Set piece.
+     */
+    public function setPiece(Piece $piece, $row, $column)
+    {
+        $this->pieces[$row][$column] = $piece;
     }
 
     public function initialize()
@@ -82,7 +92,7 @@ class Board
         $this->pieces[$move->getCurrentRow()][$move->getCurrentColumn()] = null;
 
         $piece = &$this->pieces[$move->getNewRow()][$move->getNewColumn()];
-        if ($piece instanceof King || $piece instanceof Rook) {
+        if ($piece instanceof King || $piece instanceof Rook || $piece instanceof Pawn) {
             $piece->setHasMoved(true);
         }
     }

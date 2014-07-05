@@ -11,20 +11,26 @@ class Move
     protected $currentColumn;
     protected $newRow;
     protected $newColumn;
+    protected $promotion;
 
     public function __construct($move = '')
     {
         if (!empty($move)) {
             $this->move = $move;
             $parts = explode(' ', $move);
-            if (count($parts) != 2) {
-                throw new \InvalidArgumentException('Move must be 2 parts connected by a space e.g. "a1 b2".');
+            if (count($parts) == 2) {
+                list($source, $target) = $parts;
+                $promotion = 'Q';
             }
-            list($this->source, $this->target) = $parts;
-            $this->currentRow = $this->getRow($this->source[1]);
-            $this->currentColumn = $this->getColumn($this->source[0]);
-            $this->newRow = $this->getRow($this->target[1]);
-            $this->newColumn = $this->getColumn($this->target[0]);
+            else if (count($parts) == 3) {
+                list($source, $target, $promotion) = $parts;
+            }
+            else {
+                throw new \InvalidArgumentException('Move must be "a1 b2" or "a1 b2 Q".');
+            }
+            $this->setSource($source);
+            $this->setTarget($target);
+            $this->setPromotion($promotion);
         }
     }
 
@@ -108,5 +114,42 @@ class Move
     public function setNewColumn($newColumn)
     {
         $this->newColumn = $newColumn;
+    }
+
+    public function getSource()
+    {
+        return $this->source;
+    }
+
+    public function setSource($source)
+    {
+        $this->setCurrentRow($this->getRow($source[1]));
+        $this->setCurrentColumn($this->getColumn($source[0]));
+        $this->source = $source;
+    }
+
+    public function getTarget()
+    {
+        return $this->target;
+    }
+
+    public function setTarget($target)
+    {
+        $this->setNewRow($this->getRow($target[1]));
+        $this->setNewColumn($this->getColumn($target[0]));
+        $this->target = $target;
+    }
+
+    public function getPromotion()
+    {
+        return $this->promotion;
+    }
+
+    public function setPromotion($promotion)
+    {
+        if (!in_array($promotion, array('Q', 'K', 'B', 'R'))) {
+            $promotion = 'Q';
+        }
+        $this->promotion = $promotion;
     }
 }

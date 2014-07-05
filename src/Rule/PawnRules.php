@@ -6,6 +6,10 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Tchess\MoveEvents;
 use Tchess\Event\MoveEvent;
 use Tchess\Entity\Piece\Pawn;
+use Tchess\Entity\Piece\Queen;
+use Tchess\Entity\Piece\Knight;
+use Tchess\Entity\Piece\Bishop;
+use Tchess\Entity\Piece\Rook;
 
 class PawnRules implements EventSubscriberInterface
 {
@@ -34,7 +38,7 @@ class PawnRules implements EventSubscriberInterface
         }
 
         if ($move->getCurrentColumn() == $move->getNewColumn()) {
-            //Not taking a piece
+            // Not taking a piece
             if ($color == "white") {
                 if ($board->getPiece($move->getCurrentRow() + 1, $move->getCurrentColumn()) != null) {
                     $event->setValidMove(false);
@@ -54,7 +58,7 @@ class PawnRules implements EventSubscriberInterface
                 $event->stopPropagation();
                 return;
             } else if (abs($move->getNewRow() - $move->getCurrentRow()) == 2) {
-                //Advancing two spaces at beginning
+                // Advancing two spaces at beginning
                 if ($piece->isMoved()) {
                     $event->setValidMove(false);
                     $event->stopPropagation();
@@ -96,10 +100,46 @@ class PawnRules implements EventSubscriberInterface
         $event->setValidMove(true);
     }
 
+    public function onMoveDoPromotion(MoveEvent $event)
+    {
+        $board = &$event->getBoard();
+        $move = $event->getMove();
+        $color = $event->getColor();
+        $piece = &$board->getPiece($move->getNewRow(), $move->getNewColumn());
+        if (!$piece instanceof Pawn) {
+            return;
+        }
+
+        // @todo - How to replace with Knigh or Bishop
+        if (($color == 'white' && $move->getNewRow() == 7) || ($color == 'black' && $move->getNewRow() == 0)) {
+            switch ($move->getPromotion()) {
+                case 'Q':
+                    $board->setPiece(new Queen('white'), $move->getNewRow(), $move->getNewColumn());
+                    break;
+
+                case 'K':
+                    $board->setPiece(new Knight('white'), $move->getNewRow(), $move->getNewColumn());
+                    break;
+
+                case 'B':
+                    $board->setPiece(new Bishop('white'), $move->getNewRow(), $move->getNewColumn());
+                    break;
+
+                case 'R':
+                    $board->setPiece(new Rook('white'), $move->getNewRow(), $move->getNewColumn());
+                    break;
+
+                default:
+                    break;
+            }
+        }
+    }
+
     public static function getSubscribedEvents()
     {
         return array(
             MoveEvents::CHECH_MOVE => array(array('onMoveChecking', 0)),
+            MoveEvents::MOVE => array(array('onMoveDoPromotion', 0)),
         );
     }
 
