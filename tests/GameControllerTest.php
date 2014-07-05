@@ -125,4 +125,24 @@ class GameControllerTest extends TchessTestBase
         $this->assertEquals('Game re-started', $response->getContent());
     }
 
+    /**
+     * @group move
+     * @expectedException \LogicException
+     * @expectedExceptionMessage Opponent player did not started.
+     * @expectedExceptionCode 4
+     */
+    public function testWaitingForOpponent()
+    {
+        $request = $this->getRequest('/join-game', 'POST');
+        parent::$sc->get('framework')->handle($request);
+
+        $request = $this->getRequest('/start-game', 'POST', array(), $request->getSession());
+        $response = parent::$sc->get('framework')->handle($request);
+
+        $request = $this->getRequest('/piece-move', 'POST', array(
+            'move' => 'a2 a3'
+        ), $request->getSession());
+        $response = parent::$sc->get('framework')->handle($request);
+    }
+
 }
