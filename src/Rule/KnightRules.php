@@ -3,7 +3,6 @@
 namespace Tchess\Rule;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Doctrine\ORM\EntityManagerInterface;
 use Tchess\MoveEvents;
 use Tchess\Event\MoveEvent;
 use Tchess\Entity\Piece\Knight;

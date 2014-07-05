@@ -220,6 +220,8 @@ class GameController extends ContainerAware
      */
     public function performMove(Board $board, $move, $color)
     {
+        $board->movePiece($move);
+
         $dispatcher = $this->container->get('dispatcher');
         $event = new MoveEvent($board, $move, $color);
         $dispatcher->dispatch(MoveEvents::MOVE, $event);

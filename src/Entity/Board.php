@@ -2,6 +2,8 @@
 
 namespace Tchess\Entity;
 use Tchess\Entity\Piece\Move;
+use Tchess\Entity\Piece\King;
+use Tchess\Entity\Piece\Rook;
 
 class Board
 {
@@ -77,7 +79,12 @@ class Board
     {
         //Switch the two spots on the board.
         $this->pieces[$move->getNewRow()][$move->getNewColumn()] = $this->pieces[$move->getCurrentRow()][$move->getCurrentColumn()];
-        $this->pieces[$move->getCurrentRow()][$move->getCurrentColumn()];
+        $this->pieces[$move->getCurrentRow()][$move->getCurrentColumn()] = null;
+
+        $piece = &$this->pieces[$move->getNewRow()][$move->getNewColumn()];
+        if ($piece instanceof King || $piece instanceof Rook) {
+            $piece->setHasMoved(true);
+        }
     }
 
 }
