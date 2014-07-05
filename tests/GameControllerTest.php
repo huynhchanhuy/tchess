@@ -19,6 +19,18 @@ class GameControllerTest extends TchessTestBase
     }
 
     /**
+     * @group join
+     * @expectedException \LogicException
+     * @expectedExceptionMessage Player did not join a room.
+     * @expectedExceptionCode 3
+     */
+    public function testStartGameWithoutJoiningRoom()
+    {
+        $request = $this->getRequest('/start-game', 'POST', array());
+        parent::$sc->get('framework')->handle($request);
+    }
+
+    /**
      * @group start
      * @expectedException \LogicException
      * @expectedExceptionMessage Game has been already started.

@@ -180,13 +180,13 @@ class GameController extends ContainerAware
         $player = $em->getRepository('Tchess\Entity\Player')->findOneBy(array('sid' => $sid));
 
         if (empty($player) || ($player instanceof Player && empty($player->getRoom()))) {
-            throw new \LogicException('Player did not join a room', 3);
+            throw new \LogicException('Player did not join a room.', 3);
         }
 
         $game = $player->getRoom()->getGame();
 
         if (empty($game) || ($game instanceof Game && !$game->getStarted())) {
-            throw new \LogicException('Opponent Player did not started', 4);
+            throw new \LogicException('Opponent player did not started.', 4);
         } else {
             $move = new Move($request->request->get('move'));
             $color = $request->request->get('color');
