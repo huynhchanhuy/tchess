@@ -14,6 +14,7 @@ use Tchess\MoveEvents;
 use Tchess\Event\MoveEvent;
 use Tchess\Entity\Piece\Move;
 use Tchess\Entity\Board;
+use Tchess\ExceptionCodes;
 
 class GameController extends ContainerAware
 {
@@ -33,11 +34,11 @@ class GameController extends ContainerAware
         $player = $em->getRepository('Tchess\Entity\Player')->findOneBy(array('sid' => $sid));
 
         if (empty($player) || !$player instanceof Player) {
-            throw new \LogicException('Player did not join a room.', 3);
+            throw new \LogicException('Player did not join a room', ExceptionCodes::PLAYER);
         }
 
         if ($player->getStarted()) {
-            throw new \LogicException('Game has been already started.', 1);
+            throw new \LogicException('Game has been already started', ExceptionCodes::PLAYER);
         }
 
         $player->setStarted(true);
@@ -62,11 +63,11 @@ class GameController extends ContainerAware
         $player = $em->getRepository('Tchess\Entity\Player')->findOneBy(array('sid' => $sid));
 
         if (empty($player) || !$player instanceof Player) {
-            throw new \LogicException('Player did not join a room.', 3);
+            throw new \LogicException('Player did not join a room', ExceptionCodes::PLAYER);
         }
 
         if (!$player->getStarted()) {
-            throw new \LogicException('Game is not started.', 1);
+            throw new \LogicException('Game is not started', ExceptionCodes::PLAYER);
         }
 
         $player->setStarted(false);
@@ -91,7 +92,7 @@ class GameController extends ContainerAware
         $player = $em->getRepository('Tchess\Entity\Player')->findOneBy(array('sid' => $sid));
 
         if (empty($player) || !$player instanceof Player) {
-            throw new \LogicException('Player did not join a room.', 3);
+            throw new \LogicException('Player did not join a room', ExceptionCodes::PLAYER);
         }
 
         if ($player->getStarted()) {
@@ -114,7 +115,7 @@ class GameController extends ContainerAware
             $this->container->get('dispatcher')->dispatch(GameEvents::RESTART, new GameEvent($player, $em));
             return 'Game re-started';
         } else {
-            return 'There is unknown error while re-starting game';
+            throw new \Exception('There is unknown error while re-starting game');
         }
     }
 
@@ -133,7 +134,7 @@ class GameController extends ContainerAware
         $player = $em->getRepository('Tchess\Entity\Player')->findOneBy(array('sid' => $sid));
 
         if (!empty($player) && $player instanceof Player && !empty($player->getRoom())) {
-            throw new \LogicException('Player has already joined a room.', 3);
+            throw new \LogicException('Player has already joined a room', ExceptionCodes::PLAYER);
         }
 
         if (empty($player)) {
@@ -162,7 +163,7 @@ class GameController extends ContainerAware
         $player->setRoom($room);
         $em->flush();
 
-        return 'User has join room with id: ' . $room->getId();
+        return 'Player has been joined a room';
     }
 
     /**
@@ -180,13 +181,13 @@ class GameController extends ContainerAware
         $player = $em->getRepository('Tchess\Entity\Player')->findOneBy(array('sid' => $sid));
 
         if (empty($player) || ($player instanceof Player && empty($player->getRoom()))) {
-            throw new \LogicException('Player did not join a room.', 3);
+            throw new \LogicException('Player did not join a room', ExceptionCodes::PLAYER);
         }
 
         $game = $player->getRoom()->getGame();
 
         if (empty($game) || ($game instanceof Game && !$game->getStarted())) {
-            throw new \LogicException('Opponent player did not started.', 4);
+            throw new \LogicException('Opponent player did not start the game', ExceptionCodes::PLAYER);
         } else {
             $move = new Move($request->request->get('move'));
             $color = $request->request->get('color');

@@ -19,10 +19,10 @@ class GameControllerTest extends TchessTestBase
     }
 
     /**
-     * @group join
+     * @group start
      * @expectedException \LogicException
-     * @expectedExceptionMessage Player did not join a room.
-     * @expectedExceptionCode 3
+     * @expectedExceptionMessage Player did not join a room
+     * @expectedExceptionCode \Tchess\ExceptionCodes::PLAYER
      */
     public function testStartGameWithoutJoiningRoom()
     {
@@ -33,8 +33,8 @@ class GameControllerTest extends TchessTestBase
     /**
      * @group start
      * @expectedException \LogicException
-     * @expectedExceptionMessage Game has been already started.
-     * @expectedExceptionCode 1
+     * @expectedExceptionMessage Game has been already started
+     * @expectedExceptionCode \Tchess\ExceptionCodes::PLAYER
      */
     public function testStartGameThatHasStarted()
     {
@@ -65,8 +65,20 @@ class GameControllerTest extends TchessTestBase
     /**
      * @group stop
      * @expectedException \LogicException
-     * @expectedExceptionMessage Game is not started.
-     * @expectedExceptionCode 1
+     * @expectedExceptionMessage Player did not join a room
+     * @expectedExceptionCode \Tchess\ExceptionCodes::PLAYER
+     */
+    public function testStopGameWithoutJoiningRoom()
+    {
+        $request = $this->getRequest('/stop-game', 'POST', array());
+        parent::$sc->get('framework')->handle($request);
+    }
+
+    /**
+     * @group stop
+     * @expectedException \LogicException
+     * @expectedExceptionMessage Game is not started
+     * @expectedExceptionCode \Tchess\ExceptionCodes::PLAYER
      */
     public function testStopGameThatHasNotStarted()
     {
@@ -92,6 +104,18 @@ class GameControllerTest extends TchessTestBase
         $response = parent::$sc->get('framework')->handle($request);
 
         $this->assertEquals('Game stopped', $response->getContent());
+    }
+
+    /**
+     * @group restart
+     * @expectedException \LogicException
+     * @expectedExceptionMessage Player did not join a room
+     * @expectedExceptionCode \Tchess\ExceptionCodes::PLAYER
+     */
+    public function testRestartGameWithoutJoiningRoom()
+    {
+        $request = $this->getRequest('/restart-game', 'POST', array());
+        parent::$sc->get('framework')->handle($request);
     }
 
     /**
@@ -126,10 +150,50 @@ class GameControllerTest extends TchessTestBase
     }
 
     /**
+     * @group join
+     */
+    public function testJoinGameOnce()
+    {
+        $request = $this->getRequest('/join-game', 'POST', array());
+        $response = parent::$sc->get('framework')->handle($request);
+
+        $this->assertEquals('Player has been joined a room', $response->getContent());
+    }
+
+    /**
+     * @group join
+     * @expectedException \LogicException
+     * @expectedExceptionMessage Player has already joined a room
+     * @expectedExceptionCode \Tchess\ExceptionCodes::PLAYER
+     */
+    public function testJoinGameTwice()
+    {
+        $request = $this->getRequest('/join-game', 'POST', array());
+        parent::$sc->get('framework')->handle($request);
+
+        $request = $this->getRequest('/join-game', 'POST', array(), $request->getSession());
+        parent::$sc->get('framework')->handle($request);
+    }
+
+    /**
      * @group move
      * @expectedException \LogicException
-     * @expectedExceptionMessage Opponent player did not started.
-     * @expectedExceptionCode 4
+     * @expectedExceptionMessage Player did not join a room
+     * @expectedExceptionCode \Tchess\ExceptionCodes::PLAYER
+     */
+    public function testMovePieceWithoutJoiningRoom()
+    {
+        $request = $this->getRequest('/piece-move', 'POST', array(
+            'move' => 'a2 a3'
+        ));
+        parent::$sc->get('framework')->handle($request);
+    }
+
+    /**
+     * @group move
+     * @expectedException \LogicException
+     * @expectedExceptionMessage Opponent player did not start the game
+     * @expectedExceptionCode \Tchess\ExceptionCodes::PLAYER
      */
     public function testWaitingForOpponent()
     {
