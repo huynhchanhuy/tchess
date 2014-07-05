@@ -14,15 +14,9 @@ $sc->register('loader', 'Symfony\Component\Routing\Loader\YamlFileLoader')
 $routes = $sc->get('loader')->load('routes.yml');
 $sc->setParameter('routes', $routes);
 
-$sc->setParameter('root_dir', __DIR__ . '/..');
 $sc->setParameter('entity_paths', array(__DIR__ . '/Entity'));
 
-$sc->register('yaml_parser', 'Symfony\Component\Yaml\Parser');
-
-$db_parameters = $sc->get('yaml_parser')->parse(file_get_contents(__DIR__ . "/../config/db_{$env}.yml"));
-// @todo - How we can automatically replace while reading yml file?
-$db_parameters['parameters']['path'] = str_replace('%root_dir%', $sc->getParameter('root_dir'), $db_parameters['parameters']['path']);
-$sc->setParameter('db_parameters', $db_parameters['parameters']);
+$sc->setParameter('db_config', $config);
 
 $sc->register('array_cache', 'Doctrine\Common\Cache\ArrayCache');
 
@@ -43,7 +37,7 @@ AnnotationRegistry::registerLoader('class_exists');
 $sc->register('entity_manager')
         ->setFactoryClass('Doctrine\ORM\EntityManager')
         ->setFactoryMethod('create')
-        ->setArguments(array('%db_parameters%', new Reference('entity_config')));
+        ->setArguments(array('%db_config%', new Reference('entity_config')));
 
 $sc->register('context', 'Symfony\Component\Routing\RequestContext');
 $sc->register('matcher', 'Symfony\Component\Routing\Matcher\UrlMatcher')

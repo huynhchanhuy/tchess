@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>Simple PHP Contact Form</title>
+        <meta name="HandheldFriendly" content="true">
+        <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+        <link href="style.css" rel="stylesheet" type="text/css" media="screen" />
+    </head>
+
+    <body>
+        <div class="wrapper">
+            <div id="contact_form">
+                <form name="form1" id="ff" method="post" action="installer.php">
+                    <h1>Installing Tchess</h1>
+                    <p>Please provide database connection settings.</p>
+                    <label>
+                        <span>Driver*:</span>
+                        <input type="text" name="driver" value="pdo_sqlite" required autofocus>
+                    </label>
+
+                    <label>
+                        <span>Path*:</span>
+                        <input type="text" name="path" value="%root_dir%/db/sqlite.db" required>
+                    </label>
+
+                    <label>
+                        <span>Charset:</span>
+                        <input type="text" name="charset" value="UTF-8">
+                    </label>
+
+                    <input class="sendButton" type="submit" value="Install">
+
+                </form>
+            </div>
+        </div>
+
+    </body>
+</html>

@@ -1,0 +1,6 @@
+<?php
+return array(
+    'driver' => '%db.driver%',
+    'path' => '%db.path%',
+    'charset' => '%db.charset%',
+);

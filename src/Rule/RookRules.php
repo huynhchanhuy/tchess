@@ -8,7 +8,7 @@ use Tchess\Event\MoveEvent;
 use Tchess\Entity\Piece\Bishop;
 use Tchess\Entity\Piece\Queen;
 
-class BishopRules implements EventSubscriberInterface
+class RookRules implements EventSubscriberInterface
 {
     public function onMoveChecking(MoveEvent $event)
     {

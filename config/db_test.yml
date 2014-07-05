@@ -1,4 +1,0 @@
-parameters:
-    driver:    pdo_sqlite
-    path:      %root_dir%/db/sqlite_test.db
-    charset:   UTF-8
