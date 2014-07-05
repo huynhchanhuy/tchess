@@ -39,13 +39,6 @@ class TchessTestBase extends PHPUnit_Framework_TestCase
         $schema_tool->createSchema($metadatas);
     }
 
-    public function joinGame()
-    {
-        $request = $this->getRequest('/join-game', 'POST');
-        static::$sc->get('framework')->handle($request);
-        return $request->getSession();
-    }
-
     protected function getRequest($path, $method = 'GET', $content = null, $session = null)
     {
         $request = Request::create($path, $method, array(), array(), array(), array(), $content);

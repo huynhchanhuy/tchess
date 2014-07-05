@@ -208,7 +208,7 @@ class GameController extends ContainerAware
      *
      * @return boolean
      */
-    public function isValidMove(Board $board, $move, $color)
+    private function isValidMove(Board $board, $move, $color)
     {
         $dispatcher = $this->container->get('dispatcher');
         $event = new MoveEvent($board, $move, $color);
@@ -219,7 +219,7 @@ class GameController extends ContainerAware
     /**
      * Actually move.
      */
-    public function performMove(Board $board, $move, $color)
+    private function performMove(Board $board, $move, $color)
     {
         $board->movePiece($move);
 

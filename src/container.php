@@ -24,7 +24,9 @@ $sc->register('entity_config')
         ->setFactoryClass('Doctrine\ORM\Tools\Setup')
         ->setFactoryMethod('createConfiguration')
         ->addMethodCall('setMetadataDriverImpl', array(new Reference('annotation_driver')))
-        ->addMethodCall('setMetadataCacheImpl', array(new Reference('array_cache')));
+        ->addMethodCall('setMetadataCacheImpl', array(new Reference('array_cache')))
+        ->addMethodCall('setResultCacheImpl', array(new Reference('array_cache')))
+        ->addMethodCall('setQueryCacheImpl', array(new Reference('array_cache')));
 
 $sc->register('annotation_reader', 'Doctrine\Common\Annotations\AnnotationReader');
 

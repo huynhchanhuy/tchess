@@ -6,27 +6,34 @@
 class GameControllerTest extends TchessTestBase
 {
 
-    public function setUp()
+    public function tearDown()
     {
         $entityManager = static::$sc->get('entity_manager');
         $metadatas = $entityManager->getMetadataFactory()->getAllMetadata();
         foreach ($metadatas as $metadata) {
             $entityManager->createQuery('DELETE FROM ' . $metadata->getName())->execute();
         }
+
+        // Delete doctrine's cache.
+        $entityManager->clear();
     }
 
     /**
      * @group start
+     * @expectedException \LogicException
+     * @expectedExceptionMessage Game has been already started.
+     * @expectedExceptionCode 1
      */
     public function testStartGameThatHasStarted()
     {
-        $session = $this->joinGame();
-        $session->set('started', true);
+        $request = $this->getRequest('/join-game', 'POST');
+        parent::$sc->get('framework')->handle($request);
 
-        $request = $this->getRequest('/start-game', 'POST', array(), $session);
-        $response = parent::$sc->get('framework')->handle($request);
+        $request = $this->getRequest('/start-game', 'POST', array(), $request->getSession());
+        parent::$sc->get('framework')->handle($request);
 
-        $this->assertEquals('Game started', $response->getContent());
+        $request = $this->getRequest('/start-game', 'POST', array(), $request->getSession());
+        parent::$sc->get('framework')->handle($request);
     }
 
     /**
@@ -34,10 +41,11 @@ class GameControllerTest extends TchessTestBase
      */
     public function testStartGameThatHasNotStarted()
     {
-        $request = $this->getRequest('/start-game', 'POST');
-        $request->getSession()->set('started', false);
+        $request = $this->getRequest('/join-game', 'POST');
+        parent::$sc->get('framework')->handle($request);
 
-        $response = $this->sc->get('framework')->handle($request);
+        $request = $this->getRequest('/start-game', 'POST', array(), $request->getSession());
+        $response = parent::$sc->get('framework')->handle($request);
 
         $this->assertEquals('Game started', $response->getContent());
     }
