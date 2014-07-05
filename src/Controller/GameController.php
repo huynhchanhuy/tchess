@@ -201,7 +201,7 @@ class GameController extends ContainerAware
             }
         }
 
-        return 'Move has been performed. Waiting for you opponent.';
+        return 'Move has been performed';
     }
 
 }

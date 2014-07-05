@@ -217,22 +217,46 @@ class GameControllerTest extends TchessTestBase
      */
     public function testInvalidMove()
     {
-        $request_opponent = $this->getRequest('/join-game', 'POST');
-        parent::$sc->get('framework')->handle($request_opponent);
 
-        $request_opponent = $this->getRequest('/start-game', 'POST', array(), $request_opponent->getSession());
-        parent::$sc->get('framework')->handle($request_opponent);
+        $session = $this->preparePlayers();
 
+        $request = $this->getRequest('/piece-move', 'POST', array(
+            'move' => 'b2 b7'
+        ), $session);
+        parent::$sc->get('framework')->handle($request);
+    }
+
+    /**
+     * @group move
+     */
+    public function testValidMove()
+    {
+
+        $session = $this->preparePlayers();
+
+        $request = $this->getRequest('/piece-move', 'POST', array(
+            'move' => 'b2 b3'
+        ), $session);
+        $response = parent::$sc->get('framework')->handle($request);
+
+        $this->assertEquals('Move has been performed', $response->getContent());
+    }
+
+    private function preparePlayers()
+    {
         $request = $this->getRequest('/join-game', 'POST');
         parent::$sc->get('framework')->handle($request);
 
         $request = $this->getRequest('/start-game', 'POST', array(), $request->getSession());
         parent::$sc->get('framework')->handle($request);
 
-        $request = $this->getRequest('/piece-move', 'POST', array(
-            'move' => 'b2 b7'
-        ), $request->getSession());
-        $response = parent::$sc->get('framework')->handle($request);
+        $request_opponent = $this->getRequest('/join-game', 'POST');
+        parent::$sc->get('framework')->handle($request_opponent);
+
+        $request_opponent = $this->getRequest('/start-game', 'POST', array(), $request_opponent->getSession());
+        parent::$sc->get('framework')->handle($request_opponent);
+
+        return $request->getSession();
     }
 
 }

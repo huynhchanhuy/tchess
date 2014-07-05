@@ -15,7 +15,7 @@ class PawnRules implements EventSubscriberInterface
 {
     public function onMoveChecking(MoveEvent $event)
     {
-        $board = $event->getGame()->getBoard();
+        $board = $event->getBoard();
         $move = $event->getMove();
         $color = $event->getColor();
         $piece = $board->getPiece($move->getCurrentRow(), $move->getCurrentColumn());

@@ -78,6 +78,7 @@ $sc->register('dispatcher', 'Symfony\Component\EventDispatcher\EventDispatcher')
         ->addMethodCall('addSubscriber', array(new Reference('rules.king')))
         ->addMethodCall('addSubscriber', array(new Reference('rules.knight')))
         ->addMethodCall('addSubscriber', array(new Reference('rules.rook')))
+        ->addMethodCall('addSubscriber', array(new Reference('rules.in_check')))
 ;
 
 
