@@ -159,6 +159,7 @@ class GameController extends ContainerAware
                 $room->addPlayer($player);
             }
         }
+        $player->setRoom($room);
         $em->flush();
 
         return 'User has join room with id: ' . $room->getId();

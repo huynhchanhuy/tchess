@@ -24,7 +24,7 @@ class RoomRepository extends EntityRepository
                         ->having('COUNT(DISTINCT p.id) < 2')
                         ->setMaxResults(1)
                         ->getQuery()
-                        ->getSingleResult();
+                        ->getOneOrNullResult();
     }
 
 }

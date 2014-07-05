@@ -26,6 +26,8 @@ file_put_contents(__DIR__ . '/../config/db-config.php', $configured_config_conte
 
 $config = include __DIR__ . '/../config/db-config.php';
 $config['path'] = str_replace('%root_dir%', __DIR__ . '/..', $config['path']);
+
+$env = 'prod';
 $sc = include __DIR__ . '/../src/container.php';
 
 use Doctrine\ORM\Tools\SchemaTool;

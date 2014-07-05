@@ -51,9 +51,6 @@ $sc->register('listener.router', 'Symfony\Component\HttpKernel\EventListener\Rou
 $sc->register('listener.response', 'Symfony\Component\HttpKernel\EventListener\ResponseListener')
         ->setArguments(array('UTF-8'))
 ;
-$sc->register('listener.exception', 'Symfony\Component\HttpKernel\EventListener\ExceptionListener')
-        ->setArguments(array('Tchess\\Controller\\ErrorController::exceptionAction'))
-;
 $sc->register('listener.response.string', 'Tchess\EventListener\StringResponseListener');
 $sc->register('listener.controller', 'Tchess\EventListener\ControllerListener');
 $sc->register('listener.game', 'Tchess\EventListener\GameListener')
@@ -70,7 +67,6 @@ $sc->register('rules.in_check', 'Tchess\Rule\InCheckRules')
 $sc->register('dispatcher', 'Symfony\Component\EventDispatcher\EventDispatcher')
         ->addMethodCall('addSubscriber', array(new Reference('listener.router')))
         ->addMethodCall('addSubscriber', array(new Reference('listener.response')))
-        ->addMethodCall('addSubscriber', array(new Reference('listener.exception')))
         ->addMethodCall('addSubscriber', array(new Reference('listener.response.string')))
         ->addMethodCall('addSubscriber', array(new Reference('listener.controller')))
         ->addMethodCall('addSubscriber', array(new Reference('listener.game')))
@@ -81,6 +77,15 @@ $sc->register('dispatcher', 'Symfony\Component\EventDispatcher\EventDispatcher')
         ->addMethodCall('addSubscriber', array(new Reference('rules.knight')))
         ->addMethodCall('addSubscriber', array(new Reference('rules.rook')))
 ;
+
+
+if ($env == 'prod') {
+    $sc->register('listener.exception', 'Symfony\Component\HttpKernel\EventListener\ExceptionListener')
+            ->setArguments(array('Tchess\\Controller\\ErrorController::exceptionAction'))
+    ;
+    $sc->getDefinition('dispatcher')->addMethodCall('addSubscriber', array(new Reference('listener.exception')));
+}
+
 $sc->register('framework', 'Tchess\Framework')
         ->setArguments(array(new Reference('dispatcher'), new Reference('resolver')))
         ->addMethodCall('setContainer', array($sc))
