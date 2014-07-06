@@ -17,6 +17,7 @@ class TchessTestBase extends PHPUnit_Framework_TestCase
 
     public static function setUpBeforeClass()
     {
+        // @todo - Use in memory sqlite to speed up the test.
         $config = array(
             'driver' => 'pdo_sqlite',
             'path' => '%root_dir%/db/sqlite_test.db',

@@ -67,6 +67,8 @@ $sc->register('rules.in_check', 'Tchess\Rule\InCheckRules')
         ->setArguments(array(new Reference('dispatcher')));
 
 $sc->register('dispatcher', 'Symfony\Component\EventDispatcher\EventDispatcher')
+        // @todo - This method 'addSubscriber' can be called automatically via
+        // compiler pass.
         ->addMethodCall('addSubscriber', array(new Reference('listener.router')))
         ->addMethodCall('addSubscriber', array(new Reference('listener.response')))
         ->addMethodCall('addSubscriber', array(new Reference('listener.response.string')))
@@ -91,6 +93,7 @@ if ($env == 'prod') {
 
 $sc->register('framework', 'Tchess\Framework')
         ->setArguments(array(new Reference('dispatcher'), new Reference('resolver')))
+        // @todo - Don't inject the container.
         ->addMethodCall('setContainer', array($sc))
 ;
 
