@@ -20,4 +20,9 @@ class Piece
     {
         $this->color = $color;
     }
+
+    public function __toString()
+    {
+        return $this->color == 'white' ? 'w' : 'b';
+    }
 }

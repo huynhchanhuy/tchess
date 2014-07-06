@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Tchess\GameEvents;
 use Tchess\Event\GameEvent;
 use Tchess\Entity\Game;
+use Tchess\Entity\Board;
 
 class GameListener implements EventSubscriberInterface
 {
@@ -28,11 +29,15 @@ class GameListener implements EventSubscriberInterface
         }
 
         if ($players[0]->getStarted() && $players[1]->getStarted()) {
+            $board = new Board();
+            $board->initialize();
+
             $game = new Game();
             $game->setTurn('white');
             $game->setRoom($room);
             $game->setStarted(true);
-            $game->setState('');
+            $game->setBoard($board);
+
             $this->em->persist($game);
 
             $room->setGame($game);

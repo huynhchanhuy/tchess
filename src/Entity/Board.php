@@ -1,6 +1,7 @@
 <?php
 
 namespace Tchess\Entity;
+
 use Tchess\Entity\Piece\Move;
 use Tchess\Entity\Piece\King;
 use Tchess\Entity\Piece\Rook;
@@ -9,16 +10,16 @@ use Tchess\Entity\Piece\Piece;
 use Tchess\Entity\Piece\Knight;
 use Tchess\Entity\Piece\Bishop;
 use Tchess\Entity\Piece\Queen;
+use Tchess\PieceFactory;
+use Symfony\Component\Serializer\Normalizer\NormalizableInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizableInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
-class Board
+class Board implements NormalizableInterface, DenormalizableInterface
 {
 
     protected $pieces;
-
-    public function __construct()
-    {
-        $this->initialize();
-    }
 
     /**
      * Get piece.
@@ -98,6 +99,26 @@ class Board
         if ($piece instanceof King || $piece instanceof Rook || $piece instanceof Pawn) {
             $piece->setHasMoved(true);
         }
+    }
+
+    public function denormalize(DenormalizerInterface $denormalizer, $data, $format = null, array $context = array())
+    {
+        for ($x = 0; $x < 8; $x++) {
+            for ($y = 0; $y < 8; $y++) {
+                $this->pieces[$x][$y] = (isset($data[$x][$y]) && !empty($data[$x][$y])) ? PieceFactory::create($data[$x][$y]) : null;
+            }
+        }
+    }
+
+    public function normalize(NormalizerInterface $normalizer, $format = null, array $context = array())
+    {
+        $state = array();
+        for ($x = 0; $x < 8; $x++) {
+            for ($y = 0; $y < 8; $y++) {
+                $state[$x][$y] = ($this->pieces[$x][$y] != null) ? (string) $this->pieces[$x][$y] : '';
+            }
+        }
+        return $state;
     }
 
 }

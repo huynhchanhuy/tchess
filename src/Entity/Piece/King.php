@@ -32,4 +32,9 @@ class King extends Piece
     {
         $this->castled = $castled;
     }
+
+    public function __toString()
+    {
+        return (string) parent . 'k';
+    }
 }

@@ -20,4 +20,9 @@ class Pawn extends Piece
     {
         $this->hasMoved = $hasMoved;
     }
+
+    public function __toString()
+    {
+        return (string) parent . 'p';
+    }
 }

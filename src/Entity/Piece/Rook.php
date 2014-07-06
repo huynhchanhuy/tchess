@@ -20,4 +20,9 @@ class Rook extends Piece
     {
         $this->hasMoved = $hasMoved;
     }
+
+    public function __toString()
+    {
+        return (string) parent . 'r';
+    }
 }

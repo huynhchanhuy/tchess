@@ -3,6 +3,9 @@
 namespace Tchess\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Tchess\Serializer\Encoder\BoardStringEncoder;
+use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
+use Symfony\Component\Serializer\Serializer;
 
 /**
  * @ORM\Entity(repositoryClass="Tchess\EntityRepository\GameRepository")
@@ -48,7 +51,12 @@ class Game
 
     public function __construct()
     {
-        $this->board = new Board();
+        // @todo - Use service container.
+        $encoders = array(new BoardStringEncoder());
+        $normalizers = array(new GetSetMethodNormalizer());
+
+        $this->serializer = new Serializer($normalizers, $encoders);
+
     }
 
     /**
@@ -138,6 +146,9 @@ class Game
      */
     public function setBoard(Board $board = null)
     {
+        if (!empty($this->board) && empty($this->state)) {
+            $this->saveGame();
+        }
         $this->board = $board;
 
         return $this;
@@ -150,6 +161,9 @@ class Game
      */
     public function getBoard()
     {
+        if (empty($this->board) && !empty($this->state)) {
+            $this->loadGame();
+        }
         return $this->board;
     }
 
@@ -157,7 +171,7 @@ class Game
      * Set started
      *
      * @param boolean $started
-     * @return Player
+     * @return Game
      */
     public function setStarted($started)
     {
@@ -174,6 +188,31 @@ class Game
     public function getStarted()
     {
         return $this->started;
+    }
+
+    /**
+     * Save state of the board.
+     *
+     * @return Game
+     */
+    private function saveGame()
+    {
+        $boardString = $this->serializer->serialize($this->board, 'board_string');
+        $this->state = $boardString;
+
+        return $this;
+    }
+
+    /**
+     * Load state of the board.
+     *
+     * @return Game
+     */
+    private function loadGame()
+    {
+        $this->board = $this->serializer->deserialize($this->state, 'Tchess\Entity\Board', 'board_string');
+
+        return $this;
     }
 
 }
