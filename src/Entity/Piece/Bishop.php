@@ -6,6 +6,6 @@ class Bishop extends Piece
 {
     public function __toString()
     {
-        return (string) parent . 'b';
+        return parent::__toString() . 'b';
     }
 }

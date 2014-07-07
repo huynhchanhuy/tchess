@@ -23,6 +23,6 @@ class Pawn extends Piece
 
     public function __toString()
     {
-        return (string) parent . 'p';
+        return parent::__toString() . 'p';
     }
 }

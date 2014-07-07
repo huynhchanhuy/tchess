@@ -35,6 +35,6 @@ class King extends Piece
 
     public function __toString()
     {
-        return (string) parent . 'k';
+        return parent::__toString() . 'k';
     }
 }

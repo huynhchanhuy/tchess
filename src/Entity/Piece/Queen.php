@@ -6,6 +6,6 @@ class Queen extends Piece
 {
     public function __toString()
     {
-        return (string) parent . 'q';
+        return parent::__toString() . 'q';
     }
 }

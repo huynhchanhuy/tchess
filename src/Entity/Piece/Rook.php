@@ -23,6 +23,6 @@ class Rook extends Piece
 
     public function __toString()
     {
-        return (string) parent . 'r';
+        return parent::__toString() . 'r';
     }
 }

@@ -37,6 +37,7 @@ class GameListener implements EventSubscriberInterface
             $game->setRoom($room);
             $game->setStarted(true);
             $game->setBoard($board);
+            $game->saveGame();
 
             $this->em->persist($game);
 

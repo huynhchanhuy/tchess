@@ -6,6 +6,6 @@ class Knight extends Piece
 {
     public function __toString()
     {
-        return (string) parent . 'n';
+        return parent::__toString() . 'n';
     }
 }

@@ -4,7 +4,7 @@ namespace Tchess\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Tchess\Serializer\Encoder\BoardStringEncoder;
-use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
+use Tchess\Serializer\Normalizer\BoardPiecesNormalizer;
 use Symfony\Component\Serializer\Serializer;
 
 /**
@@ -53,7 +53,7 @@ class Game
     {
         // @todo - Use service container.
         $encoders = array(new BoardStringEncoder());
-        $normalizers = array(new GetSetMethodNormalizer());
+        $normalizers = array(new BoardPiecesNormalizer());
 
         $this->serializer = new Serializer($normalizers, $encoders);
 
@@ -146,9 +146,6 @@ class Game
      */
     public function setBoard(Board $board = null)
     {
-        if (!empty($this->board) && empty($this->state)) {
-            $this->saveGame();
-        }
         $this->board = $board;
 
         return $this;
@@ -161,9 +158,6 @@ class Game
      */
     public function getBoard()
     {
-        if (empty($this->board) && !empty($this->state)) {
-            $this->loadGame();
-        }
         return $this->board;
     }
 
@@ -195,7 +189,7 @@ class Game
      *
      * @return Game
      */
-    private function saveGame()
+    public function saveGame()
     {
         $boardString = $this->serializer->serialize($this->board, 'board_string');
         $this->state = $boardString;
@@ -208,7 +202,7 @@ class Game
      *
      * @return Game
      */
-    private function loadGame()
+    public function loadGame()
     {
         $this->board = $this->serializer->deserialize($this->state, 'Tchess\Entity\Board', 'board_string');
 
