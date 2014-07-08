@@ -5,7 +5,6 @@ namespace Tchess\Controller;
 //use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\DependencyInjection\ContainerAware;
 use Tchess\Entity\Player;
 use Tchess\Entity\Room;
 use Tchess\GameEvents;

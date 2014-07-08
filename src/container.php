@@ -8,10 +8,10 @@ $sc = new DependencyInjection\ContainerBuilder();
 
 $sc->register('locator', 'Symfony\Component\Config\FileLocator')
         ->setArguments(array(__DIR__ . '/../config'));
-$sc->register('loader', 'Symfony\Component\Routing\Loader\YamlFileLoader')
+$sc->register('yaml_loader', 'Symfony\Component\Routing\Loader\YamlFileLoader')
         ->setArguments(array(new Reference('locator')));
 
-$routes = $sc->get('loader')->load('routes.yml');
+$routes = $sc->get('yaml_loader')->load('routes.yml');
 $sc->setParameter('routes', $routes);
 
 $sc->setParameter('entity_paths', array(__DIR__ . '/Entity'));
@@ -90,6 +90,49 @@ if ($env == 'prod') {
     ;
     $sc->getDefinition('dispatcher')->addMethodCall('addSubscriber', array(new Reference('listener.exception')));
 }
+
+$sc->register('url_generagor', 'Symfony\Component\Routing\Generator\UrlGenerator')
+        ->setArguments(array('%routes%', new Reference('context')));
+$sc->register('twig_routing_extension', 'Symfony\Bridge\Twig\Extension\RoutingExtension')
+        ->setArguments(array(new Reference('url_generagor')));
+
+$sc->register('twig_renderer_engine', 'Symfony\Bridge\Twig\Form\TwigRendererEngine');
+$sc->register('twig_renderer', 'Symfony\Bridge\Twig\Form\TwigRenderer')
+        ->setArguments(array(new Reference('twig_renderer_engine')));
+$sc->register('twig_form_extension', 'Symfony\Bridge\Twig\Extension\FormExtension')
+        ->setArguments(array(new Reference('twig_renderer')));
+
+$sc->setParameter('asset_root', __DIR__ . '/../resources');
+$sc->register('asset_factory', 'Assetic\Factory\AssetFactory')
+        ->setArguments(array('%asset_root%', $env == 'dev' ? true : false));
+$sc->register('twig_assetic_extension', 'Assetic\Extension\Twig\AsseticExtension')
+        ->setArguments(array(new Reference('asset_factory')));
+$sc->register('asset_function', 'Twig_SimpleFunction')
+        ->setArguments(array('asset', function ($asset) {
+            // implement whatever logic you need to determine the asset path
+
+            return sprintf('http://assets.examples.com/%s', ltrim($asset, '/'));
+        }));
+
+Twig_Autoloader::register();
+
+$twig_options = array(
+    'cache' => __DIR__ . '/../cache'
+);
+if ($env == 'dev') {
+    $twig_options['debug'] = true;
+}
+$sc->setParameter('twig_options', $twig_options);
+
+$sc->register('twig_loader', 'Twig_Loader_Filesystem')
+        ->setArguments(array(__DIR__ . '/../templates'));
+$sc->register('twig', 'Twig_Environment')
+        ->setArguments(array(new Reference('twig_loader'), '%twig_options%'))
+        ->addMethodCall('addExtension', array(new Reference('twig_routing_extension')))
+        ->addMethodCall('addExtension', array(new Reference('twig_form_extension')))
+        ->addMethodCall('addExtension', array(new Reference('twig_assetic_extension')))
+        ->addMethodCall('addFunction', array('asset', new Reference('asset_function')))
+;
 
 $sc->register('framework', 'Tchess\Framework')
         ->setArguments(array(new Reference('dispatcher'), new Reference('resolver')))

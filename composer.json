@@ -9,7 +9,11 @@
         "symfony/config": "v2.5.0",
         "symfony/yaml": "v2.5.0",
         "doctrine/orm": "v2.4.3",
-        "symfony/serializer": "v2.5.0"
+        "symfony/serializer": "v2.5.0",
+        "twig/twig": "v1.16.0",
+        "symfony/twig-bridge": "v2.5.0",
+        "symfony/form": "v2.5.0",
+        "kriswallsmith/assetic": "v1.1.2"
     },
     "autoload": {
         "psr-4": {
