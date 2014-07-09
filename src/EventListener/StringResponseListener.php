@@ -14,7 +14,7 @@ class StringResponseListener implements EventSubscriberInterface
     {
         $response = $event->getControllerResult();
 
-        if (is_string($response)) {
+        if (is_string($response) || is_null($response)) {
             $event->setResponse(new Response($response));
         }
     }

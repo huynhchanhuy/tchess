@@ -1,3 +1,7 @@
+home:
+    path:     /
+    defaults: { _controller: 'Tchess\Controller\GameController::indexAction' }
+
 join_game:
     path:     /join-game
     defaults: { _controller: 'Tchess\Controller\GameController::joinAction', _format: 'json' }

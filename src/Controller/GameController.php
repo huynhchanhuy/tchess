@@ -12,11 +12,55 @@ use Tchess\Event\GameEvent;
 use Tchess\MoveEvents;
 use Tchess\Event\MoveEvent;
 use Tchess\Entity\Piece\Move;
-use Tchess\Entity\Board;
 use Tchess\ExceptionCodes;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
-class GameController extends ContainerAware
+class GameController extends BaseController
 {
+
+    /**
+     * Show the board.
+     *
+     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @return string
+     */
+    public function indexAction(Request $request)
+    {
+        $em = $this->container->get('entity_manager');
+        $session = $request->getSession();
+        $sid = $session->getId();
+        $player = $em->getRepository('Tchess\Entity\Player')->findOneBy(array('sid' => $sid));
+
+        if (empty($player) || !$player instanceof Player) {
+            // Player is not joined a room.
+            $joined = false;
+
+            $form = $this->getFormFactory()->createBuilder()
+                    ->add('name', 'text', array(
+                        'constraints' => new NotBlank(),
+                    ))
+                    ->getForm();
+
+//            $player = new Player();
+//            $form = $this->createForm(new EnquiryType(), $player);
+//            if ($request->getMethod() == 'POST') {
+//                $form->bindRequest($request);
+//                if ($form->isValid()) {
+//                    // Perform some action, such as sending an email
+//                    // Redirect - This is important to prevent users re-posting
+//                    // the form if they refresh the page
+//                    return $this->redirect($this->generateUrl('BundleChessBundle_loggedin'));
+//                }
+//            }
+        } else {
+            $joined = true;
+        }
+
+        return $this->render('index.html.twig', array(
+                    'joined' => $joined,
+                    'form' => !$joined ? $form->createView() : null,
+                ));
+    }
 
     /**
      * Start game.

@@ -96,7 +96,9 @@ $sc->register('url_generagor', 'Symfony\Component\Routing\Generator\UrlGenerator
 $sc->register('twig_routing_extension', 'Symfony\Bridge\Twig\Extension\RoutingExtension')
         ->setArguments(array(new Reference('url_generagor')));
 
-$sc->register('twig_renderer_engine', 'Symfony\Bridge\Twig\Form\TwigRendererEngine');
+$sc->setParameter('default_form_theme', 'form_div_layout.html.twig');
+$sc->register('twig_renderer_engine', 'Symfony\Bridge\Twig\Form\TwigRendererEngine')
+        ->setArguments(array(array('%default_form_theme%')));
 $sc->register('twig_renderer', 'Symfony\Bridge\Twig\Form\TwigRenderer')
         ->setArguments(array(new Reference('twig_renderer_engine')));
 $sc->register('twig_form_extension', 'Symfony\Bridge\Twig\Extension\FormExtension')
@@ -114,6 +116,11 @@ $sc->register('asset_function', 'Twig_SimpleFunction')
             return sprintf('http://assets.examples.com/%s', ltrim($asset, '/'));
         }));
 
+$sc->register('translator', 'Symfony\Component\Translation\Translator')
+        ->setArguments(array('en'));
+$sc->register('twig_translation_extension', 'Symfony\Bridge\Twig\Extension\TranslationExtension')
+        ->setArguments(array(new Reference('translator')));
+
 Twig_Autoloader::register();
 
 $twig_options = array(
@@ -125,14 +132,36 @@ if ($env == 'dev') {
 $sc->setParameter('twig_options', $twig_options);
 
 $sc->register('twig_loader', 'Twig_Loader_Filesystem')
-        ->setArguments(array(__DIR__ . '/../templates'));
+        ->setArguments(array(array(
+            __DIR__ . '/../templates',
+            __DIR__ . '/../vendor/symfony/twig-bridge/Symfony/Bridge/Twig/Resources/views/Form'
+        )));
 $sc->register('twig', 'Twig_Environment')
         ->setArguments(array(new Reference('twig_loader'), '%twig_options%'))
         ->addMethodCall('addExtension', array(new Reference('twig_routing_extension')))
         ->addMethodCall('addExtension', array(new Reference('twig_form_extension')))
         ->addMethodCall('addExtension', array(new Reference('twig_assetic_extension')))
+        ->addMethodCall('addExtension', array(new Reference('twig_translation_extension')))
         ->addMethodCall('addFunction', array('asset', new Reference('asset_function')))
 ;
+
+
+$sc->register('validator')
+        ->setFactoryClass('Symfony\Component\Validator\Validation')
+        ->setFactoryMethod('createValidator');
+$sc->register('form_validator_extension', 'Symfony\Component\Form\Extension\Validator\ValidatorExtension')
+        ->setArguments(array(new Reference('validator')));
+
+$sc->register('form_http_foundation_extension', 'Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationExtension');
+$sc->register('form_factory_builder')
+        ->setFactoryClass('Symfony\Component\Form\Forms')
+        ->setFactoryMethod('createFormFactoryBuilder')
+        ->addMethodCall('addExtension', array(new Reference('form_http_foundation_extension')))
+        ->addMethodCall('addExtension', array(new Reference('form_validator_extension')))
+;
+$sc->register('form_factory')
+        ->setFactoryService(new Reference('form_factory_builder'))
+        ->setFactoryMethod('getFormFactory');
 
 $sc->register('framework', 'Tchess\Framework')
         ->setArguments(array(new Reference('dispatcher'), new Reference('resolver')))

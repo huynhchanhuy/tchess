@@ -15,7 +15,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
 $config = include __DIR__ . '/../config/db-config.php';
 $config['path'] = str_replace('%root_dir%', __DIR__ . '/..', $config['path']);
 
-$env = 'prod';
+$env = 'dev';
 $sc = include __DIR__ . '/../src/container.php';
 
 use Symfony\Component\HttpFoundation\Request;
