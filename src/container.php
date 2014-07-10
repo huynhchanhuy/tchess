@@ -12,7 +12,7 @@ register_kernel_services($sc, $env);
 
 register_chess_services($sc);
 
-register_twig_services($sc);
+register_twig_services($sc, $env);
 
 register_form_services($sc);
 
@@ -31,17 +31,18 @@ function register_form_services($sc) {
     $sc->register('form_factory_builder')
             ->setFactoryClass('Symfony\Component\Form\Forms')
             ->setFactoryMethod('createFormFactoryBuilder')
+            ->addMethodCall('addExtension', array(new Reference('form_csrf_extension')))
+            ->addMethodCall('addExtension', array(new Reference('form_http_foundation_extension')))
+            ->addMethodCall('addExtension', array(new Reference('form_validator_extension')))
     ;
 
     $sc->register('form_factory')
             ->setFactoryService(new Reference('form_factory_builder'))
-            ->addMethodCall('addExtension', array(new Reference('form_csrf_extension')))
-            ->addMethodCall('addExtension', array(new Reference('form_http_foundation_extension')))
-            ->addMethodCall('addExtension', array(new Reference('form_validator_extension')))
-            ->setFactoryMethod('getFormFactory');
+            ->setFactoryMethod('getFormFactory')
+    ;
 }
 
-function register_twig_services($sc) {
+function register_twig_services($sc, $env) {
     $sc->register('url_generagor', 'Symfony\Component\Routing\Generator\UrlGenerator')
         ->setArguments(array('%routes%', new Reference('context')));
     $sc->register('twig_routing_extension', 'Symfony\Bridge\Twig\Extension\RoutingExtension')
