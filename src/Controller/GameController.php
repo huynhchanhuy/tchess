@@ -32,34 +32,66 @@ class GameController extends BaseController
         $player = $em->getRepository('Tchess\Entity\Player')->findOneBy(array('sid' => $sid));
 
         if (empty($player) || !$player instanceof Player) {
-            // Player is not joined a room.
-            $joined = false;
-
-            $form = $this->getFormFactory()->createBuilder()
-                    ->add('name', 'text', array(
-                        'constraints' => new NotBlank(),
-                    ))
-                    ->getForm();
-
-//            $player = new Player();
-//            $form = $this->createForm(new EnquiryType(), $player);
-//            if ($request->getMethod() == 'POST') {
-//                $form->bindRequest($request);
-//                if ($form->isValid()) {
-//                    // Perform some action, such as sending an email
-//                    // Redirect - This is important to prevent users re-posting
-//                    // the form if they refresh the page
-//                    return $this->redirect($this->generateUrl('BundleChessBundle_loggedin'));
-//                }
-//            }
-        } else {
-            $joined = true;
+            return $this->redirect($this->generateUrl('register'));
         }
 
-        return $this->render('index.html.twig', array(
-                    'joined' => $joined,
-                    'form' => !$joined ? $form->createView() : null,
-                ));
+        return $this->render('index.html.twig');
+    }
+
+    /**
+     * Show register form.
+     *
+     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @return string
+     */
+    public function registerAction(Request $request)
+    {
+        $em = $this->container->get('entity_manager');
+        $session = $request->getSession();
+        $sid = $session->getId();
+        $player = $em->getRepository('Tchess\Entity\Player')->findOneBy(array('sid' => $sid));
+
+        if (!empty($player) && $player instanceof Player) {
+            return $this->redirect($this->generateUrl('join-room'));
+        }
+
+        $form = $this->getFormFactory()->createBuilder()
+            ->add('name', 'text', array(
+                'constraints' => new NotBlank(),
+            ))
+            ->add('auto_join', 'checkbox', array(
+                'label'     => 'Automatically join room',
+                'required'  => false,
+            ))
+            ->getForm();
+
+        if ($request->getMethod() == 'POST') {
+            $form->bind($request);
+            if ($form->isValid()) {
+                $data = $form->getData();
+                $player = new Player();
+                $player->setSid($sid);
+                $player->setStarted(false);
+                $player->setName($data['name']);
+                // Default color for all player, will be updated later.
+                $player->setColor('white');
+                $em->persist($player);
+                $em->flush();
+
+                if ($data['auto_join']) {
+                    $sub_request = Request::create('/join-empty-room');
+                    $sub_request->setSession($session);
+                    $this->container->get('framework')->handle($sub_request, HttpKernelInterface::SUB_REQUEST);
+                    return $this->redirect($this->generateUrl('homepage'));
+                }
+
+                return $this->redirect($this->generateUrl('join-room'));
+            }
+        }
+
+        return $this->render('register.html.twig', array(
+            'form' => $form->createView(),
+        ));
     }
 
     /**

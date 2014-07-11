@@ -1,20 +1,20 @@
 {
     "require": {
-        "symfony/class-loader": "v2.5.0",
-        "symfony/http-foundation": "v2.5.0",
-        "symfony/routing": "v2.5.0",
-        "symfony/http-kernel": "v2.5.0",
-        "symfony/event-dispatcher": "v2.5.0",
-        "symfony/dependency-injection": "v2.5.0",
-        "symfony/config": "v2.5.0",
-        "symfony/yaml": "v2.5.0",
+        "symfony/class-loader": "v2.5.1",
+        "symfony/http-foundation": "v2.5.1",
+        "symfony/routing": "v2.5.1",
+        "symfony/http-kernel": "v2.5.1",
+        "symfony/event-dispatcher": "v2.5.1",
+        "symfony/dependency-injection": "v2.5.1",
+        "symfony/config": "v2.5.1",
+        "symfony/yaml": "v2.5.1",
         "doctrine/orm": "v2.4.3",
-        "symfony/serializer": "v2.5.0",
+        "symfony/serializer": "v2.5.1",
         "twig/twig": "v1.16.0",
-        "symfony/twig-bridge": "v2.5.0",
-        "symfony/form": "v2.5.0",
+        "symfony/twig-bridge": "v2.5.1",
+        "symfony/form": "v2.5.1",
         "kriswallsmith/assetic": "v1.1.2",
-        "symfony/validator": "v2.5.0"
+        "symfony/validator": "v2.5.1"
     },
     "autoload": {
         "psr-4": {

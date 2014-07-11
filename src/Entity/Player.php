@@ -40,6 +40,11 @@ class Player
     protected $started;
 
     /**
+     * @ORM\Column(type="string")
+     */
+    protected $name;
+
+    /**
      * Get id
      *
      * @return integer
@@ -139,6 +144,29 @@ class Player
     public function getRoom()
     {
         return $this->room;
+    }
+
+    /**
+     * Set name
+     *
+     * @param string $name
+     * @return Player
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * Get name
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
     }
 
 }

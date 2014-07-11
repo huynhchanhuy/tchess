@@ -30,6 +30,8 @@ if (!$request->getSession()) {
     $request->setSession($session);
 }
 
+$sc->get('asset_writer')->writeManagerAssets($sc->get('asset_asset_manager'));
+
 $sc->get('context')->fromRequest($request);
 
 $response = $sc->get('framework')->handle($request);

@@ -61,9 +61,40 @@ function register_twig_services($sc, $env) {
     $sc->register('twig_form_extension', 'Symfony\Bridge\Twig\Extension\FormExtension')
             ->setArguments(array(new Reference('twig_renderer')));
 
+    // Assets
+    $sc->register('bootstrap_css_asset', 'Assetic\Asset\FileAsset')
+            ->setArguments(array(__DIR__ . '/../resources/css/bootstrap.min.css'))
+            ->addMethodCall('setTargetPath', array('css/bootstrap.min.css'));
+    $sc->register('register_css_glob_asset', 'Assetic\Asset\GlobAsset')
+            ->setArguments(array(__DIR__ . '/../resources/css/register/*', array(new Reference('yui_css_compressor_filter'))))
+            ->addMethodCall('setTargetPath', array('css/register.css'));
+//    $sc->register('ie8_fix_js_asset', 'Assetic\Asset\FileAsset')
+//            ->setArguments(array(__DIR__ . '/../resources/js/fix/ie8-responsive-file-warning.js'))
+//            ->addMethodCall('setTargetPath', array('ie8_fix.js'));
+//    $sc->register('images_glob_asset', 'Assetic\Asset\GlobAsset')
+//            ->setArguments(array(__DIR__ . '/../resources/images/*'))
+//            ->addMethodCall('setTargetPath', array('all.images'));
+
+    $sc->register('asset_asset_manager', 'Assetic\AssetManager')
+            ->addMethodCall('set', array('bootstrap', new Reference('bootstrap_css_asset')))
+            ->addMethodCall('set', array('register', new Reference('register_css_glob_asset')))
+//            ->addMethodCall('set', array('js', new Reference('js_glob_asset')))
+//            ->addMethodCall('set', array('images', new Reference('images_glob_asset')))
+    ;
+
+    $sc->register('yui_css_compressor_filter', 'Assetic\Filter\Yui\CssCompressorFilter')
+            ->setArguments(array(__DIR__ . '/../bin/yuicompressor-2.4.8.jar'));
+    $sc->register('asset_filter_manager', 'Assetic\FilterManager')
+            ->addMethodCall('set', array('yui_css', new Reference('yui_css_compressor_filter')));
+    $sc->register('asset_writer', 'Assetic\AssetWriter')
+            ->setArguments(array(__DIR__ . '/../web/resources'));
     $sc->setParameter('asset_root', __DIR__ . '/../resources');
     $sc->register('asset_factory', 'Assetic\Factory\AssetFactory')
-            ->setArguments(array('%asset_root%', $env == 'dev' ? true : false));
+            ->setArguments(array('%asset_root%'))
+            ->addMethodCall('setAssetManager', array(new Reference('asset_asset_manager')))
+            ->addMethodCall('setFilterManager', array(new Reference('asset_filter_manager')))
+            ->addMethodCall('setDebug', array($env == 'dev' ? true : false))
+    ;
     $sc->register('twig_assetic_extension', 'Assetic\Extension\Twig\AsseticExtension')
             ->setArguments(array(new Reference('asset_factory')));
     $sc->register('asset_function', 'Twig_SimpleFunction')

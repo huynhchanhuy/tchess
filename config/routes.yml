@@ -2,8 +2,12 @@ home:
     path:     /
     defaults: { _controller: 'Tchess\Controller\GameController::indexAction' }
 
-join_game:
-    path:     /join-game
+register:
+    path:     /register
+    defaults: { _controller: 'Tchess\Controller\GameController::registerAction' }
+
+join_room:
+    path:     /join-room
     defaults: { _controller: 'Tchess\Controller\GameController::joinAction', _format: 'json' }
     methods:  [POST]
 
@@ -22,7 +26,7 @@ restart_game:
     defaults: { _controller: 'Tchess\Controller\GameController::restartAction', _format: 'json' }
     methods:  [POST]
 
-piece_move:
-    path:     /piece-move
+move_piece:
+    path:     /move-piece
     defaults: { _controller: 'Tchess\Controller\GameController::moveAction', _format: 'json' }
     methods:  [POST]

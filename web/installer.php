@@ -44,6 +44,9 @@ $schema_tool->dropSchema($metadatas);
 // recreate schemas
 $schema_tool->createSchema($metadatas);
 
+// Write assets to web directory to avoid 404 errors.
+$sc->get('asset_writer')->writeManagerAssets($sc->get('asset_asset_manager'));
+
 header('Content-type: text/html; charset=utf-8', true, 200);
 
 echo '<h2>Installed</h2>';
