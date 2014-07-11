@@ -1,4 +1,4 @@
-home:
+homepage:
     path:     /
     defaults: { _controller: 'Tchess\Controller\GameController::indexAction' }
 
@@ -6,10 +6,23 @@ register:
     path:     /register
     defaults: { _controller: 'Tchess\Controller\GameController::registerAction' }
 
+auto_join_room:
+    path:     /auto-join-room
+    defaults: { _controller: 'Tchess\Controller\GameController::autoJoinAction' }
+
+rooms:
+    path:     /rooms
+    defaults: { _controller: 'Tchess\Controller\RoomController::indexAction' }
+
+create_room:
+    path:     /create-room
+    defaults: { _controller: 'Tchess\Controller\RoomController::createAction' }
+
 join_room:
-    path:     /join-room
-    defaults: { _controller: 'Tchess\Controller\GameController::joinAction', _format: 'json' }
-    methods:  [POST]
+    path:     /join-room/{room}
+    defaults: { _controller: 'Tchess\Controller\GameController::joinAction' }
+    requirements:
+        room:  \d+
 
 start_game:
     path:     /start-game

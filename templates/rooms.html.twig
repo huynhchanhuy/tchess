@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    <link href="resources/css/bootstrap.min.css" rel="stylesheet" media="screen" />
+{% endblock %}
+
+{% block body %}
+    <div class="container">
+
+      <table class="table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Opponent Name</th>
+          <th>Opponent Color</th>
+          <th>Opponent Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if rooms is empty %}
+              <a href="{{ path('create_room') }}">Create Room</a>
+        {% else %}
+            {% for room in rooms %}
+            <tr>
+              <td>{{ room.id }}</td>
+              <td>{{ (room.players|first).name }}</td>
+              <td>{{ (room.players|first).color }}</td>
+              <td>{{ (room.players|first).started ? 'Started' : '-' }}</td>
+              <td><a href="{{ path('join_room', { 'room': room.id }) }}">Join</a></td>
+            </tr>
+            {% endfor %}
+        {% endif %}
+      </tbody>
+    </table>
+
+    </div> <!-- /container -->
+{% endblock %}

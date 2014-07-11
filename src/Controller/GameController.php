@@ -35,6 +35,11 @@ class GameController extends BaseController
             return $this->redirect($this->generateUrl('register'));
         }
 
+        $last_room = $player->getRoom();
+        if (empty($last_room) || !$last_room instanceof Room) {
+            return $this->redirect($this->generateUrl('rooms'));
+        }
+
         return $this->render('index.html.twig');
     }
 
@@ -52,7 +57,7 @@ class GameController extends BaseController
         $player = $em->getRepository('Tchess\Entity\Player')->findOneBy(array('sid' => $sid));
 
         if (!empty($player) && $player instanceof Player) {
-            return $this->redirect($this->generateUrl('join-room'));
+            return $this->redirect($this->generateUrl('rooms'));
         }
 
         $form = $this->getFormFactory()->createBuilder()
@@ -79,19 +84,105 @@ class GameController extends BaseController
                 $em->flush();
 
                 if ($data['auto_join']) {
-                    $sub_request = Request::create('/join-empty-room');
+                    $sub_request = Request::create('/auto-join-room');
                     $sub_request->setSession($session);
-                    $this->container->get('framework')->handle($sub_request, HttpKernelInterface::SUB_REQUEST);
-                    return $this->redirect($this->generateUrl('homepage'));
+                    return $this->container->get('framework')->handle($sub_request, HttpKernelInterface::SUB_REQUEST);
                 }
 
-                return $this->redirect($this->generateUrl('join-room'));
+                return $this->redirect($this->generateUrl('rooms'));
             }
         }
 
         return $this->render('register.html.twig', array(
             'form' => $form->createView(),
         ));
+    }
+
+    /**
+     * Automatically join game.
+     *
+     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @return string
+     */
+    public function autoJoinAction(Request $request)
+    {
+        $em = $this->container->get('entity_manager');
+        $session = $request->getSession();
+        $sid = $session->getId();
+
+        $player = $em->getRepository('Tchess\Entity\Player')->findOneBy(array('sid' => $sid));
+
+        if (empty($player) || !$player instanceof Player) {
+            throw new \LogicException('Player did not registered', ExceptionCodes::PLAYER);
+        }
+
+        $last_room = $player->getRoom();
+        if (empty($last_room) || !$last_room instanceof Room) {
+            $room = $em->getRepository('Tchess\Entity\Room')
+                    ->findOpenRoom($player);
+
+            if (empty($room)) {
+                $room = new Room();
+                $room->addPlayer($player);
+                $em->persist($room);
+            } else {
+                $players = $room->getPlayers();
+                $opponent_player = reset($players);
+                $player->setColor($opponent_player->getColor() == 'white' ? 'black' : 'white');
+                $room->addPlayer($player);
+            }
+            $player->setRoom($room);
+            $em->flush();
+        }
+        else {
+            // If you want to play with other player, please leave room first.
+        }
+
+        return $this->redirect($this->generateUrl('homepage'));
+    }
+
+    /**
+     * Join game.
+     *
+     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @return string
+     */
+    public function joinAction(Request $request, $room = null)
+    {
+        $em = $this->container->get('entity_manager');
+        $session = $request->getSession();
+        $sid = $session->getId();
+
+        $player = $em->getRepository('Tchess\Entity\Player')->findOneBy(array('sid' => $sid));
+
+        if (empty($player) || !$player instanceof Player) {
+            throw new \LogicException('Player did not registered', ExceptionCodes::PLAYER);
+        }
+
+        $last_room = $player->getRoom();
+        if (!empty($last_room) && $last_room instanceof Room) {
+            if ($last_room->getId() != $room) {
+                throw new \LogicException('Player already join another room', ExceptionCodes::PLAYER);
+            }
+            else {
+                return $this->redirect($this->generateUrl('homepage'));
+            }
+        }
+
+        $room = $em->getRepository('Tchess\Entity\Room')->findOneBy(array('id' => $room));
+        $players = $room->getPlayers();
+
+        if (count($players) != 1) {
+            throw new \LogicException('Room must have only one players to join', ExceptionCodes::PLAYER);
+        }
+
+        $opponent_player = reset($players);
+        $player->setColor($opponent_player->getColor() == 'white' ? 'black' : 'white');
+        $room->addPlayer($player);
+        $player->setRoom($room);
+        $em->flush();
+
+        return $this->redirect($this->generateUrl('homepage'));
     }
 
     /**
@@ -192,53 +283,6 @@ class GameController extends BaseController
         } else {
             throw new \Exception('There is unknown error while re-starting game');
         }
-    }
-
-    /**
-     * Join game.
-     *
-     * @param \Symfony\Component\HttpFoundation\Request $request
-     * @return string
-     */
-    public function joinAction(Request $request)
-    {
-        $em = $this->container->get('entity_manager');
-        $session = $request->getSession();
-        $sid = $session->getId();
-
-        $player = $em->getRepository('Tchess\Entity\Player')->findOneBy(array('sid' => $sid));
-
-        if (!empty($player) && $player instanceof Player && !empty($player->getRoom())) {
-            throw new \LogicException('Player has already joined a room', ExceptionCodes::PLAYER);
-        }
-
-        if (empty($player)) {
-            $player = new Player();
-            $player->setSid($sid);
-            $player->setStarted(false);
-            // Default color for all player, will be updated later.
-            $player->setColor('white');
-            $em->persist($player);
-        }
-
-        $room = $em->getRepository('Tchess\Entity\Room')
-                ->findOpenRoom();
-
-        if (empty($room)) {
-            $room = new Room();
-            $room->addPlayer($player);
-            $em->persist($room);
-        } else {
-            $players = $room->getPlayers();
-            if (count($players) == 1 && $players[0]->getColor() == 'white' && $players[0]->getSid() != $player->getSid()) {
-                $player->setColor('black');
-                $room->addPlayer($player);
-            }
-        }
-        $player->setRoom($room);
-        $em->flush();
-
-        return 'Player has been joined a room';
     }
 
     /**
