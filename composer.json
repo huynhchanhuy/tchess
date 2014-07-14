@@ -1,4 +1,60 @@
 {
+    "name": "tienvx/tchess",
+    "license": "MIT",
+    "repositories": [{
+        "type": "package",
+        "package": {
+            "version": "dev-master",
+            "name": "tienvx/chessboardjs",
+            "type": "js-vendor",
+            "source": {
+                "url": "https://github.com/oakmac/chessboardjs.git",
+                "type": "git",
+                "reference": "master"
+            }
+        }
+    },
+    {
+        "type": "package",
+        "package": {
+            "version": "0.3.0",
+            "name": "tienvx/chessboardjs",
+            "type": "js-vendor",
+            "dist": {
+                "url": "http://chessboardjs.com/releases/0.3.0/chessboardjs-0.3.0.zip",
+                "type": "zip"
+            }
+        }
+    },
+    {
+        "type": "vcs",
+        "url": "git@github.com:tienvx/js-vendor-installer-plugin.git"
+    },
+    {
+        "type": "package",
+        "package": {
+            "version": "dev-master",
+            "name": "tienvx/chessjs",
+            "type": "js-vendor",
+            "source": {
+                "url": "https://github.com/jhlywa/chess.js.git",
+                "type": "git",
+                "reference": "master"
+            }
+        }
+    },
+    {
+        "type": "package",
+        "package": {
+            "name": "tienvx/jquery",
+            "version": "1.11.1",
+            "type": "js-vendor",
+            "dist": {
+                "url": "http://code.jquery.com/jquery-1.11.1.min.js",
+                "type": "file"
+            }
+        }
+    }],
     "require": {
         "symfony/class-loader": "v2.5.1",
         "symfony/http-foundation": "v2.5.1",
@@ -14,11 +70,22 @@
         "symfony/twig-bridge": "v2.5.1",
         "symfony/form": "v2.5.1",
         "kriswallsmith/assetic": "v1.1.2",
-        "symfony/validator": "v2.5.1"
+        "symfony/validator": "v2.5.1",
+        "tienvx/js-vendor-installer-plugin": "v1.1.1",
+        "tienvx/chessboardjs": "0.3.0",
+        "tienvx/chessjs": "dev-master",
+        "tienvx/jquery": "1.11.1"
     },
     "autoload": {
         "psr-4": {
             "Tchess\\": "src/"
+        }
+    },
+    "extra": {
+        "installer-paths": {
+            "web/js-vendor/tienvx/chessboardjs/": ["tienvx/chessboardjs"],
+            "web/js-vendor/tienvx/chessjs/": ["tienvx/chessjs"],
+            "web/js-vendor/tienvx/jquery/": ["tienvx/jquery"]
         }
     }
 }

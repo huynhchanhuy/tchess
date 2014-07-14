@@ -12,7 +12,7 @@ class BaseController extends ContainerAware
     /**
      * Render a template
      */
-    public function render($template, $variables)
+    public function render($template, $variables = array())
     {
         $twig = $this->container->get('twig');
         return $twig->render($template, $variables);

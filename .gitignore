@@ -2,3 +2,5 @@ vendor/
 nbproject/
 cache/
 bin/
+web/js-vendor/
+files/proxies/*.php

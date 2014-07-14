@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "87832e952b7481c56fa8bb9a13588019",
+    "hash": "05646e5489ba2f932a8396db6a6f7e40",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -141,7 +141,7 @@
                 {
                     "name": "Johannes Schmitt",
                     "email": "schmittjoh@gmail.com",
-                    "homepage": "https://github.com/schmittjoh",
+                    "homepage": "http://jmsyst.com",
                     "role": "Developer of wrapped JMSSerializerBundle"
                 }
             ],
@@ -413,7 +413,7 @@
                     "email": "kontakt@beberlei.de"
                 },
                 {
-                    "name": "Johannes Schmitt",
+                    "name": "Johannes M. Schmitt",
                     "email": "schmittjoh@gmail.com",
                     "homepage": "http://jmsyst.com",
                     "role": "Developer of wrapped JMSSerializerBundle"
@@ -2021,6 +2021,90 @@
             "time": "2014-07-08 12:21:33"
         },
         {
+            "name": "tienvx/chessboardjs",
+            "version": "0.3.0",
+            "dist": {
+                "type": "zip",
+                "url": "http://chessboardjs.com/releases/0.3.0/chessboardjs-0.3.0.zip",
+                "reference": null,
+                "shasum": null
+            },
+            "type": "js-vendor"
+        },
+        {
+            "name": "tienvx/chessjs",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jhlywa/chess.js.git",
+                "reference": "master"
+            },
+            "type": "js-vendor",
+            "time": "2014-06-18 11:42:55"
+        },
+        {
+            "name": "tienvx/jquery",
+            "version": "1.11.1",
+            "dist": {
+                "type": "file",
+                "url": "http://code.jquery.com/jquery-1.11.1.min.js",
+                "reference": null,
+                "shasum": null
+            },
+            "type": "js-vendor"
+        },
+        {
+            "name": "tienvx/js-vendor-installer-plugin",
+            "version": "v1.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/tienvx/js-vendor-installer-plugin.git",
+                "reference": "15ba7210a276fe85bdb078eaf0e7e76206cf827d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/tienvx/js-vendor-installer-plugin/zipball/15ba7210a276fe85bdb078eaf0e7e76206cf827d",
+                "reference": "15ba7210a276fe85bdb078eaf0e7e76206cf827d",
+                "shasum": ""
+            },
+            "require": {
+                "composer-plugin-api": "*",
+                "php": ">=5.3"
+            },
+            "type": "composer-plugin",
+            "extra": {
+                "class": [
+                    "Jsvendor\\Installer\\JsvendorPlugin"
+                ]
+            },
+            "autoload": {
+                "psr-4": {
+                    "Jsvendor\\": "src/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Tien Vo Xuan",
+                    "email": "tien.xuan.vo@gmail.com"
+                }
+            ],
+            "description": "A composer plugin, to help install packages of different types in custom paths.",
+            "homepage": "https://github.com/tienvx",
+            "keywords": [
+                "composer",
+                "composer-installer",
+                "composer-plugin"
+            ],
+            "support": {
+                "source": "https://github.com/tienvx/js-vendor-installer-plugin/tree/v1.1.1",
+                "issues": "https://github.com/tienvx/js-vendor-installer-plugin/issues"
+            },
+            "time": "2014-07-14 14:06:25"
+        },
+        {
             "name": "twig/twig",
             "version": "v1.16.0",
             "source": {
@@ -2060,7 +2144,7 @@
                     "role": "Lead Developer"
                 },
                 {
-                    "name": "Armin Ronacher",
+                    "name": "Armin Ronacher2",
                     "email": "armin.ronacher@active-4.com",
                     "role": "Project Founder"
                 },
@@ -2085,9 +2169,9 @@
 
     ],
     "minimum-stability": "stable",
-    "stability-flags": [
-
-    ],
+    "stability-flags": {
+        "tienvx/chessjs": 20
+    },
     "platform": [
 
     ],

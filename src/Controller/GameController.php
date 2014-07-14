@@ -40,7 +40,7 @@ class GameController extends BaseController
             return $this->redirect($this->generateUrl('rooms'));
         }
 
-        return $this->render('index.html.twig');
+        return $this->render('homepage.html.twig');
     }
 
     /**

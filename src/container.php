@@ -68,18 +68,18 @@ function register_twig_services($sc, $env) {
     $sc->register('register_css_glob_asset', 'Assetic\Asset\GlobAsset')
             ->setArguments(array(__DIR__ . '/../resources/css/register/*', array(new Reference('yui_css_compressor_filter'))))
             ->addMethodCall('setTargetPath', array('css/register.css'));
-//    $sc->register('ie8_fix_js_asset', 'Assetic\Asset\FileAsset')
-//            ->setArguments(array(__DIR__ . '/../resources/js/fix/ie8-responsive-file-warning.js'))
-//            ->addMethodCall('setTargetPath', array('ie8_fix.js'));
-//    $sc->register('images_glob_asset', 'Assetic\Asset\GlobAsset')
-//            ->setArguments(array(__DIR__ . '/../resources/images/*'))
-//            ->addMethodCall('setTargetPath', array('all.images'));
+    $sc->register('chess_js_asset', 'Assetic\Asset\FileAsset')
+            ->setArguments(array(__DIR__ . '/../resources/js/chess.js'))
+            ->addMethodCall('setTargetPath', array('js/chess.js'));
+    $sc->register('favicon_asset', 'Assetic\Asset\FileAsset')
+            ->setArguments(array(__DIR__ . '/../resources/images/favicon.ico'))
+            ->addMethodCall('setTargetPath', array('images/favicon.ico'));
 
     $sc->register('asset_asset_manager', 'Assetic\AssetManager')
             ->addMethodCall('set', array('bootstrap', new Reference('bootstrap_css_asset')))
-            ->addMethodCall('set', array('register', new Reference('register_css_glob_asset')))
-//            ->addMethodCall('set', array('js', new Reference('js_glob_asset')))
-//            ->addMethodCall('set', array('images', new Reference('images_glob_asset')))
+            ->addMethodCall('set', array('register_css', new Reference('register_css_glob_asset')))
+            ->addMethodCall('set', array('chess_js', new Reference('chess_js_asset')))
+            ->addMethodCall('set', array('favicon', new Reference('favicon_asset')))
     ;
 
     $sc->register('yui_css_compressor_filter', 'Assetic\Filter\Yui\CssCompressorFilter')
@@ -224,7 +224,11 @@ function register_db_services($sc, $config) {
             ->addMethodCall('setMetadataDriverImpl', array(new Reference('annotation_driver')))
             ->addMethodCall('setMetadataCacheImpl', array(new Reference('array_cache')))
             ->addMethodCall('setResultCacheImpl', array(new Reference('array_cache')))
-            ->addMethodCall('setQueryCacheImpl', array(new Reference('array_cache')));
+            ->addMethodCall('setQueryCacheImpl', array(new Reference('array_cache')))
+            ->addMethodCall('setProxyDir', array(__DIR__ . '/../files/proxies'))
+            ->addMethodCall('setProxyNamespace', array('EntityProxy'))
+            ->addMethodCall('setAutoGenerateProxyClasses', array(true))
+    ;
 
     $sc->register('annotation_reader', 'Doctrine\Common\Annotations\AnnotationReader');
 
