@@ -147,6 +147,7 @@ class Move
 
     public function setPromotion($promotion)
     {
+        $promotion = strtoupper($promotion);
         if (!in_array($promotion, array('Q', 'K', 'B', 'R'))) {
             $promotion = 'Q';
         }

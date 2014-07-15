@@ -16,6 +16,15 @@ register_twig_services($sc, $env);
 
 register_form_services($sc);
 
+register_serializer_services($sc);
+
+function register_serializer_services($sc) {
+    $sc->register('board_string_encoder', 'Tchess\Serializer\Encoder\BoardStringEncoder');
+    $sc->register('board_pieces_normalizer', 'Tchess\Serializer\Normalizer\BoardPiecesNormalizer');
+    $sc->register('serializer', 'Symfony\Component\Serializer\Serializer')
+            ->setArguments(array(array(new Reference('board_pieces_normalizer')), array(new Reference('board_string_encoder'))));
+}
+
 function register_form_services($sc) {
     $sc->register('validator')
             ->setFactoryClass('Symfony\Component\Validator\Validation')
@@ -71,6 +80,9 @@ function register_twig_services($sc, $env) {
     $sc->register('chess_js_asset', 'Assetic\Asset\FileAsset')
             ->setArguments(array(__DIR__ . '/../resources/js/chess.js'))
             ->addMethodCall('setTargetPath', array('js/chess.js'));
+    $sc->register('game_buttons_js_asset', 'Assetic\Asset\FileAsset')
+            ->setArguments(array(__DIR__ . '/../resources/js/game-buttons.js'))
+            ->addMethodCall('setTargetPath', array('js/game-buttons.js'));
     $sc->register('favicon_asset', 'Assetic\Asset\FileAsset')
             ->setArguments(array(__DIR__ . '/../resources/images/favicon.ico'))
             ->addMethodCall('setTargetPath', array('images/favicon.ico'));
@@ -79,6 +91,7 @@ function register_twig_services($sc, $env) {
             ->addMethodCall('set', array('bootstrap', new Reference('bootstrap_css_asset')))
             ->addMethodCall('set', array('register_css', new Reference('register_css_glob_asset')))
             ->addMethodCall('set', array('chess_js', new Reference('chess_js_asset')))
+            ->addMethodCall('set', array('game_buttons_js', new Reference('game_buttons_js_asset')))
             ->addMethodCall('set', array('favicon', new Reference('favicon_asset')))
     ;
 
@@ -141,7 +154,7 @@ function register_twig_services($sc, $env) {
 
 function register_chess_services($sc) {
     $sc->register('listener.game', 'Tchess\EventListener\GameListener')
-            ->setArguments(array(new Reference('entity_manager')));
+            ->setArguments(array(new Reference('entity_manager'), new Reference('serializer')));
     $sc->register('rules.basic', 'Tchess\Rule\BasicRules');
     $sc->register('rules.pawn', 'Tchess\Rule\PawnRules');
     $sc->register('rules.bishop', 'Tchess\Rule\BishopRules');

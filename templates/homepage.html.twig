@@ -3,24 +3,29 @@
 {% block title %}Home page{% endblock %}
 
 {% block stylesheets %}
-    <link href="resources/css/bootstrap.min.css" rel="stylesheet" media="screen" />
-    <link href="js-vendor/tienvx/chessboardjs/css/chessboard-0.3.0.min.css" rel="stylesheet" media="screen" />
+<link href="resources/css/bootstrap.min.css" rel="stylesheet" media="screen" />
+<link href="js-vendor/tienvx/chessboardjs/css/chessboard-0.3.0.min.css" rel="stylesheet" media="screen" />
 {% endblock %}
 
 {% block body %}
-    <div class="container">
+<div class="container">
 
-        <div id="board" style="width: 400px"></div>
-        <p>Status: <span id="status"></span></p>
-        <p>FEN: <span id="fen"></span></p>
-        <p>PGN: <span id="pgn"></span></p>
+    <div id="board" style="width: 400px"></div>
+    <p>Status: <span id="status"></span></p>
 
-    </div> <!-- /container -->
+    <div class="btn-group">
+        <button type="button" class="btn btn-default btn-start {{ started ? 'disabled' : ''}}">Start</button>
+        <button type="button" class="btn btn-default btn-stop" {{ not started ? 'disabled' : ''}}>Stop</button>
+        <button type="button" class="btn btn-default btn-restart {{ not started ? 'disabled' : ''}}">Restart</button>
+    </div>
+
+</div> <!-- /container -->
 {% endblock %}
 
 {% block javascripts %}
-    <script src="js-vendor/tienvx/jquery/jquery-1.11.1.min.js"></script>
-    <script src="js-vendor/tienvx/chessboardjs/js/chessboard-0.3.0.min.js"></script>
-    <script src="js-vendor/tienvx/chessjs/chess.min.js"></script>
-    <script src="resources/js/chess.js"></script>
+<script src="js-vendor/tienvx/jquery/jquery-1.11.1.min.js"></script>
+<script src="js-vendor/tienvx/chessboardjs/js/chessboard-0.3.0.min.js"></script>
+<script src="js-vendor/tienvx/chessjs/chess.min.js"></script>
+<script src="resources/js/chess.js"></script>
+<script src="resources/js/game-buttons.js"></script>
 {% endblock %}

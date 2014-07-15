@@ -8,15 +8,18 @@ use Tchess\GameEvents;
 use Tchess\Event\GameEvent;
 use Tchess\Entity\Game;
 use Tchess\Entity\Board;
+use Symfony\Component\Serializer\SerializerInterface;
 
 class GameListener implements EventSubscriberInterface
 {
 
     private $em;
+    private $serializer;
 
-    public function __construct(EntityManagerInterface $em)
+    public function __construct(EntityManagerInterface $em, SerializerInterface $serializer)
     {
         $this->em = $em;
+        $this->serializer = $serializer;
     }
 
     public function onGameStart(GameEvent $event)
@@ -37,7 +40,7 @@ class GameListener implements EventSubscriberInterface
             $game->setRoom($room);
             $game->setStarted(true);
             $game->setBoard($board);
-            $game->saveGame();
+            $game->saveGame($this->serializer);
 
             $this->em->persist($game);
 

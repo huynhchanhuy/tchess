@@ -40,7 +40,9 @@ class GameController extends BaseController
             return $this->redirect($this->generateUrl('rooms'));
         }
 
-        return $this->render('homepage.html.twig');
+        return $this->render('homepage.html.twig', array(
+                    'started' => $player->getStarted()
+                ));
     }
 
     /**
@@ -61,14 +63,14 @@ class GameController extends BaseController
         }
 
         $form = $this->getFormFactory()->createBuilder()
-            ->add('name', 'text', array(
-                'constraints' => new NotBlank(),
-            ))
-            ->add('auto_join', 'checkbox', array(
-                'label'     => 'Automatically join room',
-                'required'  => false,
-            ))
-            ->getForm();
+                ->add('name', 'text', array(
+                    'constraints' => new NotBlank(),
+                ))
+                ->add('auto_join', 'checkbox', array(
+                    'label' => 'Automatically join room',
+                    'required' => false,
+                ))
+                ->getForm();
 
         if ($request->getMethod() == 'POST') {
             $form->bind($request);
@@ -94,8 +96,8 @@ class GameController extends BaseController
         }
 
         return $this->render('register.html.twig', array(
-            'form' => $form->createView(),
-        ));
+                    'form' => $form->createView(),
+                ));
     }
 
     /**
@@ -127,14 +129,18 @@ class GameController extends BaseController
                 $em->persist($room);
             } else {
                 $players = $room->getPlayers();
-                $opponent_player = reset($players);
+
+                if (count($players) != 1) {
+                    throw new \LogicException('Room must have only one players to join', ExceptionCodes::PLAYER);
+                }
+
+                $opponent_player = current(reset($players));
                 $player->setColor($opponent_player->getColor() == 'white' ? 'black' : 'white');
                 $room->addPlayer($player);
             }
             $player->setRoom($room);
             $em->flush();
-        }
-        else {
+        } else {
             // If you want to play with other player, please leave room first.
         }
 
@@ -163,8 +169,7 @@ class GameController extends BaseController
         if (!empty($last_room) && $last_room instanceof Room) {
             if ($last_room->getId() != $room) {
                 throw new \LogicException('Player already join another room', ExceptionCodes::PLAYER);
-            }
-            else {
+            } else {
                 return $this->redirect($this->generateUrl('homepage'));
             }
         }
@@ -176,7 +181,7 @@ class GameController extends BaseController
             throw new \LogicException('Room must have only one players to join', ExceptionCodes::PLAYER);
         }
 
-        $opponent_player = reset($players);
+        $opponent_player = current(reset($players));
         $player->setColor($opponent_player->getColor() == 'white' ? 'black' : 'white');
         $room->addPlayer($player);
         $player->setRoom($room);
@@ -211,7 +216,10 @@ class GameController extends BaseController
         $em->flush();
 
         $this->container->get('dispatcher')->dispatch(GameEvents::START, new GameEvent($player, $em));
-        return 'Game started';
+        return json_encode(array(
+                    'message' => 'Game started',
+                    'code' => 200
+                ));
     }
 
     /**
@@ -240,7 +248,10 @@ class GameController extends BaseController
         $em->flush();
 
         $this->container->get('dispatcher')->dispatch(GameEvents::STOP, new GameEvent($player, $em));
-        return 'Game stopped';
+        return json_encode(array(
+                    'message' => 'Game stopped',
+                    'code' => 200
+                ));
     }
 
     /**
@@ -279,7 +290,10 @@ class GameController extends BaseController
         if ($player->getStarted()) {
 
             $this->container->get('dispatcher')->dispatch(GameEvents::RESTART, new GameEvent($player, $em));
-            return 'Game re-started';
+            return json_encode(array(
+                    'message' => 'Game re-started',
+                    'code' => 200
+                ));
         } else {
             throw new \Exception('There is unknown error while re-starting game');
         }
@@ -309,6 +323,7 @@ class GameController extends BaseController
         if (empty($game) || ($game instanceof Game && !$game->getStarted())) {
             throw new \LogicException('Opponent player did not start the game', ExceptionCodes::PLAYER);
         } else {
+            $game->loadGame($this->container->get('serializer'));
             $board = $game->getBoard();
             $move = new Move($request->request->get('move'));
             $color = $player->getColor();

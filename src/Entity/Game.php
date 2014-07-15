@@ -3,9 +3,6 @@
 namespace Tchess\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Tchess\Serializer\Encoder\BoardStringEncoder;
-use Tchess\Serializer\Normalizer\BoardPiecesNormalizer;
-use Symfony\Component\Serializer\Serializer;
 
 /**
  * @ORM\Entity(repositoryClass="Tchess\EntityRepository\GameRepository")
@@ -48,16 +45,6 @@ class Game
      * @ORM\Column(type="boolean")
      */
     protected $started;
-
-    public function __construct()
-    {
-        // @todo - Use service container.
-        $encoders = array(new BoardStringEncoder());
-        $normalizers = array(new BoardPiecesNormalizer());
-
-        $this->serializer = new Serializer($normalizers, $encoders);
-
-    }
 
     /**
      * Get id
@@ -189,9 +176,9 @@ class Game
      *
      * @return Game
      */
-    public function saveGame()
+    public function saveGame($serializer)
     {
-        $boardString = $this->serializer->serialize($this->board, 'board_string');
+        $boardString = $serializer->serialize($this->board, 'board_string');
         $this->state = $boardString;
 
         return $this;
@@ -202,9 +189,9 @@ class Game
      *
      * @return Game
      */
-    public function loadGame()
+    public function loadGame($serializer)
     {
-        $this->board = $this->serializer->deserialize($this->state, 'Tchess\Entity\Board', 'board_string');
+        $this->board = $serializer->deserialize($this->state, 'Tchess\Entity\Board', 'board_string');
 
         return $this;
     }
