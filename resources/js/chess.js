@@ -1,8 +1,9 @@
 var board,
 game = new Chess(),
+boardEl = $('#board'),
 statusEl = $('#status'),
-fenEl = $('#fen'),
-pgnEl = $('#pgn');
+squareClass = 'square-55d63'
+;
 
 // do not pick up pieces if the game is over
 // only pick up pieces for the side to move
@@ -30,6 +31,14 @@ var onDrop = function(source, target) {
     updateStatus();
 };
 
+var removeHighlights = function(color) {
+  boardEl.find('.' + squareClass).removeClass('highlight-' + color);
+};
+
+var highlight = function(position, color) {
+  boardEl.find('.square-' + position).addClass('highlight-' + color);
+};
+
 var movePiece = function(move) {
     $.post("/move-piece",
     {
@@ -39,6 +48,14 @@ var movePiece = function(move) {
         console.log(data);
     }
     );
+
+    var color = 'white';
+    if (move.color === 'b') {
+        color = 'black';
+    }
+    removeHighlights(color);
+    highlight(move.from, color);
+    highlight(move.to, color);
 }
 
 // update the board position after the piece snap 

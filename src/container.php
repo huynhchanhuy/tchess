@@ -77,6 +77,9 @@ function register_twig_services($sc, $env) {
     $sc->register('register_css_glob_asset', 'Assetic\Asset\GlobAsset')
             ->setArguments(array(__DIR__ . '/../resources/css/register/*', array(new Reference('yui_css_compressor_filter'))))
             ->addMethodCall('setTargetPath', array('css/register.css'));
+    $sc->register('board_highlight_css_asset', 'Assetic\Asset\FileAsset')
+            ->setArguments(array(__DIR__ . '/../resources/css/board/highlight.css', array(new Reference('yui_css_compressor_filter'))))
+            ->addMethodCall('setTargetPath', array('css/board_highlight.css'));
     $sc->register('chess_js_asset', 'Assetic\Asset\FileAsset')
             ->setArguments(array(__DIR__ . '/../resources/js/chess.js'))
             ->addMethodCall('setTargetPath', array('js/chess.js'));
@@ -90,6 +93,7 @@ function register_twig_services($sc, $env) {
     $sc->register('asset_asset_manager', 'Assetic\AssetManager')
             ->addMethodCall('set', array('bootstrap', new Reference('bootstrap_css_asset')))
             ->addMethodCall('set', array('register_css', new Reference('register_css_glob_asset')))
+            ->addMethodCall('set', array('board_highlight_css', new Reference('board_highlight_css_asset')))
             ->addMethodCall('set', array('chess_js', new Reference('chess_js_asset')))
             ->addMethodCall('set', array('game_buttons_js', new Reference('game_buttons_js_asset')))
             ->addMethodCall('set', array('favicon', new Reference('favicon_asset')))
