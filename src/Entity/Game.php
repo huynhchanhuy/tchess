@@ -47,6 +47,11 @@ class Game
     protected $started;
 
     /**
+     * @ORM\Column(type="string", nullable=true, options={"default":""})
+     */
+    protected $highlights;
+
+    /**
      * Get id
      *
      * @return integer
@@ -93,7 +98,7 @@ class Game
     }
 
     /**
-     * Get currentTurn
+     * Get turn
      *
      * @return string
      */
@@ -194,6 +199,47 @@ class Game
         $this->board = $serializer->deserialize($this->state, 'Tchess\Entity\Board', 'fen');
 
         return $this;
+    }
+
+    /**
+     * Add highlight square
+     *
+     * @param string $square
+     * @return Game
+     */
+    public function addHighlight($source, $target, $color)
+    {
+        $items = explode(' ', $this->highlights);
+        while (count($items) > 3) {
+            array_shift($items);
+        }
+        array_push($items, $source, $target, $color);
+        $this->highlights = implode(' ', $items);
+
+        return $this;
+    }
+
+    /**
+     * Set highlights
+     *
+     * @param string $highlights
+     * @return Game
+     */
+    public function setHighlights($highlights)
+    {
+        $this->highlights = $highlights;
+
+        return $this;
+    }
+
+    /**
+     * Get highlights
+     *
+     * @return string
+     */
+    public function getHighlights()
+    {
+        return $this->highlights;
     }
 
 }

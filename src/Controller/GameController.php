@@ -31,6 +31,7 @@ class GameController extends BaseController
         $session = $request->getSession();
         $sid = $session->getId();
         $player = $em->getRepository('Tchess\Entity\Player')->findOneBy(array('sid' => $sid));
+        $variables = array();
 
         if (empty($player) || !$player instanceof Player) {
             return $this->redirect($this->generateUrl('register'));
@@ -41,9 +42,22 @@ class GameController extends BaseController
             return $this->redirect($this->generateUrl('rooms'));
         }
 
-        return $this->render('homepage.html.twig', array(
-                    'started' => $player->getStarted()
-                ));
+        $variables['started'] = $player->getStarted();
+        $variables['color'] = $player->getColor();
+        $game = $player->getRoom()->getGame();
+
+        if (empty($game) || !$game instanceof Game || !$game->getStarted()) {
+            $variables['start_position'] = 'start';
+            $variables['turn'] = 'white';
+            $variables['highlights'] = '';
+        }
+        else {
+            $variables['start_position'] = $game->getState();
+            $variables['turn'] = $game->getTurn();
+            $variables['highlights'] = trim($game->getHighlights());
+        }
+
+        return $this->render('homepage.html.twig', $variables);
     }
 
     /**
@@ -321,25 +335,84 @@ class GameController extends BaseController
 
         $game = $player->getRoom()->getGame();
 
-        if (empty($game) || !$game instanceof Game) {
-            throw new \LogicException('Opponent player did not join the room', ExceptionCodes::PLAYER);
+        if (empty($game) || !$game instanceof Game || !$game->getStarted()) {
+            return json_encode(array(
+                'code' => 500,
+                'message' => 'Both players did not start the game'
+            ));
         }
-        if (!$game->getStarted()) {
-            throw new \LogicException('Opponent player did not start the game', ExceptionCodes::PLAYER);
-        } else {
-            $game->loadGame($this->container->get('serializer'));
+        else if ($game->getTurn() != $player->getColor()) {
+            return json_encode(array(
+                'code' => 500,
+                'message' => 'This is not your turn'
+            ));
+        }
+        else {
+            $serializer = $this->container->get('serializer');
+            $game->loadGame($serializer);
             $board = $game->getBoard();
             $move = new Move($request->request->get('move'));
             $color = $player->getColor();
 
             if ($dispatcher->dispatch(MoveEvents::CHECH_MOVE, new MoveEvent($board, $move, $color))->isValidMove()) {
-                $dispatcher->dispatch(MoveEvents::MOVE, new MoveEvent($board, $move, $color));
+                $board->movePiece($move);
+                $moveEvent = new MoveEvent($board, $move, $color);
+
+                $dispatcher->dispatch(MoveEvents::MOVE, $moveEvent);
+
+                $game->setTurn($color == 'white' ? 'black' : 'white');
+                $game->setBoard($moveEvent->getBoard());
+                $game->saveGame($serializer);
+                $game->addHighlight($move->getSource(), $move->getTarget(), $color);
+                $em->flush();
             } else {
-                throw new \LogicException('Move is not valid', ExceptionCodes::PLAYER);
+                return json_encode(array(
+                    'code' => 500,
+                    'message' => 'Move is not valid'
+                ));
             }
         }
 
-        return 'Move has been performed';
+        return json_encode(array(
+            'code' => 200,
+            'message' => 'Move has been performed',
+            'color' => $color,
+            'turn' => $game->getTurn()
+        ));
+    }
+
+    /**
+     * Get game state.
+     *
+     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @return string
+     */
+    public function getStateAction(Request $request)
+    {
+        $em = $this->container->get('entity_manager');
+        $session = $request->getSession();
+        $sid = $session->getId();
+
+        $player = $em->getRepository('Tchess\Entity\Player')->findOneBy(array('sid' => $sid));
+
+        if (empty($player) || ($player instanceof Player && empty($player->getRoom()))) {
+            throw new \LogicException('Player did not join a room', ExceptionCodes::PLAYER);
+        }
+
+        $game = $player->getRoom()->getGame();
+
+        if (empty($game) || !$game instanceof Game) {
+            return json_encode(array(
+                'code' => 500,
+                'message' => 'Both players did not start the game'
+            ));
+        }
+
+        return json_encode(array(
+            'position' => $game->getState(),
+            'turn' => $game->getTurn() == 'white' ? 'w' : 'b',
+            'move' => $game->getMove()
+        ));
     }
 
 }
