@@ -13,40 +13,39 @@ class PieceFactory
 {
     public static function create($serialized)
     {
-        if ($serialized == '_') {
+        if (empty($serialized)) {
             return null;
         }
-        else {
-            $color = $serialized[0] == 'w' ? 'white' : 'black';
-            switch ($serialized[1]) {
-                case 'b':
-                    $piece = new Bishop($color);
-                    break;
 
-                case 'k':
-                    $piece = new King($color);
-                    break;
+        $color = ctype_upper($serialized) ? 'white' : 'black';
+        switch (strtoupper($serialized)) {
+            case 'B':
+                $piece = new Bishop($color);
+                break;
 
-                case 'n':
-                    $piece = new Knight($color);
-                    break;
+            case 'K':
+                $piece = new King($color);
+                break;
 
-                case 'p':
-                    $piece = new Pawn($color);
-                    break;
+            case 'N':
+                $piece = new Knight($color);
+                break;
 
-                case 'q':
-                    $piece = new Queen($color);
-                    break;
+            case 'P':
+                $piece = new Pawn($color);
+                break;
 
-                case 'r':
-                    $piece = new Rook($color);
-                    break;
+            case 'Q':
+                $piece = new Queen($color);
+                break;
 
-                default:
-                    $piece = null;
-                    break;
-            }
+            case 'R':
+                $piece = new Rook($color);
+                break;
+
+            default:
+                $piece = null;
+                break;
         }
         return $piece;
     }

@@ -23,6 +23,6 @@ class Piece
 
     public function __toString()
     {
-        return $this->color == 'white' ? 'w' : 'b';
+        return '';
     }
 }

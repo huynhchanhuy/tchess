@@ -23,6 +23,6 @@ class Pawn extends Piece
 
     public function __toString()
     {
-        return parent::__toString() . 'p';
+        return $this->color == 'white' ? 'P' : 'p';
     }
 }

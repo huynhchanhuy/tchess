@@ -115,7 +115,7 @@ class Board implements NormalizableInterface, DenormalizableInterface
         $state = array();
         for ($x = 0; $x < 8; $x++) {
             for ($y = 0; $y < 8; $y++) {
-                $state[$x][$y] = ($this->pieces[$x][$y] != null) ? (string) $this->pieces[$x][$y] : '_';
+                $state[$x][$y] = ($this->pieces[$x][$y] != null) ? (string) $this->pieces[$x][$y] : '';
             }
         }
         return $state;

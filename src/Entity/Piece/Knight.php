@@ -6,6 +6,6 @@ class Knight extends Piece
 {
     public function __toString()
     {
-        return parent::__toString() . 'n';
+        return $this->color == 'white' ? 'N' : 'n';
     }
 }

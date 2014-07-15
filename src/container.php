@@ -19,10 +19,10 @@ register_form_services($sc);
 register_serializer_services($sc);
 
 function register_serializer_services($sc) {
-    $sc->register('board_string_encoder', 'Tchess\Serializer\Encoder\BoardStringEncoder');
+    $sc->register('fen_encoder', 'Tchess\Serializer\Encoder\FenEncoder');
     $sc->register('board_pieces_normalizer', 'Tchess\Serializer\Normalizer\BoardPiecesNormalizer');
     $sc->register('serializer', 'Symfony\Component\Serializer\Serializer')
-            ->setArguments(array(array(new Reference('board_pieces_normalizer')), array(new Reference('board_string_encoder'))));
+            ->setArguments(array(array(new Reference('board_pieces_normalizer')), array(new Reference('fen_encoder'))));
 }
 
 function register_form_services($sc) {

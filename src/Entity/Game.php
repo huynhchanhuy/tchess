@@ -178,7 +178,7 @@ class Game
      */
     public function saveGame($serializer)
     {
-        $boardString = $serializer->serialize($this->board, 'board_string');
+        $boardString = $serializer->serialize($this->board, 'fen');
         $this->state = $boardString;
 
         return $this;
@@ -191,7 +191,7 @@ class Game
      */
     public function loadGame($serializer)
     {
-        $this->board = $serializer->deserialize($this->state, 'Tchess\Entity\Board', 'board_string');
+        $this->board = $serializer->deserialize($this->state, 'Tchess\Entity\Board', 'fen');
 
         return $this;
     }

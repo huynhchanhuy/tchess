@@ -6,6 +6,6 @@ class Queen extends Piece
 {
     public function __toString()
     {
-        return parent::__toString() . 'q';
+        return $this->color == 'white' ? 'Q' : 'q';
     }
 }

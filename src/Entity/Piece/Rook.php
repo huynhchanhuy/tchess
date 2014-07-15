@@ -23,6 +23,6 @@ class Rook extends Piece
 
     public function __toString()
     {
-        return parent::__toString() . 'r';
+        return $this->color == 'white' ? 'R' : 'r';
     }
 }

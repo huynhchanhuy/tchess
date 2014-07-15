@@ -35,6 +35,6 @@ class King extends Piece
 
     public function __toString()
     {
-        return parent::__toString() . 'k';
+        return $this->color == 'white' ? 'K' : 'k';
     }
 }

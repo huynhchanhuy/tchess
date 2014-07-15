@@ -14,6 +14,7 @@ use Tchess\Event\MoveEvent;
 use Tchess\Entity\Piece\Move;
 use Tchess\ExceptionCodes;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Tchess\Entity\Game;
 
 class GameController extends BaseController
 {
@@ -320,7 +321,10 @@ class GameController extends BaseController
 
         $game = $player->getRoom()->getGame();
 
-        if (empty($game) || ($game instanceof Game && !$game->getStarted())) {
+        if (empty($game) || !$game instanceof Game) {
+            throw new \LogicException('Opponent player did not join the room', ExceptionCodes::PLAYER);
+        }
+        if (!$game->getStarted()) {
             throw new \LogicException('Opponent player did not start the game', ExceptionCodes::PLAYER);
         } else {
             $game->loadGame($this->container->get('serializer'));

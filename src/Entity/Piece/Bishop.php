@@ -6,6 +6,6 @@ class Bishop extends Piece
 {
     public function __toString()
     {
-        return parent::__toString() . 'b';
+        return $this->color == 'white' ? 'B' : 'b';
     }
 }
