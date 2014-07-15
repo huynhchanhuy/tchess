@@ -8,6 +8,8 @@ if (file_exists('../config/db-config.php') && strpos(file_get_contents('../confi
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
+use Doctrine\ORM\Tools\SchemaTool;
+
 // Get values from the form
 $driver = $_POST['driver'];
 $path = $_POST['path'];
@@ -24,14 +26,12 @@ $configured_config_content = str_replace(array(
 ), $config_content);
 file_put_contents(__DIR__ . '/../config/db-config.php', $configured_config_content);
 
+/** Global variables **/
 $config = include __DIR__ . '/../config/db-config.php';
 $config['path'] = str_replace('%root_dir%', __DIR__ . '/..', $config['path']);
-
 $env = 'prod';
+
 $sc = include __DIR__ . '/../src/container.php';
-
-use Doctrine\ORM\Tools\SchemaTool;
-
 
 // getting objects.
 $entityManager = $sc->get('entity_manager');

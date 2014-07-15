@@ -100,7 +100,7 @@ function register_twig_services($sc, $env) {
     ;
 
     $sc->register('yui_css_compressor_filter', 'Assetic\Filter\Yui\CssCompressorFilter')
-            ->setArguments(array(__DIR__ . '/../bin/yuicompressor-2.4.8.jar'));
+            ->setArguments(array(__DIR__ . '/../vendor/bin/yuicompressor.jar'));
     $sc->register('asset_filter_manager', 'Assetic\FilterManager')
             ->addMethodCall('set', array('yui_css', new Reference('yui_css_compressor_filter')));
     $sc->register('asset_writer', 'Assetic\AssetWriter')

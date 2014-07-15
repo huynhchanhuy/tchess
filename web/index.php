@@ -12,14 +12,15 @@ if (!file_exists('../config/db-config.php') || strpos(file_get_contents('../conf
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-$config = include __DIR__ . '/../config/db-config.php';
-$config['path'] = str_replace('%root_dir%', __DIR__ . '/..', $config['path']);
-
-$env = 'dev';
-$sc = include __DIR__ . '/../src/container.php';
-
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
+
+/** Global variables **/
+$config = include __DIR__ . '/../config/db-config.php';
+$config['path'] = str_replace('%root_dir%', __DIR__ . '/..', $config['path']);
+$env = 'prod';
+
+$sc = include __DIR__ . '/../src/container.php';
 
 $request = Request::createFromGlobals();
 

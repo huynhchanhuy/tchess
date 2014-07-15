@@ -74,7 +74,8 @@
         "tienvx/js-vendor-installer-plugin": "v1.1.1",
         "tienvx/chessboardjs": "0.3.0",
         "tienvx/chessjs": "dev-master",
-        "tienvx/jquery": "1.11.1"
+        "tienvx/jquery": "1.11.1",
+        "packagist/yuicompressor-bin": "v2.4.8"
     },
     "autoload": {
         "psr-4": {
