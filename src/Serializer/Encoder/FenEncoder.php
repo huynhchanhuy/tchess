@@ -61,12 +61,13 @@ class FenEncoder implements EncoderInterface, DecoderInterface
             throw new \InvalidArgumentException("Invalid FEN format's data");
         }
 
-        for($x = 7; $x >= 0; $x--) {
+        for($x = 0; $x < 8; $x++) {
             $y = 0;
 
-            $strlen = strlen($data);
+            $row = $rows[$x];
+            $strlen = strlen($row);
             for($i = 0; $i < $strlen; $i++) {
-                $char = substr($data, $i, 1);
+                $char = substr($row, $i, 1);
 
                 if (is_numeric($char)) {
                     $empty_count = (int) $char;
@@ -75,7 +76,7 @@ class FenEncoder implements EncoderInterface, DecoderInterface
                     }
 
                     for ($i2 = 0; $i2 < $empty_count; $i2++) {
-                        $decoded[$x][$y] = '';
+                        $decoded[7 - $x][$y] = '';
                         $y++;
                     }
                 }
@@ -84,12 +85,12 @@ class FenEncoder implements EncoderInterface, DecoderInterface
                         throw new \InvalidArgumentException("Invalid piece character");
                     }
 
-                    $decoded[$x][$y] = $char;
+                    $decoded[7 - $x][$y] = $char;
                     $y++;
                 }
             }
 
-            if ($y >= 8) {
+            if ($y > 8) {
                 throw new \InvalidArgumentException("Row contains more than 8 piece");
             }
         }
