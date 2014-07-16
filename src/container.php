@@ -21,6 +21,8 @@ register_serializer_services($sc);
 
 register_logger_services($sc);
 
+register_custom_services($sc);
+
 function register_logger_services($sc) {
     $sc->register('logger', 'Monolog\Logger')
             ->setArguments(array('moves'))
@@ -28,6 +30,10 @@ function register_logger_services($sc) {
     ;
     $sc->register('logger_stream_handler', 'Monolog\Handler\StreamHandler')
             ->setArguments(array(__DIR__ . '/../logs/moves.log', Logger::INFO));
+}
+
+function register_custom_services($sc) {
+    $sc->register('move_manager', 'Tchess\MoveManager');
 }
 
 function register_serializer_services($sc) {
