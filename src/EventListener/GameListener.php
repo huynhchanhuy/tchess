@@ -9,17 +9,25 @@ use Tchess\Event\GameEvent;
 use Tchess\Entity\Game;
 use Tchess\Entity\Board;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\HttpKernel\Event\PostResponseEvent;
+use Psr\Log\LoggerInterface;
+use Tchess\MoveManager;
+use Symfony\Component\HttpKernel\KernelEvents;
 
 class GameListener implements EventSubscriberInterface
 {
 
     private $em;
     private $serializer;
+    private $logger;
+    private $move_manager;
 
-    public function __construct(EntityManagerInterface $em, SerializerInterface $serializer)
+    public function __construct(EntityManagerInterface $em, SerializerInterface $serializer, LoggerInterface $logger, MoveManager $move_manager)
     {
         $this->em = $em;
         $this->serializer = $serializer;
+        $this->logger = $logger;
+        $this->move_manager = $move_manager;
     }
 
     public function onGameStart(GameEvent $event)
@@ -49,10 +57,21 @@ class GameListener implements EventSubscriberInterface
         }
     }
 
+    public function onKernelTerminateLogMoves(PostResponseEvent $event)
+    {
+        $moves = $this->move_manager->getMoves();
+
+        foreach ($moves as $move) {
+            $this->logger->info(sprintf("Player '%s' has moved a piece from '%s' to '%s'", $move->getColor(), $move->getSource(), $move->getTarget()));
+        }
+    }
+
     public static function getSubscribedEvents()
     {
         return array(
             GameEvents::START => array(array('onGameStart', 0)),
+            KernelEvents::TERMINATE => array('onKernelTerminateLogMoves', -1024),
+//            KernelEvents::TERMINATE => array('onKernelTerminateBroadcastMoves', -1024),
         );
     }
 

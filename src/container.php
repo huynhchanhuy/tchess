@@ -3,6 +3,7 @@
 use Symfony\Component\DependencyInjection;
 use Symfony\Component\DependencyInjection\Reference;
 use Doctrine\Common\Annotations\AnnotationRegistry;
+use Monolog\Logger;
 
 $sc = new DependencyInjection\ContainerBuilder();
 
@@ -17,6 +18,17 @@ register_twig_services($sc, $env);
 register_form_services($sc);
 
 register_serializer_services($sc);
+
+register_logger_services($sc);
+
+function register_logger_services($sc) {
+    $sc->register('logger', 'Monolog\Logger')
+            ->setArguments(array('moves'))
+            ->addMethodCall('pushHandler', array(new Reference('logger_stream_handler')))
+    ;
+    $sc->register('logger_stream_handler', 'Monolog\Handler\StreamHandler')
+            ->setArguments(array(__DIR__ . '/../logs/moves.log', Logger::INFO));
+}
 
 function register_serializer_services($sc) {
     $sc->register('fen_encoder', 'Tchess\Serializer\Encoder\FenEncoder');
@@ -158,7 +170,7 @@ function register_twig_services($sc, $env) {
 
 function register_chess_services($sc) {
     $sc->register('listener.game', 'Tchess\EventListener\GameListener')
-            ->setArguments(array(new Reference('entity_manager'), new Reference('serializer')));
+            ->setArguments(array(new Reference('entity_manager'), new Reference('serializer'), new Reference('logger'), new Reference('move_manager')));
     $sc->register('rules.basic', 'Tchess\Rule\BasicRules');
     $sc->register('rules.pawn', 'Tchess\Rule\PawnRules');
     $sc->register('rules.bishop', 'Tchess\Rule\BishopRules');

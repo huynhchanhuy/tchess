@@ -351,8 +351,8 @@ class GameController extends BaseController
             $serializer = $this->container->get('serializer');
             $game->loadGame($serializer);
             $board = $game->getBoard();
-            $move = new Move($request->request->get('move'));
             $color = $player->getColor();
+            $move = new Move($color, $request->request->get('move'));
 
             if ($dispatcher->dispatch(MoveEvents::CHECH_MOVE, new MoveEvent($board, $move, $color))->isValidMove()) {
                 $board->movePiece($move);
@@ -365,6 +365,8 @@ class GameController extends BaseController
                 $game->saveGame($serializer);
                 $game->addHighlight($move->getSource(), $move->getTarget(), $color);
                 $em->flush();
+
+                $this->container->get('move_manager')->addMove($move);
             } else {
                 return json_encode(array(
                     'code' => 500,

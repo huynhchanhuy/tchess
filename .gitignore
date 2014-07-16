@@ -4,3 +4,4 @@ cache/
 web/js-vendor/
 web/resources/
 files/proxies/*.php
+logs/*.log

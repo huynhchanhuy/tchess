@@ -62,6 +62,7 @@ class InCheckRules implements EventSubscriberInterface
                 $piece = $board->getPiece($x, $y);
                 if ($piece instanceof Piece && $piece->getColor() != $color) {
                     $move = new Move();
+                    $move->setColor($color);
                     $move->setCurrentRow($x);
                     $move->setCurrentColumn($y);
                     $move->setNewRow($row);

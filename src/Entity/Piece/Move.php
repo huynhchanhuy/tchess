@@ -4,6 +4,7 @@ namespace Tchess\Entity\Piece;
 
 class Move
 {
+    protected $color;
     protected $move;
     protected $source;
     protected $target;
@@ -13,8 +14,10 @@ class Move
     protected $newColumn;
     protected $promotion;
 
-    public function __construct($move = '')
+    public function __construct($color = 'white', $move = '')
     {
+        $this->setColor($color);
+
         if (!empty($move)) {
             $this->move = $move;
             $parts = explode(' ', $move);
@@ -152,5 +155,18 @@ class Move
             $promotion = 'Q';
         }
         $this->promotion = $promotion;
+    }
+
+    public function getColor()
+    {
+        return $this->color;
+    }
+
+    public function setColor($color)
+    {
+        if (!in_array($color, array('white', 'black'))) {
+            $color = 'white';
+        }
+        $this->color = $color;
     }
 }
