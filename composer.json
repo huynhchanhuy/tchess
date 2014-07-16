@@ -17,7 +17,7 @@
     {
         "type": "package",
         "package": {
-            "version": "0.3.0",
+            "version": "v0.3.0",
             "name": "tienvx/chessboardjs",
             "type": "js-vendor",
             "dist": {
@@ -33,24 +33,23 @@
     {
         "type": "package",
         "package": {
-            "version": "dev-master",
-            "name": "tienvx/chessjs",
+            "name": "tienvx/jquery",
+            "version": "v1.11.1",
             "type": "js-vendor",
-            "source": {
-                "url": "https://github.com/jhlywa/chess.js.git",
-                "type": "git",
-                "reference": "master"
+            "dist": {
+                "url": "http://code.jquery.com/jquery-1.11.1.min.js",
+                "type": "file"
             }
         }
     },
     {
         "type": "package",
         "package": {
-            "name": "tienvx/jquery",
-            "version": "1.11.1",
+            "version": "v0.9.3",
+            "name": "tienvx/autobahnjs",
             "type": "js-vendor",
             "dist": {
-                "url": "http://code.jquery.com/jquery-1.11.1.min.js",
+                "url": "http://autobahn.s3.amazonaws.com/js/autobahn.min.js",
                 "type": "file"
             }
         }
@@ -72,11 +71,13 @@
         "kriswallsmith/assetic": "v1.1.2",
         "symfony/validator": "v2.5.2",
         "tienvx/js-vendor-installer-plugin": "v1.1.1",
-        "tienvx/chessboardjs": "0.3.0",
-        "tienvx/chessjs": "dev-master",
-        "tienvx/jquery": "1.11.1",
+        "tienvx/chessboardjs": "v0.3.0",
+        "tienvx/jquery": "v1.11.1",
         "packagist/yuicompressor-bin": "v2.4.8",
-        "monolog/monolog": "1.10.0"
+        "monolog/monolog": "1.10.0",
+        "cboden/ratchet": "v0.3.2",
+        "react/zmq": "v0.3.0",
+        "tienvx/autobahnjs": "v0.9.3"
     },
     "autoload": {
         "psr-4": {
@@ -86,7 +87,7 @@
     "extra": {
         "installer-paths": {
             "web/js-vendor/tienvx/chessboardjs/": ["tienvx/chessboardjs"],
-            "web/js-vendor/tienvx/chessjs/": ["tienvx/chessjs"],
+            "web/js-vendor/tienvx/autobahnjs/": ["tienvx/autobahnjs"],
             "web/js-vendor/tienvx/jquery/": ["tienvx/jquery"]
         }
     }

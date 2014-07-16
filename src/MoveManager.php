@@ -10,7 +10,7 @@ class MoveManager
     /**
      * @var Move[]
      */
-    protected $moves;
+    protected $moves = array();
 
     /**
      * Add move.

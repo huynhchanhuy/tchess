@@ -61,8 +61,35 @@ class GameListener implements EventSubscriberInterface
     {
         $moves = $this->move_manager->getMoves();
 
+        if (empty($moves)) {
+            return;
+        }
+
         foreach ($moves as $move) {
             $this->logger->info(sprintf("Player '%s' has moved a piece from '%s' to '%s'", $move->getColor(), $move->getSource(), $move->getTarget()));
+        }
+    }
+
+    public function onKernelTerminateBroadcastMoves(PostResponseEvent $event)
+    {
+        $moves = $this->move_manager->getMoves();
+
+        if (empty($moves) || !(class_exists('\ZMQContext')) || !(class_exists('\ZMQ'))) {
+            return;
+        }
+
+        $context = new \ZMQContext();
+        $socket = $context->getSocket(\ZMQ::SOCKET_PUSH, 'my pusher');
+        $socket->connect("tcp://localhost:5555");
+
+        foreach ($moves as $move) {
+            $data = array(
+                'source' => $move->getSource(),
+                'target' => $move->getTarget(),
+                'color' => $move->getColor(),
+            );
+
+            $socket->send(json_encode($data));
         }
     }
 
@@ -71,7 +98,7 @@ class GameListener implements EventSubscriberInterface
         return array(
             GameEvents::START => array(array('onGameStart', 0)),
             KernelEvents::TERMINATE => array('onKernelTerminateLogMoves', -1024),
-//            KernelEvents::TERMINATE => array('onKernelTerminateBroadcastMoves', -1024),
+            KernelEvents::TERMINATE => array('onKernelTerminateBroadcastMoves', -1024),
         );
     }
 

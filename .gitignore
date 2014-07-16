@@ -5,3 +5,4 @@ web/js-vendor/
 web/resources/
 files/proxies/*.php
 logs/*.log
+server-logs/*.log

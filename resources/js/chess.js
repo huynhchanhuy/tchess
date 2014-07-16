@@ -94,5 +94,26 @@ var cfg = {
 };
 board = new ChessBoard('board', cfg);
 
+var conn = new ab.Session('ws://localhost:8080',
+    function() {
+        conn.subscribe('move', function(topic, data) {
+            board.move(data.source + '-' + data.target);
+
+            chess_turn = data.color == 'white' ? 'black' : 'white';
+
+            // Highlight the move.
+            removeHighlights(data.color);
+            highlight(data.source, data.color);
+            highlight(data.target, data.color);
+
+            updateStatus();
+        });
+    },
+    function() {
+        console.warn('WebSocket connection closed');
+    },
+    {'skipSubprotocolCheck': true}
+);
+
 updateStatus();
 prepareHighlights();
