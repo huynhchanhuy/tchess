@@ -58,11 +58,11 @@ class MoveEvent extends Event
         return $this->validMove;
     }
 
-    public function setValidMove($validMove)
+    public function setValidMove($validMove, $stopPropagation = true)
     {
         $this->validMove = $validMove;
 
-        if ($validMove == false) {
+        if ($validMove == false && $stopPropagation) {
             // If any rule is broke, we stop checking.
             $this->stopPropagation();
         }

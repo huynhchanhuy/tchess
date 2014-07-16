@@ -21,7 +21,7 @@ class RookRules implements EventSubscriberInterface
 
         if ($move->getCurrentRow() != $move->getNewRow() && $move->getCurrentColumn() != $move->getNewColumn()) {
             // Did not move along one rank/file.
-            $event->setValidMove(false);
+            $event->setValidMove(false, $piece instanceof Queen ? false : true);
             return;
         }
 
@@ -36,7 +36,7 @@ class RookRules implements EventSubscriberInterface
             for($x = $move->getCurrentRow() + $offset; $x != $move->getNewRow(); $x += $offset) {
                 // Go from currentRow to newRow, and check every space.
                 if($board->getPiece($x, $move->getCurrentColumn()) != null) {
-                    $event->setValidMove(false);
+                    $event->setValidMove(false, $piece instanceof Queen ? false : true);
                     return;
                 }
             }
@@ -53,7 +53,7 @@ class RookRules implements EventSubscriberInterface
             for($x = $move->getCurrentColumn() + $offset; $x != $move->getNewColumn(); $x += $offset) {
                 // Go from currentCol to newCol, and check every space.
                 if($board->getPiece($move->getCurrentRow(), $x) != null) {
-                    $event->setValidMove(false);
+                    $event->setValidMove(false, $piece instanceof Queen ? false : true);
                     return;
                 }
             }
