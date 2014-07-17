@@ -10,9 +10,17 @@ use Tchess\Entity\Piece\Rook;
 use Tchess\Entity\Board;
 use Tchess\Entity\Piece\Move;
 use Tchess\Rule\CheckingMoveInterface;
+use Tchess\MoveManager;
 
 class KingRules implements EventSubscriberInterface, CheckingMoveInterface
 {
+
+    private $move_manager;
+
+    public function __construct(MoveManager $move_manager)
+    {
+        $this->move_manager = $move_manager;
+    }
 
     public function onMoveChecking(MoveEvent $event)
     {
@@ -52,7 +60,7 @@ class KingRules implements EventSubscriberInterface, CheckingMoveInterface
             // Do castling logic here.
             if ($move->getNewColumn() - $move->getCurrentColumn() == 2) {
                 // Castle kingside.
-                $rook = $board->getPiece($move->getNewRow(), $move->getNewColumn() + 3);
+                $rook = $board->getPiece($move->getNewRow(), $move->getCurrentColumn() + 3);
                 if (!$rook instanceof Rook || $rook->isMoved()) {
                     return false;
                 }
@@ -62,7 +70,7 @@ class KingRules implements EventSubscriberInterface, CheckingMoveInterface
                 }
             } else if ($move->getNewColumn() - $move->getCurrentColumn() == -2) {
                 // Queenside.
-                $rook = $board->getPiece($move->getNewRow(), $move->getNewColumn() - 4);
+                $rook = $board->getPiece($move->getNewRow(), $move->getCurrentColumn() - 4);
                 if (!$rook instanceof Rook || $rook->isMoved()) {
                     return false;
                 }
@@ -104,8 +112,7 @@ class KingRules implements EventSubscriberInterface, CheckingMoveInterface
                 $rook_move->setCurrentColumn($move->getNewColumn() + 1);
                 $rook_move->setNewRow($move->getNewRow());
                 $rook_move->setNewColumn($move->getNewColumn() - 1);
-
-                $board->movePiece($rook_move);
+                $rook_move->setCastling(true);
             } else {
                 $rook = $board->getPiece($move->getNewRow(), $move->getNewColumn() - 2);
                 if (!$rook instanceof Rook || $rook->isMoved()) {
@@ -118,10 +125,13 @@ class KingRules implements EventSubscriberInterface, CheckingMoveInterface
                 $rook_move->setCurrentColumn($move->getNewColumn() - 2);
                 $rook_move->setNewRow($move->getNewRow());
                 $rook_move->setNewColumn($move->getNewColumn() + 1);
-
-                $board->movePiece($rook_move);
+                $rook_move->setCastling(true);
             }
+
+            $board->movePiece($rook_move);
             $piece->setCastled(false);
+
+            $this->move_manager->addMove($rook_move);
         }
     }
 

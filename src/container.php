@@ -180,7 +180,8 @@ function register_chess_services($sc) {
     $sc->register('rules.basic', 'Tchess\Rule\BasicRules');
     $sc->register('rules.pawn', 'Tchess\Rule\PawnRules');
     $sc->register('rules.bishop', 'Tchess\Rule\BishopRules');
-    $sc->register('rules.king', 'Tchess\Rule\KingRules');
+    $sc->register('rules.king', 'Tchess\Rule\KingRules')
+            ->setArguments(array(new Reference('move_manager')));
     $sc->register('rules.knight', 'Tchess\Rule\KnightRules');
     $sc->register('rules.rook', 'Tchess\Rule\RookRules');
     $sc->register('rules.queen', 'Tchess\Rule\QueenRules')

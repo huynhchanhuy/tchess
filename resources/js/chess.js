@@ -106,10 +106,12 @@ var conn = new ab.Session('ws://localhost:8080',
 
             chess_turn = data.color == 'white' ? 'black' : 'white';
 
-            // Highlight the move.
-            removeHighlights(data.color);
-            highlight(data.source, data.color);
-            highlight(data.target, data.color);
+            if (!data.castling) {
+                // Highlight the move.
+                removeHighlights(data.color);
+                highlight(data.source, data.color);
+                highlight(data.target, data.color);
+            }
 
             updateStatus();
         });

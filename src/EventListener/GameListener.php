@@ -87,6 +87,7 @@ class GameListener implements EventSubscriberInterface
                 'source' => $move->getSource(),
                 'target' => $move->getTarget(),
                 'color' => $move->getColor(),
+                'castling' => $move->getCastling(),
             );
 
             $socket->send(json_encode($data));

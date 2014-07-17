@@ -13,6 +13,7 @@ class Move
     protected $newRow;
     protected $newColumn;
     protected $promotion;
+    protected $castling;
 
     public function __construct($color = 'white', $move = '')
     {
@@ -35,6 +36,8 @@ class Move
             $this->setTarget($target);
             $this->setPromotion($promotion);
         }
+
+        $this->castling = false;
     }
 
     /**
@@ -50,33 +53,42 @@ class Move
     /**
      * Get column.
      */
-    private function getColumn($column)
+    private function getColumn($column, $char_to_number = true)
     {
-        $ch = strtolower($column);
-        switch ($ch) {
-            case 'a': return 0;
-            case 'b': return 1;
-            case 'c': return 2;
-            case 'd': return 3;
-            case 'e': return 4;
-            case 'f': return 5;
-            case 'g': return 6;
-            case 'h': return 7;
-            default:
-                throw new \InvalidArgumentException('Invalid board column. It must be one of these letter (a, b, c, d, e, f, g ,h).');
-                break;
+        $map = array(
+            'a' => 0,
+            'b' => 1,
+            'c' => 2,
+            'd' => 3,
+            'e' => 4,
+            'f' => 5,
+            'g' => 6,
+            'h' => 7,
+        );
+        if (!$char_to_number) {
+            $map = array_flip($map);
         }
+        $ch = strtolower($column);
+        if (isset($map[$ch])) {
+            return $map[$ch];
+        }
+        throw new \InvalidArgumentException('Invalid board column. It must be one of these letter (a, b, c, d, e, f, g ,h).');
     }
 
     /**
      * Get row.
      */
-    private function getRow($row)
+    private function getRow($row, $number_to_index = true)
     {
-        if ($row < 1 || $row > 8) {
-            throw new \InvalidArgumentException('Invalid board row. It must be in range from 1 to 8.');
+        if ((($number_to_index) && ($row < 1 || $row > 8)) || (!($number_to_index) && ($row < 0 || $row > 7))) {
+            throw new \InvalidArgumentException('Invalid board row');
         }
-        return (int) ($row) - 1;
+        if ($number_to_index) {
+            return (int) ($row) - 1;
+        }
+        else {
+            return (int) ($row) + 1;
+        }
     }
 
     public function getCurrentRow()
@@ -121,6 +133,13 @@ class Move
 
     public function getSource()
     {
+        if (!empty($this->source)) {
+            return $this->source;
+        }
+        else {
+            // Build source.
+            $this->source = $this->getColumn($this->getCurrentColumn(), false) . $this->getRow($this->getCurrentRow(), false);
+        }
         return $this->source;
     }
 
@@ -133,6 +152,13 @@ class Move
 
     public function getTarget()
     {
+        if (!empty($this->target)) {
+            return $this->target;
+        }
+        else {
+            // Build source.
+            $this->target = $this->getColumn($this->getNewColumn(), false) . $this->getRow($this->getNewRow(), false);
+        }
         return $this->target;
     }
 
@@ -168,5 +194,15 @@ class Move
             $color = 'white';
         }
         $this->color = $color;
+    }
+
+    public function getCastling()
+    {
+        return $this->castling;
+    }
+
+    public function setCastling($castling)
+    {
+        $this->castling = $castling ? true : false;
     }
 }
