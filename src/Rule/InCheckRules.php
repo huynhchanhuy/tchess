@@ -10,8 +10,9 @@ use Tchess\Entity\Board;
 use Tchess\Entity\Piece\King;
 use Tchess\Entity\Piece\Move;
 use Tchess\Entity\Piece\Piece;
+use Tchess\Rule\CheckingMoveInterface;
 
-class InCheckRules implements EventSubscriberInterface
+class InCheckRules implements EventSubscriberInterface, CheckingMoveInterface
 {
 
     private $dispatcher;
@@ -27,22 +28,24 @@ class InCheckRules implements EventSubscriberInterface
         $move = $event->getMove();
         $color = $event->getColor();
 
-        // Still valid after all rules.
-        if ($event->isValidMove()) {
-            $new_board = clone $board;
-            $new_board->movePiece($move);
+        $valid = $this->checkMove($board, $move, $color);
+        $event->setValidMove($valid);
+    }
 
-            // We wont dispatch MoveEvents::MOVE event, since it is not
-            // neccessary in checking King is in check.
+    public function checkMove(Board $board, Move $move, $color = 'white')
+    {
+        $new_board = clone $board;
+        $new_board->movePiece($move);
 
-            if ($this->isInCheck($new_board, $color)) {
-                // The king is still in check.
-                $event->setValidMove(false);
-                return;
-            }
+        // We wont dispatch MoveEvents::MOVE event, since it is not
+        // neccessary in checking King is in check.
+
+        if ($this->isInCheck($new_board, $color)) {
+            // The king is still in check.
+            return false;
         }
 
-        $event->setValidMove(true);
+        return true;
     }
 
     public static function getSubscribedEvents()

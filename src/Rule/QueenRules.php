@@ -5,19 +5,31 @@ namespace Tchess\Rule;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Tchess\MoveEvents;
 use Tchess\Event\MoveEvent;
-use Tchess\Entity\Piece\Knight;
+use Tchess\Entity\Piece\Queen;
+use Tchess\Rule\CheckingMoveInterface;
+use Tchess\Rule\BishopRules;
+use Tchess\Rule\RookRules;
 use Tchess\Entity\Board;
 use Tchess\Entity\Piece\Move;
-use Tchess\Rule\CheckingMoveInterface;
 
-class KnightRules implements EventSubscriberInterface, CheckingMoveInterface
+class QueenRules implements EventSubscriberInterface, CheckingMoveInterface
 {
+
+    private $rook_rules;
+    private $bishop_rules;
+
+    public function __construct(BishopRules $rook_rules, RookRules $bishop_rules)
+    {
+        $this->rook_rules = $rook_rules;
+        $this->bishop_rules = $bishop_rules;
+    }
+
     public function onMoveChecking(MoveEvent $event)
     {
         $board = $event->getBoard();
         $move = $event->getMove();
         $piece = $board->getPiece($move->getCurrentRow(), $move->getCurrentColumn());
-        if (!$piece instanceof Knight) {
+        if (!$piece instanceof Queen) {
             return;
         }
 
@@ -27,15 +39,7 @@ class KnightRules implements EventSubscriberInterface, CheckingMoveInterface
 
     public function checkMove(Board $board, Move $move, $color = 'white')
     {
-        if (abs($move->getNewRow() - $move->getCurrentRow()) == 2 && abs($move->getNewColumn() - $move->getCurrentColumn()) == 1) {
-            return true;
-        }
-
-        if (abs($move->getNewRow() - $move->getCurrentRow()) == 1 && abs($move->getNewColumn() - $move->getCurrentColumn()) == 2) {
-            return true;
-        }
-
-        return false;
+        return $this->bishop_rules->checkMove($board, $move, $color) || $this->rook_rules->checkMove($board, $move, $color);
     }
 
     public static function getSubscribedEvents()

@@ -6,6 +6,11 @@ squareClass = 'square-55d63'
 
 var onDrop = function(source, target) {
     var valid_move = false;
+
+    if (source == target) {
+        return 'snapback';
+    }
+
     var color = 'white';
     $.ajax({
         type: 'POST',
@@ -73,7 +78,7 @@ var prepareHighlights = function() {
         highlight(highlights[3], highlights[5]);
         highlight(highlights[4], highlights[5]);
     }
-}
+};
 
 var pieceTheme = function(piece) {
     // wikipedia theme for white pieces

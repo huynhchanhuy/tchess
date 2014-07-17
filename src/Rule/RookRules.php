@@ -6,23 +6,30 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Tchess\MoveEvents;
 use Tchess\Event\MoveEvent;
 use Tchess\Entity\Piece\Rook;
-use Tchess\Entity\Piece\Queen;
+use Tchess\Entity\Board;
+use Tchess\Entity\Piece\Move;
+use Tchess\Rule\CheckingMoveInterface;
 
-class RookRules implements EventSubscriberInterface
+class RookRules implements EventSubscriberInterface, CheckingMoveInterface
 {
     public function onMoveChecking(MoveEvent $event)
     {
         $board = $event->getBoard();
         $move = $event->getMove();
         $piece = $board->getPiece($move->getCurrentRow(), $move->getCurrentColumn());
-        if (!$piece instanceof Rook && !$piece instanceof Queen) {
+        if (!$piece instanceof Rook) {
             return;
         }
 
+        $valid = $this->checkMove($board, $move);
+        $event->setValidMove($valid);
+    }
+
+    public function checkMove(Board $board, Move $move, $color = 'white')
+    {
         if ($move->getCurrentRow() != $move->getNewRow() && $move->getCurrentColumn() != $move->getNewColumn()) {
             // Did not move along one rank/file.
-            $event->setValidMove(false, $piece instanceof Queen ? false : true);
-            return;
+            return false;
         }
 
         // First I will assumed the Rook is moving along the rows.
@@ -36,8 +43,7 @@ class RookRules implements EventSubscriberInterface
             for($x = $move->getCurrentRow() + $offset; $x != $move->getNewRow(); $x += $offset) {
                 // Go from currentRow to newRow, and check every space.
                 if($board->getPiece($x, $move->getCurrentColumn()) != null) {
-                    $event->setValidMove(false, $piece instanceof Queen ? false : true);
-                    return;
+                    return false;
                 }
             }
         }
@@ -53,13 +59,12 @@ class RookRules implements EventSubscriberInterface
             for($x = $move->getCurrentColumn() + $offset; $x != $move->getNewColumn(); $x += $offset) {
                 // Go from currentCol to newCol, and check every space.
                 if($board->getPiece($move->getCurrentRow(), $x) != null) {
-                    $event->setValidMove(false, $piece instanceof Queen ? false : true);
-                    return;
+                    return false;
                 }
             }
         }
 
-        $event->setValidMove(true);
+        return true;
     }
 
     public static function getSubscribedEvents()

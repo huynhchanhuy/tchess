@@ -28,7 +28,7 @@ class MoveEvent extends Event
         return $this->board;
     }
 
-    public function setBoard($board)
+    public function setBoard(Board $board)
     {
         $this->board = $board;
     }
@@ -58,11 +58,11 @@ class MoveEvent extends Event
         return $this->validMove;
     }
 
-    public function setValidMove($validMove, $stopPropagation = true)
+    public function setValidMove($validMove)
     {
         $this->validMove = $validMove;
 
-        if ($validMove == false && $stopPropagation) {
+        if ($validMove == false) {
             // If any rule is broke, we stop checking.
             $this->stopPropagation();
         }

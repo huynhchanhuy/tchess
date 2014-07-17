@@ -6,36 +6,44 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Tchess\MoveEvents;
 use Tchess\Event\MoveEvent;
 use Tchess\Entity\Piece\Piece;
+use Tchess\Entity\Board;
+use Tchess\Entity\Piece\Move;
+use Tchess\Rule\CheckingMoveInterface;
 
-class BasicRules implements EventSubscriberInterface
+class BasicRules implements EventSubscriberInterface, CheckingMoveInterface
 {
     public function onMoveChecking(MoveEvent $event)
     {
         $board = $event->getBoard();
         $move = $event->getMove();
         $color = $event->getColor();
+
+        $valid = $this->checkMove($board, $move, $color);
+        $event->setValidMove($valid);
+    }
+
+    public function checkMove(Board $board, Move $move, $color = 'white')
+    {
+        if ($move->getCurrentRow() == $move->getNewRow() && $move->getCurrentColumn() == $move->getNewColumn()) {
+            return false;
+        }
+
         $source_piece = $board->getPiece($move->getCurrentRow(), $move->getCurrentColumn());
         $target_piece = $board->getPiece($move->getNewRow(), $move->getNewColumn());
 
         if ($source_piece == null) {
-            $event->setValidMove(false);
-            $event->setMessage('There is no piece to move at ' . $move->getSource());
-            return;
+            return false;
         }
 
         if (!$source_piece instanceof Piece || $source_piece->getColor() != $color) {
-            $event->setValidMove(false);
-            $event->setMessage('Can not move opponent piece at ' . $move->getSource());
-            return;
+            return false;
         }
 
         if ($target_piece instanceof Piece && $target_piece->getColor() == $color) {
-            $event->setValidMove(false);
-            $event->setMessage('There is already your piece at ' . $move->getTarget());
-            return;
+            return false;
         }
 
-        $event->setValidMove(true);
+        return true;
     }
 
     public static function getSubscribedEvents()

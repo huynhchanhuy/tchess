@@ -10,8 +10,12 @@ use Tchess\Entity\Piece\Queen;
 use Tchess\Entity\Piece\Knight;
 use Tchess\Entity\Piece\Bishop;
 use Tchess\Entity\Piece\Rook;
+use Tchess\Rule\CheckingMoveInterface;
+use Tchess\Entity\Piece\Piece;
+use Tchess\Entity\Board;
+use Tchess\Entity\Piece\Move;
 
-class PawnRules implements EventSubscriberInterface
+class PawnRules implements EventSubscriberInterface, CheckingMoveInterface
 {
     public function onMoveChecking(MoveEvent $event)
     {
@@ -23,15 +27,24 @@ class PawnRules implements EventSubscriberInterface
             return;
         }
 
+        $valid = $this->checkMove($board, $move, $color);
+        $event->setValidMove($valid);
+    }
+
+    public function checkMove(Board $board, Move $move, $color = 'white')
+    {
+        $piece = $board->getPiece($move->getCurrentRow(), $move->getCurrentColumn());
+        if (!$piece instanceof Piece) {
+            return;
+        }
+
         if ($color == "white") {
             if ($move->getCurrentRow() >= $move->getNewRow()) {
-                $event->setValidMove(false);
-                return;
+                return false;
             }
         } else {
             if ($move->getNewRow() >= $move->getCurrentRow()) {
-                $event->setValidMove(false);
-                return;
+                return false;
             }
         }
 
@@ -39,35 +52,29 @@ class PawnRules implements EventSubscriberInterface
             // Not taking a piece.
             if ($color == "white") {
                 if ($board->getPiece($move->getCurrentRow() + 1, $move->getCurrentColumn()) != null) {
-                    $event->setValidMove(false);
-                    return;
+                    return false;
                 }
             } else {
                 if ($board->getPiece($move->getCurrentRow() - 1, $move->getCurrentColumn()) != null) {
-                    $event->setValidMove(false);
-                    return;
+                    return false;
                 }
             }
 
             if (abs($move->getNewRow() - $move->getCurrentRow()) > 2) {
-                $event->setValidMove(false);
-                return;
+                return false;
             } else if (abs($move->getNewRow() - $move->getCurrentRow()) == 2) {
                 // Advancing two spaces at beginning.
                 if ($piece->isMoved()) {
-                    $event->setValidMove(false);
-                    return;
+                    return false;
                 }
 
                 if ($piece->getColor() == 'white') {
                     if($board->getPiece($move->getCurrentRow() + 2, $move->getCurrentColumn()) != null) {
-                        $event->setValidMove(false);
-                        return;
+                        return false;
                     }
                 } else {
                     if($board->getPiece($move->getCurrentRow() - 2, $move->getCurrentColumn()) != null) {
-                        $event->setValidMove(false);
-                        return;
+                        return false;
                     }
                 }
 
@@ -77,17 +84,15 @@ class PawnRules implements EventSubscriberInterface
         } else {
             // Taking a piece.
             if (abs($move->getNewColumn() - $move->getCurrentColumn()) != 1 || abs($move->getNewRow() - $move->getCurrentRow()) != 1) {
-                $event->setValidMove(false);
-                return;
+                return false;
             }
 
             if($board->getPiece($move->getNewRow(), $move->getNewColumn()) == null) {
-                $event->setValidMove(false);
-                return;
+                return false;
             }
         }
 
-        $event->setValidMove(true);
+        return true;
     }
 
     public function onMoveDoQueening(MoveEvent $event)

@@ -183,6 +183,8 @@ function register_chess_services($sc) {
     $sc->register('rules.king', 'Tchess\Rule\KingRules');
     $sc->register('rules.knight', 'Tchess\Rule\KnightRules');
     $sc->register('rules.rook', 'Tchess\Rule\RookRules');
+    $sc->register('rules.queen', 'Tchess\Rule\QueenRules')
+            ->setArguments(array(new Reference('rules.bishop'), new Reference('rules.rook')));
     $sc->register('rules.in_check', 'Tchess\Rule\InCheckRules')
             ->setArguments(array(new Reference('dispatcher')));
 
@@ -194,6 +196,7 @@ function register_chess_services($sc) {
             ->addMethodCall('addSubscriber', array(new Reference('rules.king')))
             ->addMethodCall('addSubscriber', array(new Reference('rules.knight')))
             ->addMethodCall('addSubscriber', array(new Reference('rules.rook')))
+            ->addMethodCall('addSubscriber', array(new Reference('rules.queen')))
             ->addMethodCall('addSubscriber', array(new Reference('rules.in_check')))
         ;
 }
