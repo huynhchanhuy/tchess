@@ -51,7 +51,7 @@ class InCheckRules implements EventSubscriberInterface, CheckingMoveInterface
     public static function getSubscribedEvents()
     {
         return array(
-            MoveEvents::CHECH_MOVE => array(array('onMoveChecking', -1)),
+            MoveEvents::CHECK_MOVE => array(array('onMoveChecking', -1)),
         );
     }
 
@@ -72,7 +72,7 @@ class InCheckRules implements EventSubscriberInterface, CheckingMoveInterface
                     $move->setNewColumn($col);
 
                     $event = new MoveEvent($board, $move, $piece->getColor());
-                    if ($this->dispatcher->dispatch(MoveEvents::CHECH_MOVE, $event)->isValidMove()) {
+                    if ($this->dispatcher->dispatch(MoveEvents::CHECK_MOVE, $event)->isValidMove()) {
                         return true;
                     }
                 }

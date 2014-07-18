@@ -354,7 +354,7 @@ class GameController extends BaseController
             $color = $player->getColor();
             $move = new Move($color, $request->request->get('move'));
 
-            if ($dispatcher->dispatch(MoveEvents::CHECH_MOVE, new MoveEvent($board, $move, $color))->isValidMove()) {
+            if ($dispatcher->dispatch(MoveEvents::CHECK_MOVE, new MoveEvent($board, $move, $color))->isValidMove()) {
                 $board->movePiece($move);
                 $moveEvent = new MoveEvent($board, $move, $color);
 

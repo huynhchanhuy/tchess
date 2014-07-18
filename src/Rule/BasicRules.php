@@ -49,7 +49,7 @@ class BasicRules implements EventSubscriberInterface, CheckingMoveInterface
     public static function getSubscribedEvents()
     {
         return array(
-            MoveEvents::CHECH_MOVE => array(array('onMoveChecking', 1)),
+            MoveEvents::CHECK_MOVE => array(array('onMoveChecking', 1)),
         );
     }
 

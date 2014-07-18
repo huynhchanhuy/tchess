@@ -63,7 +63,7 @@ class BishopRules implements EventSubscriberInterface, CheckingMoveInterface
     public static function getSubscribedEvents()
     {
         return array(
-            MoveEvents::CHECH_MOVE => array(array('onMoveChecking', 0)),
+            MoveEvents::CHECK_MOVE => array(array('onMoveChecking', 0)),
         );
     }
 
