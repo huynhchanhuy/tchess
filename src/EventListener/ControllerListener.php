@@ -5,8 +5,8 @@ namespace Tchess\EventListener;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Tchess\FrameworkInterface;
+use Tchess\FrameworkAwareInterface;
 
 class ControllerListener implements EventSubscriberInterface
 {
@@ -17,8 +17,8 @@ class ControllerListener implements EventSubscriberInterface
         list($object, $method) = $controller;
         $kernel = $event->getKernel();
 
-        if ($object instanceof ContainerAwareInterface && $kernel instanceof FrameworkInterface) {
-            $object->setContainer($kernel->getContainer());
+        if ($object instanceof FrameworkAwareInterface && $kernel instanceof FrameworkInterface) {
+            $object->setFramework($kernel);
         }
     }
 

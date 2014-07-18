@@ -3,36 +3,86 @@
 namespace Tchess;
 
 use Symfony\Component\HttpKernel\HttpKernel;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Tchess\FrameworkInterface;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class Framework extends HttpKernel implements ContainerAwareInterface, FrameworkInterface
+class Framework extends HttpKernel implements FrameworkInterface
 {
 
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
+    protected $entity_manager;
+    protected $form_factory;
+    protected $move_manager;
+    protected $serializer;
+    protected $twig;
+    protected $url_generator;
 
-    /**
-     * Container aware.
-     *
-     * @param \ContainerInterface $container
-     */
-    public function setContainer(ContainerInterface $container = null)
+    public function getEntityManager()
     {
-        $this->container = $container;
+        return $this->entity_manager;
     }
 
-    /**
-     * Just like how Symfony\Component\HttpKernel\Kernel class works.
-     *
-     * @return ContainerInterface
-     */
-    public function getContainer()
+    public function getEventDispatcher()
     {
-        return $this->container;
+        return $this->dispatcher;
+    }
+
+    public function getFormFactory()
+    {
+        return $this->form_factory;
+    }
+
+    public function getMoveManager()
+    {
+        return $this->move_manager;
+    }
+
+    public function getSerializer()
+    {
+        return $this->serializer;
+    }
+
+    public function getTwig()
+    {
+        return $this->twig;
+    }
+
+    public function getUrlGenerator()
+    {
+        return $this->url_generator;
+    }
+
+    public function setEntityManager(EntityManagerInterface $entity_manager)
+    {
+        $this->entity_manager = $entity_manager;
+    }
+
+    public function setFormFactory(FormFactoryInterface $form_factory)
+    {
+        $this->form_factory = $form_factory;
+    }
+
+    public function setMoveManager(MoveManager $move_manager)
+    {
+        $this->move_manager = $move_manager;
+    }
+
+    public function setSerializer(SerializerInterface $serializer)
+    {
+        $this->serializer = $serializer;
+    }
+
+    public function setTwig(\Twig_Environment $twig)
+    {
+        $this->twig = $twig;
+    }
+
+    public function setUrlGenerator(UrlGeneratorInterface $url_generator)
+    {
+        $this->url_generator = $url_generator;
     }
 
 }

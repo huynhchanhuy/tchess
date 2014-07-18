@@ -2,11 +2,11 @@
 
 namespace Tchess\Controller;
 
-use Symfony\Component\DependencyInjection\ContainerAware;
+use Tchess\FrameworkAware;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
-class BaseController extends ContainerAware
+class BaseController extends FrameworkAware
 {
 
     /**
@@ -14,7 +14,7 @@ class BaseController extends ContainerAware
      */
     public function render($template, $variables = array())
     {
-        $twig = $this->container->get('twig');
+        $twig = $this->framework->getTwig();
         return $twig->render($template, $variables);
     }
 
@@ -23,7 +23,7 @@ class BaseController extends ContainerAware
      */
     public function getFormFactory()
     {
-        return $this->container->get('form_factory');
+        return $this->framework->getFormFactory();
     }
 
     /**
@@ -39,7 +39,7 @@ class BaseController extends ContainerAware
      */
     public function generateUrl($route, $parameters = array(), $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH)
     {
-        return $this->container->get('url_generagor')->generate($route, $parameters, $referenceType);
+        return $this->framework->getUrlGenerator()->generate($route, $parameters, $referenceType);
     }
 
     /**

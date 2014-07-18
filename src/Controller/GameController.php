@@ -27,7 +27,7 @@ class GameController extends BaseController
      */
     public function indexAction(Request $request)
     {
-        $em = $this->container->get('entity_manager');
+        $em = $this->framework->getEntityManager();
         $session = $request->getSession();
         $sid = $session->getId();
         $player = $em->getRepository('Tchess\Entity\Player')->findOneBy(array('sid' => $sid));
@@ -68,7 +68,7 @@ class GameController extends BaseController
      */
     public function registerAction(Request $request)
     {
-        $em = $this->container->get('entity_manager');
+        $em = $this->framework->getEntityManager();
         $session = $request->getSession();
         $sid = $session->getId();
         $player = $em->getRepository('Tchess\Entity\Player')->findOneBy(array('sid' => $sid));
@@ -103,7 +103,7 @@ class GameController extends BaseController
                 if ($data['auto_join']) {
                     $sub_request = Request::create('/auto-join-room');
                     $sub_request->setSession($session);
-                    return $this->container->get('framework')->handle($sub_request, HttpKernelInterface::SUB_REQUEST);
+                    return $this->framework->handle($sub_request, HttpKernelInterface::SUB_REQUEST);
                 }
 
                 return $this->redirect($this->generateUrl('rooms'));
@@ -123,7 +123,7 @@ class GameController extends BaseController
      */
     public function autoJoinAction(Request $request)
     {
-        $em = $this->container->get('entity_manager');
+        $em = $this->framework->getEntityManager();
         $session = $request->getSession();
         $sid = $session->getId();
 
@@ -170,7 +170,7 @@ class GameController extends BaseController
      */
     public function joinAction(Request $request, $room = null)
     {
-        $em = $this->container->get('entity_manager');
+        $em = $this->framework->getEntityManager();
         $session = $request->getSession();
         $sid = $session->getId();
 
@@ -213,7 +213,7 @@ class GameController extends BaseController
      */
     public function startAction(Request $request)
     {
-        $em = $this->container->get('entity_manager');
+        $em = $this->framework->getEntityManager();
         $session = $request->getSession();
         $sid = $session->getId();
 
@@ -230,7 +230,7 @@ class GameController extends BaseController
         $player->setStarted(true);
         $em->flush();
 
-        $this->container->get('dispatcher')->dispatch(GameEvents::START, new GameEvent($player, $em));
+        $this->framework->getEventDispatcher()->dispatch(GameEvents::START, new GameEvent($player, $em));
         return json_encode(array(
                     'message' => 'Game started',
                     'code' => 200
@@ -245,7 +245,7 @@ class GameController extends BaseController
      */
     public function stopAction(Request $request)
     {
-        $em = $this->container->get('entity_manager');
+        $em = $this->framework->getEntityManager();
         $session = $request->getSession();
         $sid = $session->getId();
 
@@ -262,7 +262,7 @@ class GameController extends BaseController
         $player->setStarted(false);
         $em->flush();
 
-        $this->container->get('dispatcher')->dispatch(GameEvents::STOP, new GameEvent($player, $em));
+        $this->framework->getEventDispatcher()->dispatch(GameEvents::STOP, new GameEvent($player, $em));
         return json_encode(array(
                     'message' => 'Game stopped',
                     'code' => 200
@@ -277,7 +277,7 @@ class GameController extends BaseController
      */
     public function restartAction(Request $request)
     {
-        $em = $this->container->get('entity_manager');
+        $em = $this->framework->getEntityManager();
         $session = $request->getSession();
         $sid = $session->getId();
 
@@ -290,21 +290,21 @@ class GameController extends BaseController
         if ($player->getStarted()) {
             $stop_sub_request = Request::create('/stop-game');
             $stop_sub_request->setSession($session);
-            $this->container->get('framework')->handle($stop_sub_request, HttpKernelInterface::SUB_REQUEST);
+            $this->framework->handle($stop_sub_request, HttpKernelInterface::SUB_REQUEST);
 
             $start_sub_request = Request::create('/start-game');
             $start_sub_request->setSession($session);
-            $this->container->get('framework')->handle($start_sub_request, HttpKernelInterface::SUB_REQUEST);
+            $this->framework->handle($start_sub_request, HttpKernelInterface::SUB_REQUEST);
         } else {
             $sub_request = Request::create('/start-game');
             $sub_request->setSession($session);
-            $this->container->get('framework')->handle($sub_request, HttpKernelInterface::SUB_REQUEST);
+            $this->framework->handle($sub_request, HttpKernelInterface::SUB_REQUEST);
         }
 
         $player = $em->getRepository('Tchess\Entity\Player')->findOneBy(array('sid' => $sid));
         if ($player->getStarted()) {
 
-            $this->container->get('dispatcher')->dispatch(GameEvents::RESTART, new GameEvent($player, $em));
+            $this->framework->getEventDispatcher()->dispatch(GameEvents::RESTART, new GameEvent($player, $em));
             return json_encode(array(
                     'message' => 'Game re-started',
                     'code' => 200
@@ -322,8 +322,8 @@ class GameController extends BaseController
      */
     public function moveAction(Request $request)
     {
-        $em = $this->container->get('entity_manager');
-        $dispatcher = $this->container->get('dispatcher');
+        $em = $this->framework->getEntityManager();
+        $dispatcher = $this->framework->getEventDispatcher();
         $session = $request->getSession();
         $sid = $session->getId();
 
@@ -348,7 +348,7 @@ class GameController extends BaseController
             ));
         }
         else {
-            $serializer = $this->container->get('serializer');
+            $serializer = $this->framework->getSerializer();
             $game->loadGame($serializer);
             $board = $game->getBoard();
             $color = $player->getColor();
@@ -366,7 +366,7 @@ class GameController extends BaseController
                 $game->addHighlight($move->getSource(), $move->getTarget(), $color);
                 $em->flush();
 
-                $this->container->get('move_manager')->addMove($move);
+                $this->framework->getMoveManager()->addMove($move);
             } else {
                 return json_encode(array(
                     'code' => 500,
@@ -391,7 +391,7 @@ class GameController extends BaseController
      */
     public function getStateAction(Request $request)
     {
-        $em = $this->container->get('entity_manager');
+        $em = $this->framework->getEntityManager();
         $session = $request->getSession();
         $sid = $session->getId();
 

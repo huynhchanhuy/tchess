@@ -1,25 +1,43 @@
 <?php
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\Reference;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use Monolog\Logger;
 
-$sc = new ContainerBuilder();
+$file = __DIR__ .'/../cache/container.php';
 
-register_db_services($sc, $config);
+if (file_exists($file)) {
+    require_once $file;
+    $sc = new ProjectServiceContainer();
+} else {
+    $sc = new ContainerBuilder();
 
-register_kernel_services($sc, $env);
+    register_db_services($sc, $config);
 
-register_chess_services($sc);
+    register_kernel_services($sc, $env);
 
-register_twig_services($sc, $env);
+    register_chess_services($sc);
 
-register_form_services($sc);
+    register_twig_services($sc, $env);
 
-register_serializer_services($sc);
+    register_form_services($sc);
 
-register_logger_services($sc);
+    register_serializer_services($sc);
+
+    register_logger_services($sc);
+
+    $sc->compile();
+
+    $dumper = new PhpDumper($sc);
+    file_put_contents($file, $dumper->dump());
+}
+
+// @todo - Run it using service container?
+AnnotationRegistry::registerLoader('class_exists');
+
+return $sc;
 
 function register_logger_services($sc) {
     $sc->register('logger', 'Monolog\Logger')
@@ -40,7 +58,8 @@ function register_serializer_services($sc) {
 function register_form_services($sc) {
     $sc->register('validator')
             ->setFactoryClass('Symfony\Component\Validator\Validation')
-            ->setFactoryMethod('createValidator');
+            ->setFactoryMethod('createValidator')
+            ->setClass('Symfony\Component\Validator\Validator');
     $sc->register('form_validator_extension', 'Symfony\Component\Form\Extension\Validator\ValidatorExtension')
             ->setArguments(array(new Reference('validator')));
 
@@ -52,6 +71,7 @@ function register_form_services($sc) {
     $sc->register('form_factory_builder')
             ->setFactoryClass('Symfony\Component\Form\Forms')
             ->setFactoryMethod('createFormFactoryBuilder')
+            ->setClass('Symfony\Component\Form\FormFactoryBuilder')
             ->addMethodCall('addExtension', array(new Reference('form_csrf_extension')))
             ->addMethodCall('addExtension', array(new Reference('form_http_foundation_extension')))
             ->addMethodCall('addExtension', array(new Reference('form_validator_extension')))
@@ -60,14 +80,15 @@ function register_form_services($sc) {
     $sc->register('form_factory')
             ->setFactoryService(new Reference('form_factory_builder'))
             ->setFactoryMethod('getFormFactory')
+            ->setClass('Symfony\Component\Form\FormFactory')
     ;
 }
 
 function register_twig_services($sc, $env) {
-    $sc->register('url_generagor', 'Symfony\Component\Routing\Generator\UrlGenerator')
-        ->setArguments(array('%routes%', new Reference('context')));
+    $sc->register('url_generator', 'Symfony\Component\Routing\Generator\UrlGenerator')
+        ->setArguments(array(new Reference('route_collection'), new Reference('context')));
     $sc->register('twig_routing_extension', 'Symfony\Bridge\Twig\Extension\RoutingExtension')
-            ->setArguments(array(new Reference('url_generagor')));
+            ->setArguments(array(new Reference('url_generator')));
 
     $sc->setParameter('csrf_secret', 'c2ioeEU1n48QF2WsHGWd2HmiuUUT6dxr');
     $sc->register('csrf_provider', 'Symfony\Component\Form\Extension\Csrf\CsrfProvider\DefaultCsrfProvider')
@@ -127,11 +148,7 @@ function register_twig_services($sc, $env) {
     $sc->register('twig_assetic_extension', 'Assetic\Extension\Twig\AsseticExtension')
             ->setArguments(array(new Reference('asset_factory')));
     $sc->register('asset_function', 'Twig_SimpleFunction')
-            ->setArguments(array('asset', function ($asset) {
-                // implement whatever logic you need to determine the asset path
-
-                return sprintf('http://assets.examples.com/%s', ltrim($asset, '/'));
-            }));
+            ->setArguments(array('asset'));
 
     $sc->register('xliff_file_loader', 'Symfony\Component\Translation\Loader\XliffFileLoader');
     $sc->register('translator', 'Symfony\Component\Translation\Translator')
@@ -204,12 +221,15 @@ function register_kernel_services($sc, $env) {
     $sc->register('yaml_loader', 'Symfony\Component\Routing\Loader\YamlFileLoader')
             ->setArguments(array(new Reference('locator')));
 
-    $routes = $sc->get('yaml_loader')->load('routes.yml');
-    $sc->setParameter('routes', $routes);
+    $sc->register('route_collection')
+            ->setFactoryService(new Reference('yaml_loader'))
+            ->setFactoryMethod('load')
+            ->setClass('Symfony\Component\Routing\RouteCollection')
+            ->setArguments(array('routes.yml'));
 
     $sc->register('context', 'Symfony\Component\Routing\RequestContext');
     $sc->register('matcher', 'Symfony\Component\Routing\Matcher\UrlMatcher')
-            ->setArguments(array('%routes%', new Reference('context')))
+            ->setArguments(array(new Reference('route_collection'), new Reference('context')))
     ;
     $sc->register('resolver', 'Symfony\Component\HttpKernel\Controller\ControllerResolver');
 
@@ -242,7 +262,12 @@ function register_kernel_services($sc, $env) {
     $sc->register('framework', 'Tchess\Framework')
             ->setArguments(array(new Reference('dispatcher'), new Reference('resolver')))
             // @todo - Don't inject the container.
-            ->addMethodCall('setContainer', array($sc))
+            ->addMethodCall('setEntityManager', array(new Reference('entity_manager')))
+            ->addMethodCall('setFormFactory', array(new Reference('form_factory')))
+            ->addMethodCall('setMoveManager', array(new Reference('move_manager')))
+            ->addMethodCall('setSerializer', array(new Reference('serializer')))
+            ->addMethodCall('setTwig', array(new Reference('twig')))
+            ->addMethodCall('setUrlGenerator', array(new Reference('url_generator')))
     ;
 }
 
@@ -256,6 +281,7 @@ function register_db_services($sc, $config) {
     $sc->register('entity_config')
             ->setFactoryClass('Doctrine\ORM\Tools\Setup')
             ->setFactoryMethod('createConfiguration')
+            ->setClass('Doctrine\ORM\Configuration')
             ->addMethodCall('setMetadataDriverImpl', array(new Reference('annotation_driver')))
             ->addMethodCall('setMetadataCacheImpl', array(new Reference('array_cache')))
             ->addMethodCall('setResultCacheImpl', array(new Reference('array_cache')))
@@ -270,13 +296,9 @@ function register_db_services($sc, $config) {
     $sc->register('annotation_driver', 'Doctrine\ORM\Mapping\Driver\AnnotationDriver')
             ->setArguments(array(new Reference('annotation_reader'), $sc->getParameter('entity_paths')));
 
-    // @todo - Run it using service container?
-    AnnotationRegistry::registerLoader('class_exists');
-
     $sc->register('entity_manager')
             ->setFactoryClass('Doctrine\ORM\EntityManager')
             ->setFactoryMethod('create')
+            ->setClass('Doctrine\ORM\EntityManager')
             ->setArguments(array('%db_config%', new Reference('entity_config')));
 }
-
-return $sc;
