@@ -44,14 +44,8 @@ cd /path/to/example.com/bin/
 ./run-server
 ```
 
-Troubleshooting
-=============
-
-In case there is an error: Failed opening required '/tmp/__CG__TchessEntityRoom.php'
-
-```
-vendor/bin/doctrine orm:generate-proxies
-```
+Update doctrine entities
+------------------------
 
 If you want to edit entity class, you should go to root dir, and run this command:
 
@@ -65,3 +59,12 @@ And then run:
  * vendor/bin/doctrine orm:schema-tool:update --force
 
 To update db schema.
+
+Troubleshooting
+=============
+
+In case there is an error: Failed opening required '/tmp/__CG__TchessEntityRoom.php'
+
+```
+vendor/bin/doctrine orm:generate-proxies
+```
