@@ -147,8 +147,6 @@ function register_twig_services($sc, $env) {
     ;
     $sc->register('twig_assetic_extension', 'Assetic\Extension\Twig\AsseticExtension')
             ->setArguments(array(new Reference('asset_factory')));
-    $sc->register('asset_function', 'Twig_SimpleFunction')
-            ->setArguments(array('asset'));
 
     $sc->register('xliff_file_loader', 'Symfony\Component\Translation\Loader\XliffFileLoader');
     $sc->register('translator', 'Symfony\Component\Translation\Translator')
@@ -160,6 +158,7 @@ function register_twig_services($sc, $env) {
     $sc->register('twig_translation_extension', 'Symfony\Bridge\Twig\Extension\TranslationExtension')
             ->setArguments(array(new Reference('translator')));
 
+    // @todo - Run it using service container?
     Twig_Autoloader::register();
 
     $twig_options = array(
@@ -181,7 +180,6 @@ function register_twig_services($sc, $env) {
             ->addMethodCall('addExtension', array(new Reference('twig_form_extension')))
             ->addMethodCall('addExtension', array(new Reference('twig_assetic_extension')))
             ->addMethodCall('addExtension', array(new Reference('twig_translation_extension')))
-            ->addMethodCall('addFunction', array('asset', new Reference('asset_function')))
     ;
 }
 
