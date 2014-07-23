@@ -5,8 +5,9 @@ use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\Reference;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use Monolog\Logger;
+use Tchess\DependencyInjection\Compiler\RegisterRulesPass;
 
-$file = __DIR__ .'/../cache/container.php';
+$file = __DIR__ . '/../cache/container.php';
 
 if (file_exists($file)) {
     require_once $file;
@@ -28,10 +29,17 @@ if (file_exists($file)) {
 
     register_logger_services($sc);
 
+    add_compiler_passes($sc);
+
     $sc->compile();
 
     $dumper = new PhpDumper($sc);
     file_put_contents($file, $dumper->dump());
+}
+
+function add_compiler_passes($sc)
+{
+    $sc->addCompilerPass(new RegisterRulesPass());
 }
 
 // @todo - Run it using service container?
@@ -39,7 +47,8 @@ AnnotationRegistry::registerLoader('class_exists');
 
 return $sc;
 
-function register_logger_services($sc) {
+function register_logger_services($sc)
+{
     $sc->register('logger', 'Monolog\Logger')
             ->setArguments(array('moves'))
             ->addMethodCall('pushHandler', array(new Reference('logger_stream_handler')))
@@ -48,14 +57,16 @@ function register_logger_services($sc) {
             ->setArguments(array(__DIR__ . '/../logs/moves.log', Logger::INFO));
 }
 
-function register_serializer_services($sc) {
+function register_serializer_services($sc)
+{
     $sc->register('fen_encoder', 'Tchess\Serializer\Encoder\FenEncoder');
     $sc->register('board_pieces_normalizer', 'Tchess\Serializer\Normalizer\BoardPiecesNormalizer');
     $sc->register('serializer', 'Symfony\Component\Serializer\Serializer')
             ->setArguments(array(array(new Reference('board_pieces_normalizer')), array(new Reference('fen_encoder'))));
 }
 
-function register_form_services($sc) {
+function register_form_services($sc)
+{
     $sc->register('validator')
             ->setFactoryClass('Symfony\Component\Validator\Validation')
             ->setFactoryMethod('createValidator')
@@ -84,9 +95,10 @@ function register_form_services($sc) {
     ;
 }
 
-function register_twig_services($sc, $env) {
+function register_twig_services($sc, $env)
+{
     $sc->register('url_generator', 'Symfony\Component\Routing\Generator\UrlGenerator')
-        ->setArguments(array(new Reference('route_collection'), new Reference('context')));
+            ->setArguments(array(new Reference('route_collection'), new Reference('context')));
     $sc->register('twig_routing_extension', 'Symfony\Bridge\Twig\Extension\RoutingExtension')
             ->setArguments(array(new Reference('url_generator')));
 
@@ -171,9 +183,9 @@ function register_twig_services($sc, $env) {
 
     $sc->register('twig_loader', 'Twig_Loader_Filesystem')
             ->setArguments(array(array(
-                __DIR__ . '/../templates',
-                __DIR__ . '/../vendor/symfony/twig-bridge/Symfony/Bridge/Twig/Resources/views/Form'
-            )));
+                    __DIR__ . '/../templates',
+                    __DIR__ . '/../vendor/symfony/twig-bridge/Symfony/Bridge/Twig/Resources/views/Form'
+                    )));
     $sc->register('twig', 'Twig_Environment')
             ->setArguments(array(new Reference('twig_loader'), '%twig_options%'))
             ->addMethodCall('addExtension', array(new Reference('twig_routing_extension')))
@@ -183,39 +195,42 @@ function register_twig_services($sc, $env) {
     ;
 }
 
-function register_chess_services($sc) {
+function register_chess_services($sc)
+{
     $sc->register('listener.game', 'Tchess\EventListener\GameListener')
             ->setArguments(array(new Reference('entity_manager'), new Reference('serializer'), new Reference('logger'), new Reference('move_manager')));
-    $sc->register('rules.basic', 'Tchess\Rule\BasicRules');
-    $sc->register('rules.pawn', 'Tchess\Rule\PawnRules');
-    $sc->register('rules.bishop', 'Tchess\Rule\BishopRules');
+
+    $sc->register('rules.basic', 'Tchess\Rule\BasicRules')
+            ->addTag('rules');
+    $sc->register('rules.pawn', 'Tchess\Rule\PawnRules')
+            ->addTag('rules');
+    $sc->register('rules.bishop', 'Tchess\Rule\BishopRules')
+            ->addTag('rules');
     $sc->register('rules.king', 'Tchess\Rule\KingRules')
-            ->setArguments(array(new Reference('move_manager')));
-    $sc->register('rules.knight', 'Tchess\Rule\KnightRules');
-    $sc->register('rules.rook', 'Tchess\Rule\RookRules');
+            ->setArguments(array(new Reference('move_manager')))
+            ->addTag('rules');
+    $sc->register('rules.knight', 'Tchess\Rule\KnightRules')
+            ->addTag('rules');
+    $sc->register('rules.rook', 'Tchess\Rule\RookRules')
+            ->addTag('rules');
     $sc->register('rules.queen', 'Tchess\Rule\QueenRules')
-            ->setArguments(array(new Reference('rules.bishop'), new Reference('rules.rook')));
+            ->setArguments(array(new Reference('rules.bishop'), new Reference('rules.rook')))
+            ->addTag('rules');
     $sc->register('rules.in_check', 'Tchess\Rule\InCheckRules')
-            ->setArguments(array(new Reference('dispatcher')));
+            ->setArguments(array(new Reference('dispatcher')))
+            ->addTag('rules');
 
     $sc->getDefinition('dispatcher')
             ->addMethodCall('addSubscriber', array(new Reference('listener.game')))
-            ->addMethodCall('addSubscriber', array(new Reference('rules.basic')))
-            ->addMethodCall('addSubscriber', array(new Reference('rules.pawn')))
-            ->addMethodCall('addSubscriber', array(new Reference('rules.bishop')))
-            ->addMethodCall('addSubscriber', array(new Reference('rules.king')))
-            ->addMethodCall('addSubscriber', array(new Reference('rules.knight')))
-            ->addMethodCall('addSubscriber', array(new Reference('rules.rook')))
-            ->addMethodCall('addSubscriber', array(new Reference('rules.queen')))
-            ->addMethodCall('addSubscriber', array(new Reference('rules.in_check')))
-        ;
+    ;
 
     $sc->register('move_manager', 'Tchess\MoveManager');
 }
 
-function register_kernel_services($sc, $env) {
+function register_kernel_services($sc, $env)
+{
     $sc->register('locator', 'Symfony\Component\Config\FileLocator')
-        ->setArguments(array(__DIR__ . '/../config'));
+            ->setArguments(array(__DIR__ . '/../config'));
     $sc->register('yaml_loader', 'Symfony\Component\Routing\Loader\YamlFileLoader')
             ->setArguments(array(new Reference('locator')));
 
@@ -269,7 +284,8 @@ function register_kernel_services($sc, $env) {
     ;
 }
 
-function register_db_services($sc, $config) {
+function register_db_services($sc, $config)
+{
     $sc->setParameter('entity_paths', array(__DIR__ . '/Entity'));
 
     $sc->setParameter('db_config', $config);
