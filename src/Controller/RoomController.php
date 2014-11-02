@@ -19,7 +19,7 @@ class RoomController extends BaseController
      */
     public function indexAction(Request $request)
     {
-        $em = $this->container->get('entity_manager');
+        $em = $this->framework->getEntityManager();
         $session = $request->getSession();
         $sid = $session->getId();
 
@@ -50,7 +50,7 @@ class RoomController extends BaseController
      */
     public function createAction(Request $request)
     {
-        $em = $this->container->get('entity_manager');
+        $em = $this->framework->getEntityManager();
         $session = $request->getSession();
         $sid = $session->getId();
 
