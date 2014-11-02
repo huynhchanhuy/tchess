@@ -14,6 +14,8 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeFileSessionHandler;
+use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
 
 /** Global variables **/
 $config = include __DIR__ . '/../config/db-config.php';
@@ -26,7 +28,9 @@ $request = Request::createFromGlobals();
 
 // Prepare session.
 if (!$request->getSession()) {
-    $session = new Session();
+    $storage = new NativeSessionStorage(array(), new NativeFileSessionHandler());
+    $session = new Session($storage);
+    $session->getMetadataBag()->stampNew(0);
     $session->start();
     $request->setSession($session);
 }
