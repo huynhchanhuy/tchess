@@ -122,15 +122,21 @@ function register_twig_services($sc, $env)
     $sc->register('register_css_glob_asset', 'Assetic\Asset\GlobAsset')
             ->setArguments(array(__DIR__ . '/../resources/css/register/*', array(new Reference('yui_css_compressor_filter'))))
             ->addMethodCall('setTargetPath', array('css/register.css'));
-    $sc->register('board_highlight_css_asset', 'Assetic\Asset\FileAsset')
-            ->setArguments(array(__DIR__ . '/../resources/css/board/highlight.css', array(new Reference('yui_css_compressor_filter'))))
-            ->addMethodCall('setTargetPath', array('css/board_highlight.css'));
+    $sc->register('homepage_css_glob_asset', 'Assetic\Asset\GlobAsset')
+            ->setArguments(array(__DIR__ . '/../resources/css/homepage/*', array(new Reference('yui_css_compressor_filter'))))
+            ->addMethodCall('setTargetPath', array('css/homepage.css'));
+    $sc->register('board_css_glob_asset', 'Assetic\Asset\GlobAsset')
+            ->setArguments(array(__DIR__ . '/../resources/css/board/*', array(new Reference('yui_css_compressor_filter'))))
+            ->addMethodCall('setTargetPath', array('css/board.css'));
     $sc->register('chess_js_asset', 'Assetic\Asset\FileAsset')
             ->setArguments(array(__DIR__ . '/../resources/js/chess.js'))
             ->addMethodCall('setTargetPath', array('js/chess.js'));
     $sc->register('game_buttons_js_asset', 'Assetic\Asset\FileAsset')
             ->setArguments(array(__DIR__ . '/../resources/js/game-buttons.js'))
             ->addMethodCall('setTargetPath', array('js/game-buttons.js'));
+    $sc->register('bootstrap_js_asset', 'Assetic\Asset\FileAsset')
+            ->setArguments(array(__DIR__ . '/../resources/js/bootstrap.min.js'))
+            ->addMethodCall('setTargetPath', array('js/bootstrap.min.js'));
     $sc->register('favicon_asset', 'Assetic\Asset\FileAsset')
             ->setArguments(array(__DIR__ . '/../resources/images/favicon.ico'))
             ->addMethodCall('setTargetPath', array('images/favicon.ico'));
@@ -138,9 +144,11 @@ function register_twig_services($sc, $env)
     $sc->register('asset_asset_manager', 'Assetic\AssetManager')
             ->addMethodCall('set', array('bootstrap', new Reference('bootstrap_css_asset')))
             ->addMethodCall('set', array('register_css', new Reference('register_css_glob_asset')))
-            ->addMethodCall('set', array('board_highlight_css', new Reference('board_highlight_css_asset')))
+            ->addMethodCall('set', array('homepage_css', new Reference('homepage_css_glob_asset')))
+            ->addMethodCall('set', array('board_css', new Reference('board_css_glob_asset')))
             ->addMethodCall('set', array('chess_js', new Reference('chess_js_asset')))
             ->addMethodCall('set', array('game_buttons_js', new Reference('game_buttons_js_asset')))
+            ->addMethodCall('set', array('bootstrap_js', new Reference('bootstrap_js_asset')))
             ->addMethodCall('set', array('favicon', new Reference('favicon_asset')))
     ;
 
