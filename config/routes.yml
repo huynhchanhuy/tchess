@@ -6,6 +6,10 @@ register:
     path:     /register
     defaults: { _controller: 'Tchess\Controller\GameController::registerAction' }
 
+logout:
+    path:     /logout
+    defaults: { _controller: 'Tchess\Controller\GameController::logoutAction' }
+
 auto_join_room:
     path:     /auto-join-room
     defaults: { _controller: 'Tchess\Controller\GameController::autoJoinAction' }

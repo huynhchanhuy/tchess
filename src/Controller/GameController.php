@@ -116,6 +116,19 @@ class GameController extends BaseController
     }
 
     /**
+     * Logout.
+     *
+     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @return string
+     */
+    public function logoutAction(Request $request)
+    {
+        $session = $request->getSession();
+        $session->invalidate();
+        return $this->redirect($this->generateUrl('register'));
+    }
+
+    /**
      * Automatically join game.
      *
      * @param \Symfony\Component\HttpFoundation\Request $request
