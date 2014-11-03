@@ -75,12 +75,12 @@ class GameController extends BaseController
 
         if (empty($player) || !$player instanceof Player) {
             $variables = array(
-                'logged_in' => true,
+                'logged_in' => false,
             );
         }
         else {
             $variables = array(
-                'logged_in' => false,
+                'logged_in' => true,
             );
         }
 
