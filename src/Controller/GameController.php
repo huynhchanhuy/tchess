@@ -34,7 +34,7 @@ class GameController extends BaseController
         $variables = array();
 
         if (empty($player) || !$player instanceof Player) {
-            return $this->redirect($this->generateUrl('register'));
+            return $this->redirect($this->generateUrl('dashboard'));
         }
 
         $last_room = $player->getRoom();
