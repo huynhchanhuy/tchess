@@ -134,6 +134,9 @@ function register_twig_services($sc, $env)
     $sc->register('chess_js_asset', 'Assetic\Asset\FileAsset')
             ->setArguments(array(__DIR__ . '/../resources/js/chess.js'))
             ->addMethodCall('setTargetPath', array('js/chess.js'));
+    $sc->register('chess_practice_js_asset', 'Assetic\Asset\FileAsset')
+            ->setArguments(array(__DIR__ . '/../resources/js/chess-practice.js'))
+            ->addMethodCall('setTargetPath', array('js/chess-practice.js'));
     $sc->register('game_buttons_js_asset', 'Assetic\Asset\FileAsset')
             ->setArguments(array(__DIR__ . '/../resources/js/game-buttons.js'))
             ->addMethodCall('setTargetPath', array('js/game-buttons.js'));
@@ -151,6 +154,7 @@ function register_twig_services($sc, $env)
             ->addMethodCall('set', array('homepage_css', new Reference('homepage_css_glob_asset')))
             ->addMethodCall('set', array('board_css', new Reference('board_css_glob_asset')))
             ->addMethodCall('set', array('chess_js', new Reference('chess_js_asset')))
+            ->addMethodCall('set', array('chess_js', new Reference('chess_practice_js_asset')))
             ->addMethodCall('set', array('game_buttons_js', new Reference('game_buttons_js_asset')))
             ->addMethodCall('set', array('bootstrap_js', new Reference('bootstrap_js_asset')))
             ->addMethodCall('set', array('favicon', new Reference('favicon_asset')))

@@ -6,6 +6,10 @@ dashboard:
     path:     /dashboard
     defaults: { _controller: 'Tchess\Controller\GameController::dashboardAction' }
 
+practice:
+    path:     /practice
+    defaults: { _controller: 'Tchess\Controller\GameController::practiceAction' }
+
 register:
     path:     /register
     defaults: { _controller: 'Tchess\Controller\GameController::registerAction' }

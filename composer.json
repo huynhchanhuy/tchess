@@ -45,6 +45,18 @@
     {
         "type": "package",
         "package": {
+            "name": "tienvx/chessjs",
+            "version": "dev-master",
+            "type": "js-vendor",
+            "dist": {
+                "url": "https://github.com/jhlywa/chess.js/archive/master.zip",
+                "type": "zip"
+            }
+        }
+    },
+    {
+        "type": "package",
+        "package": {
             "version": "v0.9.3",
             "name": "tienvx/autobahnjs",
             "type": "js-vendor",
@@ -77,7 +89,8 @@
         "monolog/monolog": "1.10.0",
         "cboden/ratchet": "v0.3.2",
         "react/zmq": "v0.3.0",
-        "tienvx/autobahnjs": "v0.9.3"
+        "tienvx/autobahnjs": "v0.9.3",
+        "tienvx/chessjs": "dev-master"
     },
     "autoload": {
         "psr-4": {
@@ -88,7 +101,8 @@
         "installer-paths": {
             "web/js-vendor/tienvx/chessboardjs/": ["tienvx/chessboardjs"],
             "web/js-vendor/tienvx/autobahnjs/": ["tienvx/autobahnjs"],
-            "web/js-vendor/tienvx/jquery/": ["tienvx/jquery"]
+            "web/js-vendor/tienvx/jquery/": ["tienvx/jquery"],
+            "web/js-vendor/tienvx/chessjs/": ["tienvx/chessjs"]
         }
     }
 }

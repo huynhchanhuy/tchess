@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "416251af626a8a52180fc5f15d25781b",
+    "hash": "88779cc83b248fdf40821ebc6f016ca0",
     "packages": [
         {
             "name": "cboden/ratchet",
@@ -2523,6 +2523,17 @@
             "type": "js-vendor"
         },
         {
+            "name": "tienvx/chessjs",
+            "version": "dev-master",
+            "dist": {
+                "type": "zip",
+                "url": "https://github.com/jhlywa/chess.js/archive/master.zip",
+                "reference": null,
+                "shasum": null
+            },
+            "type": "js-vendor"
+        },
+        {
             "name": "tienvx/jquery",
             "version": "1.11.1",
             "dist": {
@@ -2645,7 +2656,9 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "tienvx/chessjs": 20
+    },
     "prefer-stable": false,
     "platform": [],
     "platform-dev": []

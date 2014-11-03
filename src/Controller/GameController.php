@@ -88,6 +88,17 @@ class GameController extends BaseController
     }
 
     /**
+     * Practice.
+     *
+     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @return string
+     */
+    public function practiceAction(Request $request)
+    {
+        return $this->render('practice.html.twig');
+    }
+
+    /**
      * Show register form.
      *
      * @param \Symfony\Component\HttpFoundation\Request $request
