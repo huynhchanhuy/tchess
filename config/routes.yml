@@ -2,6 +2,10 @@ homepage:
     path:     /
     defaults: { _controller: 'Tchess\Controller\GameController::indexAction' }
 
+dashboard:
+    path:     /dashboard
+    defaults: { _controller: 'Tchess\Controller\GameController::dashboardAction' }
+
 register:
     path:     /register
     defaults: { _controller: 'Tchess\Controller\GameController::registerAction' }

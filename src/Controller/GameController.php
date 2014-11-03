@@ -61,6 +61,33 @@ class GameController extends BaseController
     }
 
     /**
+     * Dashboard.
+     *
+     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @return string
+     */
+    public function dashboardAction(Request $request)
+    {
+        $em = $this->framework->getEntityManager();
+        $session = $request->getSession();
+        $sid = $session->getId();
+        $player = $em->getRepository('Tchess\Entity\Player')->findOneBy(array('sid' => $sid));
+
+        if (empty($player) || !$player instanceof Player) {
+            $variables = array(
+                'logged_in' => true,
+            );
+        }
+        else {
+            $variables = array(
+                'logged_in' => false,
+            );
+        }
+
+        return $this->render('dashboard.html.twig', $variables);
+    }
+
+    /**
      * Show register form.
      *
      * @param \Symfony\Component\HttpFoundation\Request $request

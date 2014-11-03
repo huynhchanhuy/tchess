@@ -119,6 +119,9 @@ function register_twig_services($sc, $env)
     $sc->register('bootstrap_css_asset', 'Assetic\Asset\FileAsset')
             ->setArguments(array(__DIR__ . '/../resources/css/bootstrap.min.css'))
             ->addMethodCall('setTargetPath', array('css/bootstrap.min.css'));
+    $sc->register('nav_css_asset', 'Assetic\Asset\FileAsset')
+            ->setArguments(array(__DIR__ . '/../resources/css/nav.css'))
+            ->addMethodCall('setTargetPath', array('css/nav.css'));
     $sc->register('register_css_glob_asset', 'Assetic\Asset\GlobAsset')
             ->setArguments(array(__DIR__ . '/../resources/css/register/*', array(new Reference('yui_css_compressor_filter'))))
             ->addMethodCall('setTargetPath', array('css/register.css'));
@@ -143,6 +146,7 @@ function register_twig_services($sc, $env)
 
     $sc->register('asset_asset_manager', 'Assetic\AssetManager')
             ->addMethodCall('set', array('bootstrap', new Reference('bootstrap_css_asset')))
+            ->addMethodCall('set', array('bootstrap', new Reference('nav_css_asset')))
             ->addMethodCall('set', array('register_css', new Reference('register_css_glob_asset')))
             ->addMethodCall('set', array('homepage_css', new Reference('homepage_css_glob_asset')))
             ->addMethodCall('set', array('board_css', new Reference('board_css_glob_asset')))
