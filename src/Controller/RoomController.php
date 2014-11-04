@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Tchess\Entity\Player;
 use Tchess\Entity\Room;
 use Tchess\ExceptionCodes;
+use Tchess\Helper\Paginator;
 
 class RoomController extends BaseController
 {
@@ -15,9 +16,10 @@ class RoomController extends BaseController
      * Show open rooms.
      *
      * @param \Symfony\Component\HttpFoundation\Request $request
+     * @param int $offset
      * @return string
      */
-    public function indexAction(Request $request)
+    public function indexAction(Request $request, $offset)
     {
         $em = $this->framework->getEntityManager();
         $session = $request->getSession();
@@ -25,20 +27,18 @@ class RoomController extends BaseController
 
         $player = $em->getRepository('Tchess\Entity\Player')->findOneBy(array('sid' => $sid));
 
-        if (empty($player) || !$player instanceof Player) {
-            throw new \LogicException('Player did not registered', ExceptionCodes::PLAYER);
-        }
-
-        $last_room = $player->getRoom();
-        if (!empty($last_room) && $last_room instanceof Room) {
-            return $this->redirect($this->generateUrl('homepage'));
-        }
+        $limit = 10;
+        $midrange = 3;
 
         $rooms = $em->getRepository('Tchess\Entity\Room')
-                ->findOpenRooms($player);
+                ->findRooms($offset, $limit);
+
+        $paginator = new Paginator(74, $offset , $limit, $midrange);
 
         return $this->render('rooms.html.twig', array(
             'rooms' => $rooms,
+            'player' => $player,
+            'paginator' => $paginator
         ));
     }
 
