@@ -16,10 +16,10 @@ class RoomController extends BaseController
      * Show open rooms.
      *
      * @param \Symfony\Component\HttpFoundation\Request $request
-     * @param int $offset
+     * @param int $page
      * @return string
      */
-    public function indexAction(Request $request, $offset)
+    public function indexAction(Request $request, $page = 1)
     {
         $em = $this->framework->getEntityManager();
         $session = $request->getSession();
@@ -29,11 +29,12 @@ class RoomController extends BaseController
 
         $limit = 10;
         $midrange = 3;
+        $offset = $limit * ($page - 1);
 
         $rooms = $em->getRepository('Tchess\Entity\Room')
                 ->findRooms($offset, $limit);
 
-        $paginator = new Paginator(74, $offset , $limit, $midrange);
+        $paginator = new Paginator(count($rooms), $offset , $limit, $midrange);
 
         return $this->render('rooms.html.twig', array(
             'rooms' => $rooms,

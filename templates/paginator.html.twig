@@ -1,7 +1,11 @@
 {% if paginator.numpages > 1 %}
 <nav>
     <ul class="pagination">
-        <li><a {% if paginator.currentpage == 1 %}class="disabled"{% endif %} href="{{ path(route, {  'offset': paginator.currentpage - 1 }) }}">&laquo;</a></li>
+        {% if paginator.currentpage > 1 %}
+            <li><a href="{{ path(route, {  'page': paginator.currentpage-1 }) }}">&laquo;</a></li>
+        {% else %}
+            <li class="disabled"><a href="#">&laquo;</a></li>
+        {% endif %}
         {% for i in 1..paginator.numpages %}
             {% if paginator.range.0 > 2 and i == paginator.range.0 %}
                 <li class="disabled"><a href="#">...</a></li>
@@ -9,9 +13,9 @@
 
             {%  if(i==1 or i==paginator.numpages or i in paginator.range) %}
                 {% if i==paginator.currentpage %}
-                    <li><a class="active" href="{{ path(route, {  'offset': i })}}">{{i}}</a></li>
+                    <li class="active"><a href="{{ path(route, {  'page': i })}}">{{i}}</a></li>
                 {% else %}
-                <li><a href="{{ path(route, {  'offset': i }) }}"> {{i}}</a></li>
+                <li><a href="{{ path(route, {  'page': i }) }}"> {{i}}</a></li>
                 {% endif %}
             {% endif %}
 
@@ -19,7 +23,11 @@
                 <li class="disabled"><a href="#">...</a></li>
             {% endif %}
         {% endfor %}
-        <li><a {% if paginator.currentpage < paginator.numpages %}class="disabled"{% endif %} href="{{ path(route, {  'offset': paginator.currentpage + 1 }) }}">&raquo;</a></li>
+        {% if paginator.currentpage < paginator.numpages %}
+            <li><a href="{{ path(route, {  'page': paginator.currentpage + 1 }) }}">&raquo;</a></li>
+        {% else %}
+            <li class="disabled"><a href="#">&raquo;</a></li>
+        {% endif %}
     </ul>
 </nav>
 {% endif %}

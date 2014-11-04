@@ -23,8 +23,8 @@ auto_join_room:
     defaults: { _controller: 'Tchess\Controller\GameController::autoJoinAction' }
 
 rooms:
-    path:     /rooms/{offset}
-    defaults: { _controller: 'Tchess\Controller\RoomController::indexAction', offset: 0 }
+    path:     /rooms/{page}
+    defaults: { _controller: 'Tchess\Controller\RoomController::indexAction', page: 1 }
 
 create_room:
     path:     /create-room
