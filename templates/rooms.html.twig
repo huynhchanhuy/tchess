@@ -9,10 +9,9 @@
       <thead>
         <tr>
           <th>#</th>
-          <th>Opponent Name</th>
-          <th>Opponent Color</th>
-          <th>Opponent Status</th>
-          <th>Action</th>
+          <th>Player 1</th>
+          <th>Player 2</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -22,9 +21,16 @@
             {% for room in rooms %}
             <tr>
               <td>{{ room.id }}</td>
-              <td>{{ (room.players|first).name }}</td>
-              <td>{{ (room.players|first).color }}</td>
-              <td>{{ (room.players|first).started ? 'Started' : '-' }}</td>
+              {% if (room.players|first).started %}
+                <td>{{ (room.players|first).name }} ({{ (room.players|first).color }})</td>
+              {% else %}
+                <td>-</td>
+              {% endif %}
+              {% if (room.players|last).started %}
+                <td>{{ (room.players|last).name }} ({{ (room.players|last).color }})</td>
+              {% else %}
+                <td>-</td>
+              {% endif %}
               <td><a href="{{ path('join_room', { 'room': room.id }) }}">Join</a></td>
             </tr>
             {% endfor %}
