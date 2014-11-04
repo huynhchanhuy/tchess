@@ -34,7 +34,7 @@ class RoomController extends BaseController
         $rooms = $em->getRepository('Tchess\Entity\Room')
                 ->findRooms($offset, $limit);
 
-        $paginator = new Paginator(count($rooms), $offset , $limit, $midrange);
+        $paginator = new Paginator(count($rooms), $page , $limit, $midrange);
 
         return $this->render('rooms.html.twig', array(
             'rooms' => $rooms,
