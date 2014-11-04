@@ -21,17 +21,24 @@
             {% for room in rooms %}
             <tr>
               <td>{{ room.id }}</td>
-              {% if (room.players|first).started %}
-                <td>{{ (room.players|first).name }} ({{ (room.players|first).color }})</td>
+              {% if (room.players[0]) %}
+                <td>{{ (room.players[0]).name }} ({{ (room.players[0]).color }}{{ (room.players[0]).started ? ' - started' : '' }})</td>
               {% else %}
                 <td>-</td>
               {% endif %}
-              {% if (room.players|last).started %}
-                <td>{{ (room.players|last).name }} ({{ (room.players|last).color }})</td>
+              {% if (room.players[1]) %}
+                <td>{{ (room.players[1]).name }} ({{ (room.players[1]).color }}{{ (room.players[1]).started ? ' - started' : '' }})</td>
               {% else %}
                 <td>-</td>
               {% endif %}
-              <td><a href="{{ path('join_room', { 'room': room.id }) }}">Join</a></td>
+              <td>
+              {% if player not in room.players and not player.room %}
+                <a href="{{ path('join_room', { 'room': room.id }) }}">Join</a>
+              {% endif %}
+              {% if room.players[0].started and room.players[1].started %}
+                <a href="{{ path('watch_game', { 'room': room.id }) }}">Watch</a>
+              {% endif %}
+              </td>
             </tr>
             {% endfor %}
         {% endif %}

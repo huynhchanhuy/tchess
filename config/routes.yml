@@ -36,6 +36,12 @@ join_room:
     requirements:
         room:  \d+
 
+watch_game:
+    path:     /room/{room}
+    defaults: { _controller: 'Tchess\Controller\GameController::watchAction' }
+    requirements:
+        room:  \d+
+
 start_game:
     path:     /start-game
     defaults: { _controller: 'Tchess\Controller\GameController::startAction', _format: 'json' }
