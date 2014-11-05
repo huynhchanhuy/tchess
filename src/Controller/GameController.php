@@ -366,6 +366,40 @@ class GameController extends BaseController
     }
 
     /**
+     * Leave game.
+     *
+     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @return string
+     */
+    public function leaveAction(Request $request)
+    {
+        $em = $this->framework->getEntityManager();
+        $session = $request->getSession();
+        $sid = $session->getId();
+
+        $player = $em->getRepository('Tchess\Entity\Player')->findOneBy(array('sid' => $sid));
+
+        if (empty($player) || !$player instanceof Player) {
+            throw new \LogicException('Player did not join a room', ExceptionCodes::PLAYER);
+        }
+
+        if (!$player->getRoom()) {
+            throw new \LogicException('Player did not join a room', ExceptionCodes::PLAYER);
+        }
+
+        $player->getRoom()->removePlayer($player);
+        $player->setRoom();
+        $player->setStarted(false);
+        $em->flush();
+
+        $this->framework->getEventDispatcher()->dispatch(GameEvents::LEAVE, new GameEvent($player, $em));
+        return json_encode(array(
+                    'message' => 'Leaved game',
+                    'code' => 200
+                ));
+    }
+
+    /**
      * Move a piece.
      *
      * @param \Symfony\Component\HttpFoundation\Request $request

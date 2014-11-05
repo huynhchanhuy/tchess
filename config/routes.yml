@@ -57,6 +57,11 @@ restart_game:
     defaults: { _controller: 'Tchess\Controller\GameController::restartAction', _format: 'json' }
     methods:  [POST]
 
+leave_game:
+    path:     /leave-game
+    defaults: { _controller: 'Tchess\Controller\GameController::leaveAction', _format: 'json' }
+    methods:  [POST]
+
 move_piece:
     path:     /move-piece
     defaults: { _controller: 'Tchess\Controller\GameController::moveAction', _format: 'json' }
