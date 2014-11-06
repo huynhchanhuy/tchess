@@ -61,6 +61,34 @@ class GameController extends BaseController
     }
 
     /**
+     * Show the board.
+     *
+     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @param int $room Room id
+     * @return string
+     */
+    public function watchAction(Request $request, $room)
+    {
+        $em = $this->framework->getEntityManager();
+        $room = $em->getRepository('Tchess\Entity\Room')->findOneBy(array('id' => $room));
+        $variables = array();
+        $game = $room->getGame();
+
+        if (empty($game) || !$game instanceof Game || !$game->getStarted()) {
+            $variables['start_position'] = 'start';
+            $variables['turn'] = 'white';
+            $variables['highlights'] = '';
+        }
+        else {
+            $variables['start_position'] = $game->getState();
+            $variables['turn'] = $game->getTurn();
+            $variables['highlights'] = trim($game->getHighlights());
+        }
+
+        return $this->render('watch.html.twig', $variables);
+    }
+
+    /**
      * Dashboard.
      *
      * @param \Symfony\Component\HttpFoundation\Request $request

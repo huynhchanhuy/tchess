@@ -125,18 +125,24 @@ function register_twig_services($sc, $env)
     $sc->register('register_css_glob_asset', 'Assetic\Asset\GlobAsset')
             ->setArguments(array(__DIR__ . '/../resources/css/register/*', array(new Reference('yui_css_compressor_filter'))))
             ->addMethodCall('setTargetPath', array('css/register.css'));
-    $sc->register('homepage_css_glob_asset', 'Assetic\Asset\GlobAsset')
-            ->setArguments(array(__DIR__ . '/../resources/css/homepage/*', array(new Reference('yui_css_compressor_filter'))))
-            ->addMethodCall('setTargetPath', array('css/homepage.css'));
     $sc->register('board_css_glob_asset', 'Assetic\Asset\GlobAsset')
             ->setArguments(array(__DIR__ . '/../resources/css/board/*', array(new Reference('yui_css_compressor_filter'))))
             ->addMethodCall('setTargetPath', array('css/board.css'));
     $sc->register('chess_js_asset', 'Assetic\Asset\FileAsset')
             ->setArguments(array(__DIR__ . '/../resources/js/chess.js'))
             ->addMethodCall('setTargetPath', array('js/chess.js'));
+    $sc->register('chess_remote_js_asset', 'Assetic\Asset\FileAsset')
+            ->setArguments(array(__DIR__ . '/../resources/js/chess-remote.js'))
+            ->addMethodCall('setTargetPath', array('js/chess-remote.js'));
     $sc->register('chess_practice_js_asset', 'Assetic\Asset\FileAsset')
             ->setArguments(array(__DIR__ . '/../resources/js/chess-practice.js'))
             ->addMethodCall('setTargetPath', array('js/chess-practice.js'));
+    $sc->register('chess_watch_js_asset', 'Assetic\Asset\FileAsset')
+            ->setArguments(array(__DIR__ . '/../resources/js/chess-watch.js'))
+            ->addMethodCall('setTargetPath', array('js/chess-watch.js'));
+    $sc->register('chess_play_js_asset', 'Assetic\Asset\FileAsset')
+            ->setArguments(array(__DIR__ . '/../resources/js/chess-play.js'))
+            ->addMethodCall('setTargetPath', array('js/chess-play.js'));
     $sc->register('game_buttons_js_asset', 'Assetic\Asset\FileAsset')
             ->setArguments(array(__DIR__ . '/../resources/js/game-buttons.js'))
             ->addMethodCall('setTargetPath', array('js/game-buttons.js'));
@@ -151,19 +157,26 @@ function register_twig_services($sc, $env)
             ->addMethodCall('set', array('bootstrap', new Reference('bootstrap_css_asset')))
             ->addMethodCall('set', array('bootstrap', new Reference('nav_css_asset')))
             ->addMethodCall('set', array('register_css', new Reference('register_css_glob_asset')))
-            ->addMethodCall('set', array('homepage_css', new Reference('homepage_css_glob_asset')))
             ->addMethodCall('set', array('board_css', new Reference('board_css_glob_asset')))
             ->addMethodCall('set', array('chess_js', new Reference('chess_js_asset')))
-            ->addMethodCall('set', array('chess_js', new Reference('chess_practice_js_asset')))
+            ->addMethodCall('set', array('chess_remote_js', new Reference('chess_remote_js_asset')))
+            ->addMethodCall('set', array('chess_practice_js', new Reference('chess_practice_js_asset')))
+            ->addMethodCall('set', array('chess_watch_js', new Reference('chess_watch_js_asset')))
+            ->addMethodCall('set', array('chess_play_js', new Reference('chess_play_js_asset')))
             ->addMethodCall('set', array('game_buttons_js', new Reference('game_buttons_js_asset')))
             ->addMethodCall('set', array('bootstrap_js', new Reference('bootstrap_js_asset')))
             ->addMethodCall('set', array('favicon', new Reference('favicon_asset')))
     ;
 
+    // jui compressor.
     $sc->register('yui_css_compressor_filter', 'Assetic\Filter\Yui\CssCompressorFilter')
             ->setArguments(array(__DIR__ . '/../vendor/bin/yuicompressor.jar'));
+    $sc->register('yui_js_compressor_filter', 'Assetic\Filter\Yui\JsCompressorFilter')
+            ->setArguments(array(__DIR__ . '/../vendor/bin/yuicompressor.jar'));
+
     $sc->register('asset_filter_manager', 'Assetic\FilterManager')
-            ->addMethodCall('set', array('yui_css', new Reference('yui_css_compressor_filter')));
+            ->addMethodCall('set', array('yui_css', new Reference('yui_css_compressor_filter')))
+            ->addMethodCall('set', array('yui_js', new Reference('yui_js_compressor_filter')));
     $sc->register('asset_writer', 'Assetic\AssetWriter')
             ->setArguments(array(__DIR__ . '/../web/resources'));
     $sc->setParameter('asset_root', __DIR__ . '/../resources');

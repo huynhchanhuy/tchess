@@ -1,15 +1,4 @@
-var board,
-  game = new Chess();
-
-var pieceTheme = function(piece) {
-    // wikipedia theme for white pieces
-    if (piece.search(/w/) !== -1) {
-        return 'js-vendor/tienvx/chessboardjs/img/chesspieces/wikipedia/' + piece + '.png';
-    }
-  
-    // alpha theme for black pieces
-    return 'js-vendor/tienvx/chessboardjs/img/chesspieces/wikipedia/' + piece + '.png';
-};
+var game = new Chess();
 
 // do not pick up pieces if the game is over
 // only pick up pieces for White

@@ -2,11 +2,6 @@
 
 {% block title %}Dashboard{% endblock %}
 
-{% block stylesheets %}
-    {{ parent() }}
-    <link href="resources/css/bootstrap.min.css" rel="stylesheet" media="screen" />
-{% endblock %}
-
 {% block nav_links %}
     {{ logged_in ? '<li><a href="/">Home</a></li>' : ''}}
     <li class="active"><a href="#">Dashboard</a></li>
