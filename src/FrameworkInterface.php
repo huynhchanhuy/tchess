@@ -22,6 +22,6 @@ interface FrameworkInterface extends HttpKernelInterface
     public function getEventDispatcher();
     public function setSerializer(SerializerInterface $serializer);
     public function getSerializer();
-    public function setMoveManager(MoveManager $move_manager);
+    public function setMoveManager(MoveManager $moveManager);
     public function getMoveManager();
 }

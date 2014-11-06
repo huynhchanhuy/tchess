@@ -15,7 +15,7 @@ class Framework extends HttpKernel implements FrameworkInterface
 
     protected $entity_manager;
     protected $form_factory;
-    protected $move_manager;
+    protected $moveManager;
     protected $serializer;
     protected $twig;
     protected $url_generator;
@@ -37,7 +37,7 @@ class Framework extends HttpKernel implements FrameworkInterface
 
     public function getMoveManager()
     {
-        return $this->move_manager;
+        return $this->moveManager;
     }
 
     public function getSerializer()
@@ -65,9 +65,9 @@ class Framework extends HttpKernel implements FrameworkInterface
         $this->form_factory = $form_factory;
     }
 
-    public function setMoveManager(MoveManager $move_manager)
+    public function setMoveManager(MoveManager $moveManager)
     {
-        $this->move_manager = $move_manager;
+        $this->moveManager = $moveManager;
     }
 
     public function setSerializer(SerializerInterface $serializer)

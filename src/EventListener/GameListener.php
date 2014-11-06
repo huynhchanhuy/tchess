@@ -20,14 +20,14 @@ class GameListener implements EventSubscriberInterface
     private $em;
     private $serializer;
     private $logger;
-    private $move_manager;
+    private $moveManager;
 
-    public function __construct(EntityManagerInterface $em, SerializerInterface $serializer, LoggerInterface $logger, MoveManager $move_manager)
+    public function __construct(EntityManagerInterface $em, SerializerInterface $serializer, LoggerInterface $logger, MoveManager $moveManager)
     {
         $this->em = $em;
         $this->serializer = $serializer;
         $this->logger = $logger;
-        $this->move_manager = $move_manager;
+        $this->moveManager = $moveManager;
     }
 
     public function onGameStart(GameEvent $event)
@@ -59,7 +59,7 @@ class GameListener implements EventSubscriberInterface
 
     public function onKernelTerminateLogMoves(PostResponseEvent $event)
     {
-        $moves = $this->move_manager->getMoves();
+        $moves = $this->moveManager->getMoves();
 
         if (empty($moves)) {
             return;
@@ -72,7 +72,7 @@ class GameListener implements EventSubscriberInterface
 
     public function onKernelTerminateBroadcastMoves(PostResponseEvent $event)
     {
-        $moves = $this->move_manager->getMoves();
+        $moves = $this->moveManager->getMoves();
 
         if (empty($moves) || !(class_exists('\ZMQContext')) || !(class_exists('\ZMQ'))) {
             return;
