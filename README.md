@@ -68,3 +68,12 @@ In case there is an error: Failed opening required '/tmp/__CG__TchessEntityRoom.
 ```
 vendor/bin/doctrine orm:generate-proxies
 ```
+
+Development
+=============
+
+ * The idea of backend is come from https://github.com/sagnew/Chess
+ * Front end are combine of http://chessboardjs.com and
+   https://github.com/jhlywa/chess.js
+ * With various [components](tuts/) from [Symfony 2](http://symfony.com/)
+ * Pull requests are welcome.
