@@ -108,18 +108,22 @@ class PawnRules implements EventSubscriberInterface, CheckingMoveInterface
         if (($color == 'white' && $move->getNewRow() == 7) || ($color == 'black' && $move->getNewRow() == 0)) {
             switch ($move->getPromotion()) {
                 case 'Q':
+                    // 96.9% people choose a queen for promotion.
                     $board->setPiece(new Queen('white'), $move->getNewRow(), $move->getNewColumn());
                     break;
 
                 case 'K':
+                    // 1.8% people choose a knight for promotion.
                     $board->setPiece(new Knight('white'), $move->getNewRow(), $move->getNewColumn());
                     break;
 
                 case 'B':
+                    // 1.1% people choose a bishop for promotion.
                     $board->setPiece(new Bishop('white'), $move->getNewRow(), $move->getNewColumn());
                     break;
 
                 case 'R':
+                    // 0.2% people choose a rook for promotion.
                     $board->setPiece(new Rook('white'), $move->getNewRow(), $move->getNewColumn());
                     break;
 
