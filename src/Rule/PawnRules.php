@@ -109,22 +109,22 @@ class PawnRules implements EventSubscriberInterface, CheckingMoveInterface
             switch ($move->getPromotion()) {
                 case 'Q':
                     // 96.9% people choose a queen for promotion.
-                    $board->setPiece(new Queen('white'), $move->getNewRow(), $move->getNewColumn());
+                    $board->setPiece(new Queen($color), $move->getNewRow(), $move->getNewColumn());
                     break;
 
                 case 'K':
                     // 1.8% people choose a knight for promotion.
-                    $board->setPiece(new Knight('white'), $move->getNewRow(), $move->getNewColumn());
+                    $board->setPiece(new Knight($color), $move->getNewRow(), $move->getNewColumn());
                     break;
 
                 case 'B':
                     // 1.1% people choose a bishop for promotion.
-                    $board->setPiece(new Bishop('white'), $move->getNewRow(), $move->getNewColumn());
+                    $board->setPiece(new Bishop($color), $move->getNewRow(), $move->getNewColumn());
                     break;
 
                 case 'R':
                     // 0.2% people choose a rook for promotion.
-                    $board->setPiece(new Rook('white'), $move->getNewRow(), $move->getNewColumn());
+                    $board->setPiece(new Rook($color), $move->getNewRow(), $move->getNewColumn());
                     break;
 
                 default:
