@@ -15,13 +15,13 @@ use Tchess\Entity\Piece\Move;
 class QueenRules implements EventSubscriberInterface, CheckingMoveInterface
 {
 
-    private $rook_rules;
-    private $bishop_rules;
+    private $bishopRules;
+    private $rookRules;
 
-    public function __construct(BishopRules $rook_rules, RookRules $bishop_rules)
+    public function __construct(BishopRules $bishopRules, RookRules $rookRules)
     {
-        $this->rook_rules = $rook_rules;
-        $this->bishop_rules = $bishop_rules;
+        $this->bishopRules = $bishopRules;
+        $this->rookRules = $rookRules;
     }
 
     public function onMoveChecking(MoveEvent $event)
@@ -39,7 +39,7 @@ class QueenRules implements EventSubscriberInterface, CheckingMoveInterface
 
     public function checkMove(Board $board, Move $move, $color = 'white')
     {
-        return $this->bishop_rules->checkMove($board, $move, $color) || $this->rook_rules->checkMove($board, $move, $color);
+        return $this->bishopRules->checkMove($board, $move, $color) || $this->rookRules->checkMove($board, $move, $color);
     }
 
     public static function getSubscribedEvents()

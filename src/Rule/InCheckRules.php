@@ -37,8 +37,8 @@ class InCheckRules implements EventSubscriberInterface, CheckingMoveInterface
         $new_board = clone $board;
         $new_board->movePiece($move);
 
-        // We wont dispatch MoveEvents::MOVE event, since it is not
-        // neccessary in checking King is in check.
+        // We wont dispatch MoveEvents::MOVE event, because we are checking King
+        // is in check, not really move the piece.
 
         if ($this->isInCheck($new_board, $color)) {
             // The king is still in check.
@@ -55,7 +55,7 @@ class InCheckRules implements EventSubscriberInterface, CheckingMoveInterface
         );
     }
 
-    private function isInCheck(Board $board, $color)
+    public function isInCheck(Board $board, $color)
     {
         $kingPos = $this->getKingPos($board, $color);
         list($row, $col) = $kingPos;

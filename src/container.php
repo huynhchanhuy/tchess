@@ -236,7 +236,7 @@ function register_chess_services($sc)
     $sc->register('rules.bishop', 'Tchess\Rule\BishopRules')
             ->addTag('rules');
     $sc->register('rules.king', 'Tchess\Rule\KingRules')
-            ->setArguments(array(new Reference('move_manager')))
+            ->setArguments(array(new Reference('move_manager'), new Reference('rules.in_check')))
             ->addTag('rules');
     $sc->register('rules.knight', 'Tchess\Rule\KnightRules')
             ->addTag('rules');

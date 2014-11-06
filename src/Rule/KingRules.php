@@ -11,15 +11,18 @@ use Tchess\Entity\Board;
 use Tchess\Entity\Piece\Move;
 use Tchess\Rule\CheckingMoveInterface;
 use Tchess\MoveManager;
+use Tchess\Rule\InCheckRules;
 
 class KingRules implements EventSubscriberInterface, CheckingMoveInterface
 {
 
-    private $move_manager;
+    private $moveManager;
+    private $inCheckRules;
 
-    public function __construct(MoveManager $move_manager)
+    public function __construct(MoveManager $moveManager, InCheckRules $inCheckRules)
     {
-        $this->move_manager = $move_manager;
+        $this->moveManager = $moveManager;
+        $this->inCheckRules = $inCheckRules;
     }
 
     public function onMoveChecking(MoveEvent $event)
@@ -54,6 +57,11 @@ class KingRules implements EventSubscriberInterface, CheckingMoveInterface
             }
 
             if (abs($move->getNewColumn() - $move->getCurrentColumn()) != 2 || $move->getCurrentRow() != $move->getNewRow()) {
+                return false;
+            }
+
+            if (!$this->inCheckRules->isInCheck($board, $color)) {
+                // The king must not be in check while castling.
                 return false;
             }
 
@@ -131,7 +139,7 @@ class KingRules implements EventSubscriberInterface, CheckingMoveInterface
             $board->movePiece($rook_move);
             $piece->setCastled(false);
 
-            $this->move_manager->addMove($rook_move);
+            $this->moveManager->addMove($rook_move);
         }
     }
 
