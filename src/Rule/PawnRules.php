@@ -79,7 +79,25 @@ class PawnRules implements EventSubscriberInterface, CheckingMoveInterface
                 }
 
                 // En passante
-                // @todo - Checking and doing en passante.
+                if ($move->getNewColumn() + 1 < 8) {
+                    // Check right side.
+                    if($board->getPiece($move->getNewRow(), $move->getNewColumn() + 1) != null) {
+                        $epPiece = &$board->getPiece($move->getNewRow(), $move->getNewColumn() + 1);
+                        if($epPiece instanceof Pawn && $epPiece->getColor() != $color) {
+                            $epPiece->setEpAble(true);
+                        }
+                    }
+                } else if ($move->getNewColumn() - 1 > 0) {
+                    // Check left side.
+                    if($board->getPiece($move->getNewRow(), $move->getNewColumn() - 1) != null) {
+                        $epPiece = &$board->getPiece($move->getNewRow(), $move->getNewColumn() - 1);
+                        if($epPiece instanceof Pawn && $epPiece->getColor() != $color) {
+                            $epPiece->setEpAble(true);
+                        }
+                    }
+                }
+            } else if (abs($move->getNewRow() - $move->getCurrentRow()) == 1) {
+                // Allowed to move.
             }
         } else {
             // Taking a piece.
@@ -133,11 +151,66 @@ class PawnRules implements EventSubscriberInterface, CheckingMoveInterface
         }
     }
 
+    private function inSixthRank($color, $rank){
+        if ($color == 'white') {
+            return $rank == 5;
+        } else {
+            return $rank == 2;
+        }
+    }
+
+    public function onMoveCaptureEnPassant(MoveEvent $event)
+    {
+        $board = &$event->getBoard();
+        $move = $event->getMove();
+        $color = $event->getColor();
+        $piece = &$board->getPiece($move->getNewRow(), $move->getNewColumn());
+        if (!$piece instanceof Pawn) {
+            return;
+        }
+
+        if ($this->inSixthRank($color, $move->getNewRow())) {
+            if ($move->getNewRow() == 2) {
+                if($board->getPiece($move->getNewRow() + 1, $move->getNewColumn()) != null) {
+                    $epPiece = $board->getPiece($move->getNewRow() + 1, $move->getNewColumn());
+                    if($epPiece instanceof Pawn && $epPiece->isEpAble() && $epPiece->getColor() != $color) {
+                        $board->setPiece($move->getNewRow() + 1, $move->getNewColumn(), null);
+                    }
+                }
+            } else if ($move->getNewRow() == 5) {
+                if($board->getPiece($move->getNewRow() - 1, $move->getNewColumn()) != null) {
+                    $epPiece = $board->getPiece($move->getNewRow() - 1, $move->getNewColumn());
+                    if($epPiece instanceof Pawn && $epPiece->isEpAble() && $epPiece->getColor() != $color) {
+                        $board->setPiece($move->getNewRow() - 1, $move->getNewColumn(), null);
+                    }
+                }
+            }
+        }
+
+        // You only get one chance to capture en passant.
+        if ($color == 'white') {
+            $row = 4;
+        } else {
+            $row = 3;
+        }
+        for ($column = 0; $column < 8; $column++) {
+            if($board->getPiece($row, $column) != null) {
+                $epPiece = &$board->getPiece($row, $column);
+                if($epPiece instanceof Pawn && $epPiece->isEpAble() && $epPiece->getColor() != $color) {
+                    $epPiece->setEpAble(false);
+                }
+            }
+        }
+    }
+
     public static function getSubscribedEvents()
     {
         return array(
             MoveEvents::CHECK_MOVE => array(array('onMoveChecking', 0)),
-            MoveEvents::MOVE => array(array('onMoveDoQueening', 0)),
+            MoveEvents::MOVE => array(
+                array('onMoveDoQueening', 0),
+                array('onMoveCaptureEnPassant', 0),
+            ),
         );
     }
 
