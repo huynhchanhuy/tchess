@@ -6,7 +6,6 @@ namespace Tchess\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Tchess\Entity\Player;
 use Tchess\Entity\Room;
-use Tchess\ExceptionCodes;
 use Tchess\Helper\Paginator;
 
 class RoomController extends BaseController
@@ -39,7 +38,8 @@ class RoomController extends BaseController
         return $this->render('rooms.html.twig', array(
             'rooms' => $rooms,
             'player' => $player,
-            'paginator' => $paginator
+            'paginator' => $paginator,
+            'logged_in' => $this->isLoggedIn($request)
         ));
     }
 

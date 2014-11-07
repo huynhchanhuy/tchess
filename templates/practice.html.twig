@@ -10,14 +10,20 @@
 {% endblock %}
 
 {% block nav_links %}
-    <li><a href="/">Home</a></li>
-    <li><a href="dashboard">Dashboard</a></li>
-    <li class="active"><a href="#">Practice</a></li>
+    {% if logged_in %}
+        <li><a href="/logout">Logout</a></li>
+    {% else %}
+        <li><a href="/register">Register</a></li>
+    {% endif %}
+    <li><a href="/rooms">Rooms</a></li>
+    <li class="active"><a href="/practice">Practice</a></li>
 {% endblock %}
 
 {% block body %}
 <div class="container">
     <h2>Practice with bot</h2>
+
+    <p>Status: <span id="status"></span></p>
 
     <div id="board" style="width: 400px"></div>
 

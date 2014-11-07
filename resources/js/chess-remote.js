@@ -1,5 +1,4 @@
 var boardEl = $('#board'),
-statusEl = $('#status'),
 squareClass = 'square-55d63'
 ;
 
@@ -9,37 +8,6 @@ var removeHighlights = function(color) {
 
 var highlight = function(position, color) {
     boardEl.find('.square-' + position).addClass('highlight-' + color);
-};
-
-var updateStatus = function() {
-    var status = '';
-
-    var moveColor = 'White';
-    if (game.turn() === 'b') {
-      moveColor = 'Black';
-    }
-
-    // checkmate?
-    if (game.in_checkmate() === true) {
-      status = 'Game over, ' + moveColor + ' is in checkmate.';
-    }
-
-    // draw?
-    else if (game.in_draw() === true) {
-      status = 'Game over, drawn position';
-    }
-
-    // game still on
-    else {
-      status = moveColor + ' to move';
-
-      // check?
-      if (game.in_check() === true) {
-        status += ', ' + moveColor + ' is in check';
-      }
-    }
-
-    statusEl.html(status);
 };
 
 var prepareHighlights = function() {

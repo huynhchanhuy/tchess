@@ -5,9 +5,27 @@ namespace Tchess\Controller;
 use Tchess\FrameworkAware;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Tchess\Entity\Player;
 
 class BaseController extends FrameworkAware
 {
+
+    /**
+     * Render a template
+     */
+    public function isLoggedIn(Request $request)
+    {
+        $em = $this->framework->getEntityManager();
+        $session = $request->getSession();
+        $sid = $session->getId();
+        $player = $em->getRepository('Tchess\Entity\Player')->findOneBy(array('sid' => $sid));
+
+        if (empty($player) || !$player instanceof Player) {
+            return false;
+        }
+        return true;
+    }
 
     /**
      * Render a template

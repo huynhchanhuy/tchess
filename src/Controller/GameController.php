@@ -34,7 +34,7 @@ class GameController extends BaseController
         $variables = array();
 
         if (empty($player) || !$player instanceof Player) {
-            return $this->redirect($this->generateUrl('dashboard'));
+            return $this->redirect($this->generateUrl('register'));
         }
 
         $last_room = $player->getRoom();
@@ -69,6 +69,11 @@ class GameController extends BaseController
     {
         $em = $this->framework->getEntityManager();
         $room = $em->getRepository('Tchess\Entity\Room')->findOneBy(array('id' => $room));
+
+        if (empty($room) || !$room instanceof Room) {
+            return $this->redirect($this->generateUrl('rooms'));
+        }
+
         $variables = array();
         $game = $room->getGame();
 
@@ -85,33 +90,6 @@ class GameController extends BaseController
     }
 
     /**
-     * Dashboard.
-     *
-     * @param \Symfony\Component\HttpFoundation\Request $request
-     * @return string
-     */
-    public function dashboardAction(Request $request)
-    {
-        $em = $this->framework->getEntityManager();
-        $session = $request->getSession();
-        $sid = $session->getId();
-        $player = $em->getRepository('Tchess\Entity\Player')->findOneBy(array('sid' => $sid));
-
-        if (empty($player) || !$player instanceof Player) {
-            $variables = array(
-                'logged_in' => false,
-            );
-        }
-        else {
-            $variables = array(
-                'logged_in' => true,
-            );
-        }
-
-        return $this->render('dashboard.html.twig', $variables);
-    }
-
-    /**
      * Practice.
      *
      * @param \Symfony\Component\HttpFoundation\Request $request
@@ -119,7 +97,10 @@ class GameController extends BaseController
      */
     public function practiceAction(Request $request)
     {
-        return $this->render('practice.html.twig');
+        $variables = array(
+            'logged_in' => $this->isLoggedIn($request)
+        );
+        return $this->render('practice.html.twig', $variables);
     }
 
     /**
@@ -143,10 +124,6 @@ class GameController extends BaseController
                 ->add('name', 'text', array(
                     'constraints' => new NotBlank(),
                 ))
-                ->add('auto_join', 'checkbox', array(
-                    'label' => 'Automatically join room',
-                    'required' => false,
-                ))
                 ->getForm();
 
         if ($request->getMethod() == 'POST') {
@@ -162,19 +139,14 @@ class GameController extends BaseController
                 $em->persist($player);
                 $em->flush();
 
-                if ($data['auto_join']) {
-                    $sub_request = Request::create('/auto-join-room');
-                    $sub_request->setSession($session);
-                    return $this->framework->handle($sub_request, HttpKernelInterface::SUB_REQUEST);
-                }
-
                 return $this->redirect($this->generateUrl('rooms'));
             }
         }
 
-        return $this->render('register.html.twig', array(
-                    'form' => $form->createView(),
-                ));
+        $variables = array(
+            'form' => $form->createView(),
+        );
+        return $this->render('register.html.twig', $variables);
     }
 
     /**
@@ -188,53 +160,6 @@ class GameController extends BaseController
         $session = $request->getSession();
         $session->invalidate();
         return $this->redirect($this->generateUrl('register'));
-    }
-
-    /**
-     * Automatically join game.
-     *
-     * @param \Symfony\Component\HttpFoundation\Request $request
-     * @return string
-     */
-    public function autoJoinAction(Request $request)
-    {
-        $em = $this->framework->getEntityManager();
-        $session = $request->getSession();
-        $sid = $session->getId();
-
-        $player = $em->getRepository('Tchess\Entity\Player')->findOneBy(array('sid' => $sid));
-
-        if (empty($player) || !$player instanceof Player) {
-            throw new \LogicException('Player did not registered', ExceptionCodes::PLAYER);
-        }
-
-        $last_room = $player->getRoom();
-        if (empty($last_room) || !$last_room instanceof Room) {
-            $room = $em->getRepository('Tchess\Entity\Room')
-                    ->findOpenRoom($player);
-
-            if (empty($room)) {
-                $room = new Room();
-                $room->addPlayer($player);
-                $em->persist($room);
-            } else {
-                $players = $room->getPlayers();
-
-                if (count($players) != 1) {
-                    throw new \LogicException('Room must have only one players to join', ExceptionCodes::PLAYER);
-                }
-
-                $opponent_player = current(reset($players));
-                $player->setColor($opponent_player->getColor() == 'white' ? 'black' : 'white');
-                $room->addPlayer($player);
-            }
-            $player->setRoom($room);
-            $em->flush();
-        } else {
-            // If you want to play with other player, please leave room first.
-        }
-
-        return $this->redirect($this->generateUrl('homepage'));
     }
 
     /**
@@ -252,7 +177,7 @@ class GameController extends BaseController
         $player = $em->getRepository('Tchess\Entity\Player')->findOneBy(array('sid' => $sid));
 
         if (empty($player) || !$player instanceof Player) {
-            throw new \LogicException('Player did not registered', ExceptionCodes::PLAYER);
+            return $this->redirect($this->generateUrl('register'));
         }
 
         $last_room = $player->getRoom();

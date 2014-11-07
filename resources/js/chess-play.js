@@ -1,9 +1,9 @@
-var chess;
+var game;
 if (chess_start_position == 'start') {
-    chess = new Chess();
+    game = new Chess();
 }
 else {
-    chess = new Chess(chess_start_position);
+    game = new Chess(chess_start_position);
 }
 
 var removeGreySquares = function() {
@@ -46,7 +46,7 @@ var onDrop = function(source, target) {
     if (move === null) return 'snapback';
 
     // Highlight the move.
-    var color = chess.turn() == 'b' ? 'white' : 'black';
+    var color = game.turn() == 'b' ? 'white' : 'black';
     removeHighlights(color);
     highlight(source, color);
     highlight(target, color);
