@@ -21,6 +21,14 @@ class Board implements NormalizableInterface, DenormalizableInterface
 
     protected $pieces;
 
+    protected $activeColor;
+
+    protected $castlingAvailability;
+
+    protected $enPassantTarget;
+
+    protected $fullmoveNumber;
+
     /**
      * Get piece.
      *
@@ -37,6 +45,106 @@ class Board implements NormalizableInterface, DenormalizableInterface
     public function setPiece(Piece $piece, $row, $column)
     {
         $this->pieces[$row][$column] = $piece;
+    }
+
+    /**
+     * Set active color
+     *
+     * @param string $activeColor
+     */
+    public function setActiveColor($activeColor)
+    {
+        $this->activeColor = $activeColor;
+    }
+
+    /**
+     * Get active color
+     *
+     * @return string
+     */
+    public function getActiveColor()
+    {
+        return $this->activeColor;
+    }
+
+    /**
+     * Set castling availability
+     *
+     * @param string $castlingAvailability
+     */
+    public function setCastlingAvailability($castlingAvailability)
+    {
+        $this->castlingAvailability = $castlingAvailability;
+    }
+
+    /**
+     * Get castling availability
+     *
+     * @return string
+     */
+    public function getCastlingAvailability()
+    {
+        return $this->castlingAvailability;
+    }
+
+    /**
+     * Remove castling availability
+     *
+     * @param string $availability
+     */
+    public function removeCastlingAvailability($availability)
+    {
+        $this->castlingAvailability = str_replace($availability, '', $this->castlingAvailability);
+    }
+
+    /**
+     * Set en passant target
+     *
+     * @param string $target
+     */
+    public function setEnPassantTarget($target)
+    {
+        $this->enPassantTarget = $target;
+    }
+
+    /**
+     * Get en passant target
+     *
+     * @return string
+     */
+    public function getEnPassantTarget()
+    {
+        return $this->enPassantTarget;
+    }
+
+    /**
+     * Set fullmove number
+     *
+     * @param int $fullmoveNumber
+     */
+    public function setFullmoveNumber($fullmoveNumber)
+    {
+        $this->fullmoveNumber = $fullmoveNumber;
+    }
+
+    /**
+     * Get fullmove number
+     *
+     * @return int
+     */
+    public function getFullmoveNumber()
+    {
+        return $this->fullmoveNumber;
+    }
+
+    /**
+     * Increase fullmove number
+     *
+     * @return int
+     */
+    public function increaseFullmoveNumber()
+    {
+        $this->fullmoveNumber++;
     }
 
     public function initialize()

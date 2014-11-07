@@ -25,11 +25,6 @@ class Game
     protected $room;
 
     /**
-     * @ORM\Column(type="string")
-     */
-    protected $turn;
-
-    /**
      * @ORM\Column(type="text")
      *
      * Serialization of board.
@@ -50,6 +45,15 @@ class Game
      * @ORM\Column(type="string", nullable=true, options={"default":""})
      */
     protected $highlights;
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        // Don't setup any things here, because this clases is used in many
+        // places.
+    }
 
     /**
      * Get id
@@ -82,29 +86,6 @@ class Game
     public function getState()
     {
         return $this->state;
-    }
-
-    /**
-     * Set turn
-     *
-     * @param string $turn
-     * @return Game
-     */
-    public function setTurn($turn)
-    {
-        $this->turn = $turn;
-
-        return $this;
-    }
-
-    /**
-     * Get turn
-     *
-     * @return string
-     */
-    public function getTurn()
-    {
-        return $this->turn;
     }
 
     /**

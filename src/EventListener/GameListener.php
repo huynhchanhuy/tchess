@@ -41,10 +41,13 @@ class GameListener implements EventSubscriberInterface
 
         if ($players[0]->getStarted() && $players[1]->getStarted()) {
             $board = new Board();
+            $board->setActiveColor('white');
+            $board->setCastlingAvailability('KQkq');
+            $board->setEnPassantTarget('');
+            $board->setFullmoveNumber(0);
             $board->initialize();
 
             $game = new Game();
-            $game->setTurn('white');
             $game->setRoom($room);
             $game->setStarted(true);
             $game->setBoard($board);

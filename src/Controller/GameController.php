@@ -53,7 +53,7 @@ class GameController extends BaseController
         }
         else {
             $variables['start_position'] = $game->getState();
-            $variables['turn'] = $game->getTurn();
+            $variables['turn'] = $game->getBoard()->getActiveColor();
             $variables['highlights'] = trim($game->getHighlights());
         }
 
@@ -81,7 +81,7 @@ class GameController extends BaseController
         }
         else {
             $variables['start_position'] = $game->getState();
-            $variables['turn'] = $game->getTurn();
+            $variables['turn'] = $game->getBoard()->getActiveColor();
             $variables['highlights'] = trim($game->getHighlights());
         }
 
@@ -454,7 +454,7 @@ class GameController extends BaseController
                 'message' => 'Both players did not start the game'
             ));
         }
-        else if ($game->getTurn() != $player->getColor()) {
+        else if ($game->getBoard()->getActiveColor() != $player->getColor()) {
             return json_encode(array(
                 'code' => 500,
                 'message' => 'This is not your turn'
@@ -473,8 +473,7 @@ class GameController extends BaseController
 
                 $dispatcher->dispatch(MoveEvents::MOVE, $moveEvent);
 
-                $game->setTurn($color == 'white' ? 'black' : 'white');
-                $game->setBoard($moveEvent->getBoard());
+                $board->setActiveColor($color == 'white' ? 'black' : 'white');
                 $game->saveGame($serializer);
                 $game->addHighlight($move->getSource(), $move->getTarget(), $color);
                 $em->flush();
@@ -492,7 +491,7 @@ class GameController extends BaseController
             'code' => 200,
             'message' => 'Move has been performed',
             'color' => $color,
-            'turn' => $game->getTurn()
+            'turn' => $game->getBoard()->getActiveColor()
         ));
     }
 
@@ -525,7 +524,7 @@ class GameController extends BaseController
 
         return json_encode(array(
             'position' => $game->getState(),
-            'turn' => $game->getTurn() == 'white' ? 'w' : 'b',
+            'turn' => $game->getBoard()->getActiveColor() == 'white' ? 'w' : 'b',
             'move' => $game->getMove()
         ));
     }

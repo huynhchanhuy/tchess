@@ -46,10 +46,21 @@ class BasicRules implements EventSubscriberInterface, CheckingMoveInterface
         return true;
     }
 
+    public function onMoveUpdateFullmoveNumber(MoveEvent $event)
+    {
+        $board = &$event->getBoard();
+        $color = $event->getColor();
+        if ($color == 'black') {
+            // Incremented after Black's move.
+            $board->increaseFullmoveNumber();
+        }
+    }
+
     public static function getSubscribedEvents()
     {
         return array(
             MoveEvents::CHECK_MOVE => array(array('onMoveChecking', 1)),
+            MoveEvents::MOVE => array(array('onMoveUpdateFullmoveNumber', 0)),
         );
     }
 
