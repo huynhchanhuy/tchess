@@ -58,7 +58,7 @@ class RoomController extends BaseController
         $player = $em->getRepository('Tchess\Entity\Player')->findOneBy(array('sid' => $sid));
 
         if (empty($player) || !$player instanceof Player) {
-            throw new \LogicException('Player did not registered', ExceptionCodes::PLAYER);
+            return $this->redirect($this->generateUrl('register'));
         }
 
         $last_room = $player->getRoom();

@@ -2,6 +2,12 @@
 
 {% block title %}Rooms{% endblock %}
 
+{% block nav_links %}
+    <li><a href="/">Home</a></li>
+    <li><a href="/dashboard">Dashboard</a></li>
+    <li class="active"><a href="#">Rooms</a></li>
+{% endblock %}
+
 {% block body %}
     <div class="container">
 
@@ -16,7 +22,6 @@
       </thead>
       <tbody>
         {% if rooms is empty %}
-              <a href="{{ path('create_room') }}">Create Room</a>
         {% else %}
             {% set inroom = false %}
             {% for room in rooms %}
@@ -48,12 +53,14 @@
         {% endif %}
       </tbody>
     </table>
-    {% if inroom %}
         <div class="btn-group game-buttons">
-            <a class="btn btn-primary" href="/">Go To Current Room</a>
-            <button type="button" class="btn btn-danger btn-leave">Leave Current Room</button>
+            {% if inroom %}
+                <a class="btn btn-primary" href="/">Go to your room</a>
+                <button type="button" class="btn btn-danger btn-leave">Leave your room</button>
+            {% else %}
+                <a class="btn btn-primary" href="{{ path('create_room') }}">Create room</a>
+            {% endif %}
         </div>
-    {% endif %}
 
     {% set vars = {'route': 'rooms', 'paginator': paginator} %}
     {% include 'paginator.html.twig' with vars %}
