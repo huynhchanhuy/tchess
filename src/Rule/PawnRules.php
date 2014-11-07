@@ -81,7 +81,7 @@ class PawnRules implements EventSubscriberInterface, CheckingMoveInterface
                         $epPiece = &$board->getPiece($move->getNewRow(), $move->getNewColumn() + 1);
                         if($epPiece instanceof Pawn && $epPiece->getColor() != $color) {
                             $piece->setEpAble(true);
-                            $this->setEnPassantTarget($board, $move, $piece);
+                            $this->updateEnPassantTarget($board, $move, $piece);
                         }
                     }
                 } else if ($move->getNewColumn() - 1 > 0) {
@@ -90,7 +90,7 @@ class PawnRules implements EventSubscriberInterface, CheckingMoveInterface
                         $epPiece = &$board->getPiece($move->getNewRow(), $move->getNewColumn() - 1);
                         if($epPiece instanceof Pawn && $epPiece->getColor() != $color) {
                             $piece->setEpAble(true);
-                            $this->setEnPassantTarget($board, $move, $piece);
+                            $this->updateEnPassantTarget($board, $move, $piece);
                         }
                     }
                 }
@@ -111,7 +111,7 @@ class PawnRules implements EventSubscriberInterface, CheckingMoveInterface
         return true;
     }
 
-    private function setEnPassantTarget(Board $board, Move $move, Piece $piece)
+    private function updateEnPassantTarget(Board $board, Move $move, Piece $piece)
     {
         // Update en passant target.
         $newMove = new Move();

@@ -190,6 +190,12 @@ class Board implements NormalizableInterface, DenormalizableInterface
         //Kings
         $this->pieces[0][4] = new King("white");
         $this->pieces[7][4] = new King("black");
+
+        // Other attributes.
+        $this->setActiveColor('white');
+        $this->setCastlingAvailability('KQkq');
+        $this->setEnPassantTarget('');
+        $this->setFullmoveNumber(0);
     }
 
     /**
@@ -213,9 +219,28 @@ class Board implements NormalizableInterface, DenormalizableInterface
     {
         for ($x = 0; $x < 8; $x++) {
             for ($y = 0; $y < 8; $y++) {
-                $this->pieces[$x][$y] = (isset($data[$x][$y]) && !empty($data[$x][$y])) ? PieceFactory::create($data[$x][$y]) : null;
+                $this->pieces[$x][$y] = (isset($data['pieces'][$x][$y]) && !empty($data['pieces'][$x][$y])) ? PieceFactory::create($data['pieces'][$x][$y]) : null;
             }
         }
+
+        $this->activeColor = $data['active'] == 'w' ? 'white' : 'black';
+        if (!empty($data['castling']) && (preg_match('/^K{0,1}Q{0,1}k{0,1}q{0,1}$/', $data['castling']) || $data['castling'] == '-')) {
+            if ($data['castling'] == '-') {
+                $this->castlingAvailability = '';
+            }
+            else {
+                $this->castlingAvailability = $data['castling'];
+            }
+        }
+        if (!empty($data['ep']) && (preg_match('/^[a-h]{1}(3|6){1}$/', $data['ep']) || $data['ep'] == '-')) {
+            if ($data['ep'] == '-') {
+                $this->enPassantTarget = '';
+            }
+            else {
+                $this->enPassantTarget = $data['ep'];
+            }
+        }
+        $this->fullmoveNumber = $data['fullmove'] > 0 ? $data['fullmove'] : 0;
     }
 
     public function normalize(NormalizerInterface $normalizer, $format = null, array $context = array())
@@ -223,9 +248,27 @@ class Board implements NormalizableInterface, DenormalizableInterface
         $state = array();
         for ($x = 0; $x < 8; $x++) {
             for ($y = 0; $y < 8; $y++) {
-                $state[$x][$y] = ($this->pieces[$x][$y] != null) ? (string) $this->pieces[$x][$y] : '';
+                $state['pieces'][$x][$y] = ($this->pieces[$x][$y] != null) ? (string) $this->pieces[$x][$y] : '';
             }
         }
+
+        $state['active'] = $this->activeColor == 'white' ? 'w' : 'b';
+        if (preg_match('/^K{0,1}Q{0,1}k{0,1}q{0,1}$/', $this->castlingAvailability)) {
+            if (empty($this->castlingAvailability)) {
+                $state['castling'] = '-';
+            }
+            else {
+                $state['castling'] = $this->castlingAvailability;
+            }
+        }
+        if (preg_match('/^[a-h]{1}(3|6){1}$/', $this->enPassantTarget)) {
+            $state['ep'] = $this->enPassantTarget;
+        }
+        else {
+            $state['ep'] = '-';
+        }
+        $state['fullmove'] = $this->fullmoveNumber > 0 ? $this->fullmoveNumber : 0;
+
         return $state;
     }
 

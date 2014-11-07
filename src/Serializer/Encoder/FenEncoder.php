@@ -15,21 +15,23 @@ class FenEncoder implements EncoderInterface, DecoderInterface
     public function encode($data, $format, array $context = array())
     {
         $encoded = '';
+
+        // pieces.
         $empty_count = 0;
         $separator = '/';
         for ($x = 7; $x >= 0; $x--) {
             for ($y = 0; $y < 8; $y++) {
-                if (empty($data[$x][$y])) {
+                if (empty($data['pieces'][$x][$y])) {
                     $empty_count++;
                 }
                 else {
                     if ($empty_count > 0) {
-                        $encoded .= $empty_count . $data[$x][$y];
+                        $encoded .= $empty_count . $data['pieces'][$x][$y];
                         // Reset empty count.
                         $empty_count = 0;
                     }
                     else {
-                        $encoded .= $data[$x][$y];
+                        $encoded .= $data['pieces'][$x][$y];
                     }
                 }
             }
@@ -46,6 +48,13 @@ class FenEncoder implements EncoderInterface, DecoderInterface
                 $encoded .= $separator;
             }
         }
+
+        // other attributes.
+        $encoded .= ' ' . $data['active'];
+        $encoded .= ' ' . $data['castling'];
+        $encoded .= ' ' . $data['ep'];
+        $encoded .= ' 0'; // Halfmove: not used.
+        $encoded .= ' ' . $data['fullmove'];
         return $encoded;
     }
 
@@ -54,11 +63,18 @@ class FenEncoder implements EncoderInterface, DecoderInterface
      */
     public function decode($data, $format, array $context = array())
     {
-        $rows = explode('/', $data);
+        // Split parts of FEN.
+        $parts = explode(' ', $data);
+        if (count($parts) != 6) {
+            throw new \InvalidArgumentException("Invalid FEN format's data");
+        }
+        list($pieces, $active, $castling, $ep, $halfmove, $fullmove) = $parts;
         $decoded = array();
 
+        // pieces.
+        $rows = explode('/', $pieces);
         if (count($rows) != 8) {
-            throw new \InvalidArgumentException("Invalid FEN format's data");
+            throw new \InvalidArgumentException("Number of columns does not equal to 8");
         }
 
         for($x = 0; $x < 8; $x++) {
@@ -76,7 +92,7 @@ class FenEncoder implements EncoderInterface, DecoderInterface
                     }
 
                     for ($i2 = 0; $i2 < $empty_count; $i2++) {
-                        $decoded[7 - $x][$y] = '';
+                        $decoded['pieces'][7 - $x][$y] = '';
                         $y++;
                     }
                 }
@@ -85,7 +101,7 @@ class FenEncoder implements EncoderInterface, DecoderInterface
                         throw new \InvalidArgumentException("Invalid piece character");
                     }
 
-                    $decoded[7 - $x][$y] = $char;
+                    $decoded['pieces'][7 - $x][$y] = $char;
                     $y++;
                 }
             }
@@ -94,6 +110,14 @@ class FenEncoder implements EncoderInterface, DecoderInterface
                 throw new \InvalidArgumentException("Row contains more than 8 piece");
             }
         }
+
+        // other attributes.
+        $decoded['active'] = $active;
+        $decoded['castling'] = $castling;
+        $decoded['ep'] = $ep;
+        // Halfmove: not used.
+        $decoded['fullmove'] = $fullmove;
+
         return $decoded;
     }
 

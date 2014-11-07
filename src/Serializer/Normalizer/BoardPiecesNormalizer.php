@@ -49,16 +49,6 @@ class BoardPiecesNormalizer implements NormalizerInterface, DenormalizerInterfac
      */
     public function supportsDenormalization($data, $type, $format = null)
     {
-        if (!is_array($data) || count($data) != 8) {
-            return false;
-        }
-
-        for($i = 0; $i < 8; $i++) {
-            if (!is_array($data[$i]) || count($data[$i]) != 8) {
-                return false;
-            }
-        }
-
-        return true;
+        return (isset($data['pieces']) && isset($data['active']) && isset($data['castling']) && isset($data['ep']) && isset($data['fullmove']));
     }
 }
