@@ -45,6 +45,18 @@
     {
         "type": "package",
         "package": {
+            "name": "tienvx/bootstrap",
+            "version": "v3.3.0",
+            "type": "js-vendor",
+            "dist": {
+                "url": "https://github.com/twbs/bootstrap/releases/download/v3.3.0/bootstrap-3.3.0-dist.zip",
+                "type": "zip"
+            }
+        }
+    },
+    {
+        "type": "package",
+        "package": {
             "name": "tienvx/chessjs",
             "version": "dev-master",
             "type": "js-vendor",
@@ -85,6 +97,7 @@
         "tienvx/js-vendor-installer-plugin": "v1.1.1",
         "tienvx/chessboardjs": "v0.3.0",
         "tienvx/jquery": "v1.11.1",
+        "tienvx/bootstrap": "v3.3.0",
         "packagist/yuicompressor-bin": "v2.4.8",
         "monolog/monolog": "1.10.0",
         "cboden/ratchet": "v0.3.2",
@@ -102,6 +115,7 @@
             "web/js-vendor/tienvx/chessboardjs/": ["tienvx/chessboardjs"],
             "web/js-vendor/tienvx/autobahnjs/": ["tienvx/autobahnjs"],
             "web/js-vendor/tienvx/jquery/": ["tienvx/jquery"],
+            "web/js-vendor/tienvx/bootstrap/": ["tienvx/bootstrap"],
             "web/js-vendor/tienvx/chessjs/": ["tienvx/chessjs"]
         }
     }

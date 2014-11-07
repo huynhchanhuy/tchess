@@ -66,7 +66,3 @@ move_piece:
     path:     /move-piece
     defaults: { _controller: 'Tchess\Controller\GameController::moveAction', _format: 'json' }
     methods:  [POST]
-
-get_game_state:
-    path:     /get-game-state
-    defaults: { _controller: 'Tchess\Controller\GameController::getStateAction' }

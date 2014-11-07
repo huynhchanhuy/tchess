@@ -12,7 +12,7 @@
 <div class="container">
     <h2>Player1 (white) vs Player2 (black)</h2>
 
-    <p>Current turn: <span id="turn"></span></p>
+    <p>Status: <span id="status"></span></p>
 
     <div id="board"></div>
 
@@ -24,11 +24,10 @@
 {% block javascripts %}
 <script type="text/javascript">
     var chess_start_position = '{{ start_position }}';
-    var chess_turn = '{{ turn }}';
     var chess_highlights = '{{ highlights }}';
 </script>
 <script src="/js-vendor/tienvx/jquery/jquery-1.11.1.min.js"></script>
-<script src="/resources/js/bootstrap.min.js"></script>
+<script src="/js-vendor/tienvx/bootstrap/js/bootstrap.min.js"></script>
 <script src="/js-vendor/tienvx/autobahnjs/autobahn.min.js"></script>
 <script src="/js-vendor/tienvx/chessboardjs/js/chessboard-0.3.0.min.js"></script>
 <script src="/resources/js/chess.js"></script>

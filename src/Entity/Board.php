@@ -245,31 +245,31 @@ class Board implements NormalizableInterface, DenormalizableInterface
 
     public function normalize(NormalizerInterface $normalizer, $format = null, array $context = array())
     {
-        $state = array();
+        $data = array();
         for ($x = 0; $x < 8; $x++) {
             for ($y = 0; $y < 8; $y++) {
-                $state['pieces'][$x][$y] = ($this->pieces[$x][$y] != null) ? (string) $this->pieces[$x][$y] : '';
+                $data['pieces'][$x][$y] = ($this->pieces[$x][$y] != null) ? (string) $this->pieces[$x][$y] : '';
             }
         }
 
-        $state['active'] = $this->activeColor == 'white' ? 'w' : 'b';
+        $data['active'] = $this->activeColor == 'white' ? 'w' : 'b';
         if (preg_match('/^K{0,1}Q{0,1}k{0,1}q{0,1}$/', $this->castlingAvailability)) {
             if (empty($this->castlingAvailability)) {
-                $state['castling'] = '-';
+                $data['castling'] = '-';
             }
             else {
-                $state['castling'] = $this->castlingAvailability;
+                $data['castling'] = $this->castlingAvailability;
             }
         }
         if (preg_match('/^[a-h]{1}(3|6){1}$/', $this->enPassantTarget)) {
-            $state['ep'] = $this->enPassantTarget;
+            $data['ep'] = $this->enPassantTarget;
         }
         else {
-            $state['ep'] = '-';
+            $data['ep'] = '-';
         }
-        $state['fullmove'] = $this->fullmoveNumber > 0 ? $this->fullmoveNumber : 0;
+        $data['fullmove'] = $this->fullmoveNumber > 0 ? $this->fullmoveNumber : 0;
 
-        return $state;
+        return $data;
     }
 
 }

@@ -1,5 +1,5 @@
 var boardEl = $('#board'),
-turnEl = $('#turn'),
+statusEl = $('#status'),
 squareClass = 'square-55d63'
 ;
 
@@ -12,7 +12,34 @@ var highlight = function(position, color) {
 };
 
 var updateStatus = function() {
-    turnEl.html(chess_turn);
+    var status = '';
+
+    var moveColor = 'White';
+    if (game.turn() === 'b') {
+      moveColor = 'Black';
+    }
+
+    // checkmate?
+    if (game.in_checkmate() === true) {
+      status = 'Game over, ' + moveColor + ' is in checkmate.';
+    }
+
+    // draw?
+    else if (game.in_draw() === true) {
+      status = 'Game over, drawn position';
+    }
+
+    // game still on
+    else {
+      status = moveColor + ' to move';
+
+      // check?
+      if (game.in_check() === true) {
+        status += ', ' + moveColor + ' is in check';
+      }
+    }
+
+    statusEl.html(status);
 };
 
 var prepareHighlights = function() {
@@ -39,8 +66,6 @@ var conn = new ab.Session('ws://localhost:8080',
     function() {
         conn.subscribe('move', function(topic, data) {
             board.move(data.source + '-' + data.target);
-
-            chess_turn = data.color == 'white' ? 'black' : 'white';
 
             if (!data.castling) {
                 // Highlight the move.

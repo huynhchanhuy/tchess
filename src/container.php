@@ -116,9 +116,6 @@ function register_twig_services($sc, $env)
             ->setArguments(array(new Reference('twig_renderer')));
 
     // Assets
-    $sc->register('bootstrap_css_asset', 'Assetic\Asset\FileAsset')
-            ->setArguments(array(__DIR__ . '/../resources/css/bootstrap.min.css'))
-            ->addMethodCall('setTargetPath', array('css/bootstrap.min.css'));
     $sc->register('nav_css_asset', 'Assetic\Asset\FileAsset')
             ->setArguments(array(__DIR__ . '/../resources/css/nav.css'))
             ->addMethodCall('setTargetPath', array('css/nav.css'));
@@ -146,16 +143,12 @@ function register_twig_services($sc, $env)
     $sc->register('game_buttons_js_asset', 'Assetic\Asset\FileAsset')
             ->setArguments(array(__DIR__ . '/../resources/js/game-buttons.js'))
             ->addMethodCall('setTargetPath', array('js/game-buttons.js'));
-    $sc->register('bootstrap_js_asset', 'Assetic\Asset\FileAsset')
-            ->setArguments(array(__DIR__ . '/../resources/js/bootstrap.min.js'))
-            ->addMethodCall('setTargetPath', array('js/bootstrap.min.js'));
     $sc->register('favicon_asset', 'Assetic\Asset\FileAsset')
             ->setArguments(array(__DIR__ . '/../resources/images/favicon.ico'))
             ->addMethodCall('setTargetPath', array('images/favicon.ico'));
 
     $sc->register('asset_asset_manager', 'Assetic\AssetManager')
-            ->addMethodCall('set', array('bootstrap', new Reference('bootstrap_css_asset')))
-            ->addMethodCall('set', array('bootstrap', new Reference('nav_css_asset')))
+            ->addMethodCall('set', array('nav', new Reference('nav_css_asset')))
             ->addMethodCall('set', array('register_css', new Reference('register_css_glob_asset')))
             ->addMethodCall('set', array('board_css', new Reference('board_css_glob_asset')))
             ->addMethodCall('set', array('chess_js', new Reference('chess_js_asset')))
@@ -164,7 +157,6 @@ function register_twig_services($sc, $env)
             ->addMethodCall('set', array('chess_watch_js', new Reference('chess_watch_js_asset')))
             ->addMethodCall('set', array('chess_play_js', new Reference('chess_play_js_asset')))
             ->addMethodCall('set', array('game_buttons_js', new Reference('game_buttons_js_asset')))
-            ->addMethodCall('set', array('bootstrap_js', new Reference('bootstrap_js_asset')))
             ->addMethodCall('set', array('favicon', new Reference('favicon_asset')))
     ;
 

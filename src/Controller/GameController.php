@@ -48,12 +48,10 @@ class GameController extends BaseController
 
         if (empty($game) || !$game instanceof Game || !$game->getStarted()) {
             $variables['start_position'] = 'start';
-            $variables['turn'] = 'white';
             $variables['highlights'] = '';
         }
         else {
             $variables['start_position'] = $game->getState();
-            $variables['turn'] = $game->getBoard()->getActiveColor();
             $variables['highlights'] = trim($game->getHighlights());
         }
 
@@ -76,12 +74,10 @@ class GameController extends BaseController
 
         if (empty($game) || !$game instanceof Game || !$game->getStarted()) {
             $variables['start_position'] = 'start';
-            $variables['turn'] = 'white';
             $variables['highlights'] = '';
         }
         else {
             $variables['start_position'] = $game->getState();
-            $variables['turn'] = $game->getBoard()->getActiveColor();
             $variables['highlights'] = trim($game->getHighlights());
         }
 
@@ -492,40 +488,6 @@ class GameController extends BaseController
             'message' => 'Move has been performed',
             'color' => $color,
             'turn' => $game->getBoard()->getActiveColor()
-        ));
-    }
-
-    /**
-     * Get game state.
-     *
-     * @param \Symfony\Component\HttpFoundation\Request $request
-     * @return string
-     */
-    public function getStateAction(Request $request)
-    {
-        $em = $this->framework->getEntityManager();
-        $session = $request->getSession();
-        $sid = $session->getId();
-
-        $player = $em->getRepository('Tchess\Entity\Player')->findOneBy(array('sid' => $sid));
-
-        if (empty($player) || ($player instanceof Player && empty($player->getRoom()))) {
-            throw new \LogicException('Player did not join a room', ExceptionCodes::PLAYER);
-        }
-
-        $game = $player->getRoom()->getGame();
-
-        if (empty($game) || !$game instanceof Game) {
-            return json_encode(array(
-                'code' => 500,
-                'message' => 'Both players did not start the game'
-            ));
-        }
-
-        return json_encode(array(
-            'position' => $game->getState(),
-            'turn' => $game->getBoard()->getActiveColor() == 'white' ? 'w' : 'b',
-            'move' => $game->getMove()
         ));
     }
 
