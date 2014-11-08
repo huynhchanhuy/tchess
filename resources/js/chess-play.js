@@ -45,14 +45,6 @@ var onDrop = function(source, target) {
     // illegal move
     if (move === null) return 'snapback';
 
-    // Highlight the move.
-    var color = game.turn() == 'b' ? 'white' : 'black';
-    removeHighlights(color);
-    highlight(source, color);
-    highlight(target, color);
-
-    updateStatus();
-
     $.ajax({
         type: 'POST',
         url: "/move-piece",
@@ -61,11 +53,22 @@ var onDrop = function(source, target) {
         },
         success: function(data) {
             if (data.code == '200') {
-            // Do some things here.
+                // Highlight the move.
+                var color = game.turn() == 'b' ? 'white' : 'black';
+                removeHighlights(color);
+                highlight(source, color);
+                highlight(target, color);
             }
+            else {
+                // Move piece back.
+                game.undo();
+                board.position(game.fen());
+            }
+
+            updateStatus();
         },
         dataType: 'json',
-        async:false
+        async:true
     });
 };
 
