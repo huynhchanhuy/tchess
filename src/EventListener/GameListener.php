@@ -21,6 +21,7 @@ class GameListener implements EventSubscriberInterface
     private $serializer;
     private $logger;
     private $moveManager;
+    private $socket;
 
     public function __construct(EntityManagerInterface $em, SerializerInterface $serializer, LoggerInterface $logger, MoveManager $moveManager)
     {
@@ -28,6 +29,11 @@ class GameListener implements EventSubscriberInterface
         $this->serializer = $serializer;
         $this->logger = $logger;
         $this->moveManager = $moveManager;
+    }
+
+    public function setSocket($socket = null)
+    {
+        $this->socket = $socket;
     }
 
     public function onRoomJoin(RoomEvent $event)
@@ -77,23 +83,21 @@ class GameListener implements EventSubscriberInterface
     {
         $moves = $this->moveManager->getMoves();
 
-        if (empty($moves) || !(class_exists('\ZMQContext')) || !(class_exists('\ZMQ'))) {
+        if (empty($moves) || empty($this->socket)) {
             return;
         }
 
-        $context = new \ZMQContext();
-        $socket = $context->getSocket(\ZMQ::SOCKET_PUSH, 'my pusher');
-        $socket->connect("tcp://localhost:5555");
-
         foreach ($moves as $move) {
             $data = array(
+                'room' => $move->getRoomId(),
+                'action' => 'move',
                 'source' => $move->getSource(),
                 'target' => $move->getTarget(),
                 'color' => $move->getColor(),
                 'castling' => $move->getCastling(),
             );
 
-            $socket->send(json_encode($data));
+            $this->socket->send(json_encode($data));
         }
     }
 

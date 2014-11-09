@@ -99,6 +99,7 @@ class KingRules implements EventSubscriberInterface, CheckingMoveInterface
 
     public function onMoveDoCastling(MoveEvent $event)
     {
+        $room = $event->getRoom();
         $board = &$event->getBoard();
         $move = $event->getMove();
         $color = $event->getColor();
@@ -122,6 +123,7 @@ class KingRules implements EventSubscriberInterface, CheckingMoveInterface
                 $rook_move->setNewRow($move->getNewRow());
                 $rook_move->setNewColumn($move->getNewColumn() - 1);
                 $rook_move->setCastling(true);
+                $rook_move->setRoomId($room->getId());
 
                 // Remove castling availability.
                 $board->removeCastlingAvailability($color == 'white' ? 'K' : 'k');
@@ -138,6 +140,7 @@ class KingRules implements EventSubscriberInterface, CheckingMoveInterface
                 $rook_move->setNewRow($move->getNewRow());
                 $rook_move->setNewColumn($move->getNewColumn() + 1);
                 $rook_move->setCastling(true);
+                $rook_move->setRoomId($room->getId());
 
                 // Remove castling availability.
                 $board->removeCastlingAvailability($color == 'white' ? 'Q' : 'q');

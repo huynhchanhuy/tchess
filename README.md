@@ -76,4 +76,5 @@ Development
  * Front end are combine of http://chessboardjs.com and
    https://github.com/jhlywa/chess.js
  * With various [components](tuts/) from [Symfony 2](http://symfony.com/)
+ * Real-time updates feature is come from http://socketo.me/docs/push
  * Pull requests are welcome.

@@ -4,6 +4,7 @@ namespace Tchess\Entity\Piece;
 
 class Move
 {
+    protected $roomId;
     protected $color;
     protected $move;
     protected $source;
@@ -38,6 +39,16 @@ class Move
         }
 
         $this->castling = false;
+    }
+
+    public function getRoomId()
+    {
+        return $this->roomId;
+    }
+
+    public function setRoomId($roomId)
+    {
+        $this->roomId = $roomId;
     }
 
     /**

@@ -32,7 +32,13 @@ var prepareHighlights = function() {
 
 var conn = new ab.Session('ws://localhost:8080',
     function() {
-        conn.subscribe('move', function(topic, data) {
+        conn.subscribe(chess_room_id + '.move', function(topic, data) {
+            game.move({
+                from: data.source,
+                to: data.target,
+                // TODO: show a dialog for choosing promotion.
+                promotion: 'q'
+            });
             board.move(data.source + '-' + data.target);
 
             if (!data.castling) {

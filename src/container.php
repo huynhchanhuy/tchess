@@ -29,6 +29,8 @@ if (file_exists($file)) {
 
     register_logger_services($sc);
 
+    register_socket_services($sc);
+
     add_compiler_passes($sc);
 
     $sc->compile();
@@ -215,7 +217,8 @@ function register_twig_services($sc, $env)
 function register_chess_services($sc)
 {
     $sc->register('listener.game', 'Tchess\EventListener\GameListener')
-            ->setArguments(array(new Reference('entity_manager'), new Reference('serializer'), new Reference('logger'), new Reference('move_manager')));
+            ->setArguments(array(new Reference('entity_manager'), new Reference('serializer'), new Reference('logger'), new Reference('move_manager')))
+            ->addMethodCall('setSocket', array(new Reference('socket')));
 
     $sc->register('rules.basic', 'Tchess\Rule\BasicRules')
             ->addTag('rules');
@@ -332,4 +335,21 @@ function register_db_services($sc, $config)
             ->setFactoryMethod('create')
             ->setClass('Doctrine\ORM\EntityManager')
             ->setArguments(array('%db_config%', new Reference('entity_config')));
+}
+
+function register_socket_services($sc)
+{
+    if (!(class_exists('\ZMQContext')) || !(class_exists('\ZMQSocket')) || !(class_exists('\ZMQ'))) {
+        return;
+    }
+
+    $sc->register('zmq_context', '\ZMQContext');
+
+    $sc->register('socket')
+            ->setFactoryService(new Reference('zmq_context'))
+            ->setFactoryMethod('getSocket')
+            ->setClass('\ZMQSocket')
+            ->setArguments(array(\ZMQ::SOCKET_PUSH, 'my pusher'))
+            ->addMethodCall('connect', "tcp://localhost:5555")
+    ;
 }

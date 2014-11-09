@@ -11,7 +11,6 @@ use Tchess\Event\RoomEvent;
 use Tchess\MoveEvents;
 use Tchess\Event\MoveEvent;
 use Tchess\Entity\Piece\Move;
-use Tchess\ExceptionCodes;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Tchess\Entity\Game;
 
@@ -41,8 +40,9 @@ class GameController extends BaseController
             return $this->redirect($this->generateUrl('rooms'));
         }
 
+        $variables['room_id'] = $room->getId();
         $variables['color'] = $player->getColor();
-        $game = $player->getRoom()->getGame();
+        $game = $room->getGame();
 
         if (empty($game) || !$game instanceof Game) {
             $variables['start_position'] = 'start';
@@ -72,7 +72,9 @@ class GameController extends BaseController
             return $this->redirect($this->generateUrl('rooms'));
         }
 
-        $variables = array();
+        $variables = array(
+            'room_id' => $room->getId()
+        );
         $game = $room->getGame();
 
         if (empty($game) || !$game instanceof Game) {
@@ -280,57 +282,67 @@ class GameController extends BaseController
 
         $player = $em->getRepository('Tchess\Entity\Player')->findOneBy(array('sid' => $sid));
 
-        if (empty($player) || ($player instanceof Player && empty($player->getRoom()))) {
-            throw new \LogicException('Player did not join a room', ExceptionCodes::PLAYER);
+        if (empty($player) || ($player instanceof Player)) {
+            return json_encode(array(
+                'code' => 500,
+                'message' => 'Player did not register'
+            ));
         }
 
-        $game = $player->getRoom()->getGame();
+        $room = $player->getRoom();
+        if (empty($room) || !($room instanceof Room)) {
+            return json_encode(array(
+                'code' => 500,
+                'message' => 'Player did not join a room'
+            ));
+        }
 
+        $game = $room->getGame();
         if (empty($game) || !$game instanceof Game) {
             return json_encode(array(
                 'code' => 500,
-                'message' => 'Both players did not start the game'
+                'message' => 'There is not enough players in the room'
             ));
         }
-        else if ($game->getBoard()->getActiveColor() != $player->getColor()) {
+
+        if ($game->getBoard()->getActiveColor() != $player->getColor()) {
             return json_encode(array(
                 'code' => 500,
                 'message' => 'This is not your turn'
             ));
         }
-        else {
-            $serializer = $this->framework->getSerializer();
-            $game->loadGame($serializer);
-            $board = $game->getBoard();
-            $color = $player->getColor();
-            $move = new Move($color, $request->request->get('move'));
 
-            if ($dispatcher->dispatch(MoveEvents::CHECK_MOVE, new MoveEvent($board, $move, $color))->isValidMove()) {
-                $board->movePiece($move);
-                $moveEvent = new MoveEvent($board, $move, $color);
+        $serializer = $this->framework->getSerializer();
+        $game->loadGame($serializer);
+        $board = $game->getBoard();
+        $color = $player->getColor();
+        $move = new Move($color, $request->request->get('move'));
+        $move->setRoomId($room->getId());
 
-                $dispatcher->dispatch(MoveEvents::MOVE, $moveEvent);
+        if ($dispatcher->dispatch(MoveEvents::CHECK_MOVE, new MoveEvent($room, $board, $move, $color))->isValidMove()) {
+            $board->movePiece($move);
+            $moveEvent = new MoveEvent($room, $board, $move, $color);
 
-                $board->setActiveColor($color == 'white' ? 'black' : 'white');
-                $game->saveGame($serializer);
-                $game->addHighlight($move->getSource(), $move->getTarget(), $color);
-                $em->flush();
+            $dispatcher->dispatch(MoveEvents::MOVE, $moveEvent);
 
-                $this->framework->getMoveManager()->addMove($move);
-            } else {
-                return json_encode(array(
-                    'code' => 500,
-                    'message' => 'Move is not valid'
-                ));
-            }
+            $board->setActiveColor($color == 'white' ? 'black' : 'white');
+            $game->saveGame($serializer);
+            $game->addHighlight($move->getSource(), $move->getTarget(), $color);
+            $em->flush();
+
+            $this->framework->getMoveManager()->addMove($move);
+
+            return json_encode(array(
+                'code' => 200,
+                'message' => 'Move has been performed',
+                'color' => $color,
+            ));
+        } else {
+            return json_encode(array(
+                'code' => 500,
+                'message' => 'Move is not valid'
+            ));
         }
-
-        return json_encode(array(
-            'code' => 200,
-            'message' => 'Move has been performed',
-            'color' => $color,
-            'turn' => $game->getBoard()->getActiveColor()
-        ));
     }
 
 }
