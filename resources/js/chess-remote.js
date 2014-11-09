@@ -53,19 +53,19 @@ var conn = new ab.Session('ws://localhost:8080',
 
         conn.subscribe(chess_room_id + '.join', function(topic, data) {
             if (data.color == 'white') {
-              $('#white-player').html(data.name);
+              $('.white-player').html(data.name);
             }
             if (data.color == 'black') {
-              $('#black-player').html(data.name);
+              $('.black-player').html(data.name);
             }
         });
 
         conn.subscribe(chess_room_id + '.leave', function(topic, data) {
             if (data.color == 'white') {
-              $('#white-player').html('-');
+              $('.white-player').html('-');
             }
             if (data.color == 'black') {
-              $('#black-player').html('-');
+              $('.black-player').html('-');
             }
         });
     },

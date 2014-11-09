@@ -127,6 +127,9 @@ function register_twig_services($sc, $env)
     $sc->register('board_css_glob_asset', 'Assetic\Asset\GlobAsset')
             ->setArguments(array(__DIR__ . '/../resources/css/board/*', array(new Reference('yui_css_compressor_filter'))))
             ->addMethodCall('setTargetPath', array('css/board.css'));
+    $sc->register('status_css_asset', 'Assetic\Asset\FileAsset')
+            ->setArguments(array(__DIR__ . '/../resources/css/status.css'))
+            ->addMethodCall('setTargetPath', array('css/status.css'));
     $sc->register('chess_js_asset', 'Assetic\Asset\FileAsset')
             ->setArguments(array(__DIR__ . '/../resources/js/chess.js'))
             ->addMethodCall('setTargetPath', array('js/chess.js'));
@@ -150,6 +153,7 @@ function register_twig_services($sc, $env)
             ->addMethodCall('set', array('nav', new Reference('nav_css_asset')))
             ->addMethodCall('set', array('register_css', new Reference('register_css_glob_asset')))
             ->addMethodCall('set', array('board_css', new Reference('board_css_glob_asset')))
+            ->addMethodCall('set', array('status', new Reference('status_css_asset')))
             ->addMethodCall('set', array('chess_js', new Reference('chess_js_asset')))
             ->addMethodCall('set', array('chess_remote_js', new Reference('chess_remote_js_asset')))
             ->addMethodCall('set', array('chess_practice_js', new Reference('chess_practice_js_asset')))

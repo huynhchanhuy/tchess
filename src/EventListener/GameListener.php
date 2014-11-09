@@ -13,6 +13,7 @@ use Symfony\Component\HttpKernel\Event\PostResponseEvent;
 use Psr\Log\LoggerInterface;
 use Tchess\MessageManager;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Tchess\Message\Message;
 
 class GameListener implements EventSubscriberInterface
 {
@@ -73,7 +74,7 @@ class GameListener implements EventSubscriberInterface
             $this->em->flush();
         }
 
-        $message = new Message($room->getId(), 'join', array(
+        $message = new Message($room->getId(), 'leave', array(
             'color' => $player->getColor(),
         ));
         $this->messageManager->addMessage($message);
