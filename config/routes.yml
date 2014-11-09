@@ -17,10 +17,12 @@ logout:
 rooms:
     path:     /rooms/{page}
     defaults: { _controller: 'Tchess\Controller\RoomController::indexAction', page: 1 }
+    requirements:
+        room:  \d+
 
 create_room:
     path:     /create-room
-    defaults: { _controller: 'Tchess\Controller\RoomController::createAction' }
+    defaults: { _controller: 'Tchess\Controller\GameController::createAction' }
 
 join_room:
     path:     /join-room/{room}
