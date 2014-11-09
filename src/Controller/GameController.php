@@ -237,6 +237,7 @@ class GameController extends BaseController
 
         $room = $player->getRoom();
         if (!empty($room) && $room instanceof Room) {
+            $em->remove($room->getGame());
             $room->removePlayer($player);
             $player->setRoom(null);
             $em->flush();
