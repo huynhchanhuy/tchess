@@ -343,13 +343,13 @@ function register_socket_services($sc)
         return;
     }
 
-    $sc->register('zmq_context', '\ZMQContext');
+    $sc->register('zmq_context', 'ZMQContext');
 
     $sc->register('socket')
             ->setFactoryService(new Reference('zmq_context'))
             ->setFactoryMethod('getSocket')
-            ->setClass('\ZMQSocket')
+            ->setClass('ZMQSocket')
             ->setArguments(array(\ZMQ::SOCKET_PUSH, 'my pusher'))
-            ->addMethodCall('connect', "tcp://localhost:5555")
+            ->addMethodCall('connect', array('tcp://localhost:5555'))
     ;
 }
