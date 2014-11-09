@@ -48,6 +48,14 @@ class Board implements NormalizableInterface, DenormalizableInterface
     }
 
     /**
+     * Remove piece.
+     */
+    public function removePiece($row, $column)
+    {
+        $this->pieces[$row][$column] = null;
+    }
+
+    /**
      * Set active color
      *
      * @param string $activeColor
@@ -210,16 +218,14 @@ class Board implements NormalizableInterface, DenormalizableInterface
         $this->pieces[$move->getCurrentRow()][$move->getCurrentColumn()] = null;
 
         $piece = &$this->pieces[$move->getNewRow()][$move->getNewColumn()];
-        if ($piece instanceof King || $piece instanceof Rook || $piece instanceof Pawn) {
-            $piece->setHasMoved(true);
-        }
+        $piece->setHasMoved(true);
     }
 
     public function denormalize(DenormalizerInterface $denormalizer, $data, $format = null, array $context = array())
     {
         for ($x = 0; $x < 8; $x++) {
             for ($y = 0; $y < 8; $y++) {
-                $this->pieces[$x][$y] = (isset($data['pieces'][$x][$y]) && !empty($data['pieces'][$x][$y])) ? PieceFactory::create($data['pieces'][$x][$y]) : null;
+                $this->pieces[$x][$y] = (isset($data['pieces'][$x][$y]) && !empty($data['pieces'][$x][$y])) ? PieceFactory::create($data['pieces'][$x][$y], $x, $y, $data['ep']) : null;
             }
         }
 
@@ -232,13 +238,11 @@ class Board implements NormalizableInterface, DenormalizableInterface
                 $this->castlingAvailability = $data['castling'];
             }
         }
-        if (!empty($data['ep']) && (preg_match('/^[a-h]{1}(3|6){1}$/', $data['ep']) || $data['ep'] == '-')) {
-            if ($data['ep'] == '-') {
-                $this->enPassantTarget = '';
-            }
-            else {
-                $this->enPassantTarget = $data['ep'];
-            }
+        if (preg_match('/^[a-h]{1}(3|6){1}$/', $data['ep'])) {
+            $this->enPassantTarget = $data['ep'];
+        }
+        else {
+            $this->enPassantTarget = '';
         }
         $this->fullmoveNumber = $data['fullmove'] > 0 ? $data['fullmove'] : 1;
     }
