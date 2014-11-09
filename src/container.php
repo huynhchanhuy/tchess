@@ -244,7 +244,7 @@ function register_chess_services($sc)
             ->addMethodCall('addSubscriber', array(new Reference('listener.game')))
     ;
 
-    $sc->register('move_manager', 'Tchess\MoveManager');
+    $sc->register('move_manager', 'Tchess\MessageManager');
 }
 
 function register_kernel_services($sc, $env)
@@ -297,7 +297,7 @@ function register_kernel_services($sc, $env)
             // @todo - Don't inject the container.
             ->addMethodCall('setEntityManager', array(new Reference('entity_manager')))
             ->addMethodCall('setFormFactory', array(new Reference('form_factory')))
-            ->addMethodCall('setMoveManager', array(new Reference('move_manager')))
+            ->addMethodCall('setMessageManager', array(new Reference('move_manager')))
             ->addMethodCall('setSerializer', array(new Reference('serializer')))
             ->addMethodCall('setTwig', array(new Reference('twig')))
             ->addMethodCall('setUrlGenerator', array(new Reference('url_generator')))

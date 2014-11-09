@@ -50,6 +50,24 @@ var conn = new ab.Session('ws://localhost:8080',
 
             updateStatus();
         });
+
+        conn.subscribe(chess_room_id + '.join', function(topic, data) {
+            if (data.color == 'white') {
+              $('#white-player').html(data.name);
+            }
+            if (data.color == 'black') {
+              $('#black-player').html(data.name);
+            }
+        });
+
+        conn.subscribe(chess_room_id + '.leave', function(topic, data) {
+            if (data.color == 'white') {
+              $('#white-player').html('-');
+            }
+            if (data.color == 'black') {
+              $('#black-player').html('-');
+            }
+        });
     },
     function() {
         console.warn('WebSocket connection closed');

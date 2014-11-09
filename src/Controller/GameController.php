@@ -13,6 +13,7 @@ use Tchess\Event\MoveEvent;
 use Tchess\Entity\Piece\Move;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Tchess\Entity\Game;
+use Tchess\Message\Message;
 
 class GameController extends BaseController
 {
@@ -330,7 +331,6 @@ class GameController extends BaseController
         $board = $game->getBoard();
         $color = $player->getColor();
         $move = new Move($color, $request->request->get('move'));
-        $move->setRoomId($room->getId());
 
         if ($dispatcher->dispatch(MoveEvents::CHECK_MOVE, new MoveEvent($room, $board, $move, $color))->isValidMove()) {
             $board->movePiece($move);
@@ -343,7 +343,13 @@ class GameController extends BaseController
             $game->addHighlight($move->getSource(), $move->getTarget(), $color);
             $em->flush();
 
-            $this->framework->getMoveManager()->addMove($move);
+            $message = new Message($room->getId(), 'move', array(
+                'source' => $move->getSource(),
+                'target' => $move->getTarget(),
+                'color' => $move->getColor(),
+                'castling' => $move->getCastling(),
+            ));
+            $this->framework->getMessageManager()->addMessage($message);
 
             return json_encode(array(
                 'code' => 200,

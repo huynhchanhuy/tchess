@@ -11,7 +11,7 @@ use Tchess\Entity\Board;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\HttpKernel\Event\PostResponseEvent;
 use Psr\Log\LoggerInterface;
-use Tchess\MoveManager;
+use Tchess\MessageManager;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 class GameListener implements EventSubscriberInterface
@@ -20,15 +20,15 @@ class GameListener implements EventSubscriberInterface
     private $em;
     private $serializer;
     private $logger;
-    private $moveManager;
+    private $messageManager;
     private $socket;
 
-    public function __construct(EntityManagerInterface $em, SerializerInterface $serializer, LoggerInterface $logger, MoveManager $moveManager)
+    public function __construct(EntityManagerInterface $em, SerializerInterface $serializer, LoggerInterface $logger, MessageManager $messageManager)
     {
         $this->em = $em;
         $this->serializer = $serializer;
         $this->logger = $logger;
-        $this->moveManager = $moveManager;
+        $this->messageManager = $messageManager;
     }
 
     public function setSocket($socket = null)
@@ -39,6 +39,7 @@ class GameListener implements EventSubscriberInterface
     public function onRoomJoin(RoomEvent $event)
     {
         $room = $event->getRoom();
+        $player = $event->getPlayer();
 
         if (count($room->getPlayers()) == 2) {
             $board = new Board();
@@ -54,50 +55,56 @@ class GameListener implements EventSubscriberInterface
             $room->setGame($game);
             $this->em->flush();
         }
+
+        $message = new Message($room->getId(), 'join', array(
+            'color' => $player->getColor(),
+            'name' => $player->getName(),
+        ));
+        $this->messageManager->addMessage($message);
     }
 
     public function onRoomLeave(RoomEvent $event)
     {
         $room = $event->getRoom();
+        $player = $event->getPlayer();
 
         if (count($room->getPlayers()) == 0) {
             $this->em->remove($room);
             $this->em->flush();
         }
+
+        $message = new Message($room->getId(), 'join', array(
+            'color' => $player->getColor(),
+        ));
+        $this->messageManager->addMessage($message);
     }
 
     public function onKernelTerminateLogMoves(PostResponseEvent $event)
     {
-        $moves = $this->moveManager->getMoves();
+        $messages = $this->messageManager->getMessages();
 
-        if (empty($moves)) {
+        if (empty($messages)) {
             return;
         }
 
-        foreach ($moves as $move) {
-            $this->logger->info(sprintf("Player '%s' has moved a piece from '%s' to '%s'", $move->getColor(), $move->getSource(), $move->getTarget()));
+        foreach ($messages as $message) {
+            if ($message->getAction() == 'move') {
+                $data = $message->getData();
+                $this->logger->info(sprintf("Player '%s' has moved a piece from '%s' to '%s'", $data['color'], $data['source'], $data['target']));
+            }
         }
     }
 
     public function onKernelTerminateBroadcastMoves(PostResponseEvent $event)
     {
-        $moves = $this->moveManager->getMoves();
+        $messages = $this->messageManager->getMessages();
 
-        if (empty($moves) || empty($this->socket)) {
+        if (empty($messages) || empty($this->socket)) {
             return;
         }
 
-        foreach ($moves as $move) {
-            $data = array(
-                'room' => $move->getRoomId(),
-                'action' => 'move',
-                'source' => $move->getSource(),
-                'target' => $move->getTarget(),
-                'color' => $move->getColor(),
-                'castling' => $move->getCastling(),
-            );
-
-            $this->socket->send(json_encode($data));
+        foreach ($messages as $message) {
+            $this->socket->send(json_encode($message));
         }
     }
 

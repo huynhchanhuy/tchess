@@ -10,18 +10,19 @@ use Tchess\Entity\Piece\Rook;
 use Tchess\Entity\Board;
 use Tchess\Entity\Piece\Move;
 use Tchess\Rule\CheckingMoveInterface;
-use Tchess\MoveManager;
+use Tchess\MessageManager;
 use Tchess\Rule\InCheckRules;
+use Tchess\Message\Message;
 
 class KingRules implements EventSubscriberInterface, CheckingMoveInterface
 {
 
-    private $moveManager;
+    private $messageManager;
     private $inCheckRules;
 
-    public function __construct(MoveManager $moveManager, InCheckRules $inCheckRules)
+    public function __construct(MessageManager $messageManager, InCheckRules $inCheckRules)
     {
-        $this->moveManager = $moveManager;
+        $this->messageManager = $messageManager;
         $this->inCheckRules = $inCheckRules;
     }
 
@@ -123,7 +124,6 @@ class KingRules implements EventSubscriberInterface, CheckingMoveInterface
                 $rook_move->setNewRow($move->getNewRow());
                 $rook_move->setNewColumn($move->getNewColumn() - 1);
                 $rook_move->setCastling(true);
-                $rook_move->setRoomId($room->getId());
 
                 // Remove castling availability.
                 $board->removeCastlingAvailability($color == 'white' ? 'K' : 'k');
@@ -140,16 +140,22 @@ class KingRules implements EventSubscriberInterface, CheckingMoveInterface
                 $rook_move->setNewRow($move->getNewRow());
                 $rook_move->setNewColumn($move->getNewColumn() + 1);
                 $rook_move->setCastling(true);
-                $rook_move->setRoomId($room->getId());
 
                 // Remove castling availability.
                 $board->removeCastlingAvailability($color == 'white' ? 'Q' : 'q');
             }
+            $rook_move->setColor($color);
 
             $board->movePiece($rook_move);
             $piece->setCastled(false);
 
-            $this->moveManager->addMove($rook_move);
+            $message = new Message($room->getId(), 'move', array(
+                'source' => $rook_move->getSource(),
+                'target' => $rook_move->getTarget(),
+                'color' => $rook_move->getColor(),
+                'castling' => $rook_move->getCastling(),
+            ));
+            $this->messageManager->addMessage($message);
         }
     }
 

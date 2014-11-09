@@ -7,7 +7,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Serializer\SerializerInterface;
-use Tchess\MoveManager;
+use Tchess\MessageManager;
 
 interface FrameworkInterface extends HttpKernelInterface
 {
@@ -22,6 +22,6 @@ interface FrameworkInterface extends HttpKernelInterface
     public function getEventDispatcher();
     public function setSerializer(SerializerInterface $serializer);
     public function getSerializer();
-    public function setMoveManager(MoveManager $moveManager);
-    public function getMoveManager();
+    public function setMessageManager(MessageManager $messageManager);
+    public function getMessageManager();
 }
