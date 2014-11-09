@@ -7,7 +7,6 @@ use Tchess\MoveEvents;
 use Tchess\Event\MoveEvent;
 use Tchess\Entity\Piece\King;
 use Tchess\Entity\Piece\Rook;
-use Tchess\Entity\Board;
 use Tchess\Entity\Piece\Move;
 use Tchess\Rule\CheckingMoveInterface;
 use Tchess\MessageManager;
@@ -28,19 +27,17 @@ class KingRules implements EventSubscriberInterface, CheckingMoveInterface
 
     public function onMoveChecking(MoveEvent $event)
     {
-        $board = $event->getBoard();
-        $move = $event->getMove();
-        $piece = $board->getPiece($move->getCurrentRow(), $move->getCurrentColumn());
-        if (!$piece instanceof King) {
-            return;
+        $valid = $this->checkMove($event);
+        if (is_bool($valid)) {
+          $event->setValidMove($valid);
         }
-
-        $valid = $this->checkMove($board, $move);
-        $event->setValidMove($valid);
     }
 
-    public function checkMove(Board $board, Move $move, $color = 'white')
+    public function checkMove(MoveEvent $event)
     {
+        $board = $event->getBoard();
+        $move = $event->getMove();
+
         // @todo - Do we need reference sign here?
         $piece = &$board->getPiece($move->getCurrentRow(), $move->getCurrentColumn());
         if (!$piece instanceof King) {
@@ -61,7 +58,7 @@ class KingRules implements EventSubscriberInterface, CheckingMoveInterface
                 return false;
             }
 
-            if (!$this->inCheckRules->isInCheck($board, $color)) {
+            if (!$this->inCheckRules->isInCheck($event)) {
                 // The king must not be in check while castling.
                 return false;
             }

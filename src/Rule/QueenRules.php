@@ -9,8 +9,6 @@ use Tchess\Entity\Piece\Queen;
 use Tchess\Rule\CheckingMoveInterface;
 use Tchess\Rule\BishopRules;
 use Tchess\Rule\RookRules;
-use Tchess\Entity\Board;
-use Tchess\Entity\Piece\Move;
 
 class QueenRules implements EventSubscriberInterface, CheckingMoveInterface
 {
@@ -26,6 +24,14 @@ class QueenRules implements EventSubscriberInterface, CheckingMoveInterface
 
     public function onMoveChecking(MoveEvent $event)
     {
+        $valid = $this->checkMove($event);
+        if (is_bool($valid)) {
+          $event->setValidMove($valid);
+        }
+    }
+
+    public function checkMove(MoveEvent $event)
+    {
         $board = $event->getBoard();
         $move = $event->getMove();
         $piece = $board->getPiece($move->getCurrentRow(), $move->getCurrentColumn());
@@ -33,13 +39,7 @@ class QueenRules implements EventSubscriberInterface, CheckingMoveInterface
             return;
         }
 
-        $valid = $this->checkMove($board, $move);
-        $event->setValidMove($valid);
-    }
-
-    public function checkMove(Board $board, Move $move, $color = 'white')
-    {
-        return $this->bishopRules->checkMove($board, $move, $color) || $this->rookRules->checkMove($board, $move, $color);
+        return $this->bishopRules->checkMove($event) || $this->rookRules->checkMove($event);
     }
 
     public static function getSubscribedEvents()

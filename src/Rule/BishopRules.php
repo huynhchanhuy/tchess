@@ -6,27 +6,28 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Tchess\MoveEvents;
 use Tchess\Event\MoveEvent;
 use Tchess\Entity\Piece\Bishop;
-use Tchess\Entity\Board;
-use Tchess\Entity\Piece\Move;
 use Tchess\Rule\CheckingMoveInterface;
 
 class BishopRules implements EventSubscriberInterface, CheckingMoveInterface
 {
     public function onMoveChecking(MoveEvent $event)
     {
+        $valid = $this->checkMove($event);
+        if (is_bool($valid)) {
+          $event->setValidMove($valid);
+        }
+    }
+
+    public function checkMove(MoveEvent $event)
+    {
         $board = $event->getBoard();
         $move = $event->getMove();
+
         $piece = $board->getPiece($move->getCurrentRow(), $move->getCurrentColumn());
         if (!$piece instanceof Bishop) {
             return;
         }
 
-        $valid = $this->checkMove($board, $move);
-        $event->setValidMove($valid);
-    }
-
-    public function checkMove(Board $board, Move $move, $color = 'white')
-    {
         if ($move->getCurrentRow() == $move->getNewRow() || $move->getCurrentColumn() == $move->getNewColumn()) {
             // Did not move diagonally.
             return false;

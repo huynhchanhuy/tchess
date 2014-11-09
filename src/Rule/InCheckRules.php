@@ -24,23 +24,27 @@ class InCheckRules implements EventSubscriberInterface, CheckingMoveInterface
 
     public function onMoveChecking(MoveEvent $event)
     {
-        $board = $event->getBoard();
-        $move = $event->getMove();
-        $color = $event->getColor();
-
-        $valid = $this->checkMove($board, $move, $color);
-        $event->setValidMove($valid);
+        $valid = $this->checkMove($event);
+        if (is_bool($valid)) {
+          $event->setValidMove($valid);
+        }
     }
 
-    public function checkMove(Board $board, Move $move, $color = 'white')
+    public function checkMove(MoveEvent $event)
     {
-        $new_board = clone $board;
-        $new_board->movePiece($move);
+        $board = $event->getBoard();
+        $move = $event->getMove();
+
+        $newBoard = clone $board;
+        $newBoard->movePiece($move);
+
+        $newEvent = clone $event;
+        $newEvent->setBoard($newBoard);
 
         // We wont dispatch MoveEvents::MOVE event, because we are checking King
         // is in check, not really move the piece.
 
-        if ($this->isInCheck($new_board, $color)) {
+        if ($this->isInCheck($newEvent)) {
             // The king is still in check.
             return false;
         }
@@ -55,8 +59,11 @@ class InCheckRules implements EventSubscriberInterface, CheckingMoveInterface
         );
     }
 
-    public function isInCheck(Board $board, $color)
+    public function isInCheck(MoveEvent $event)
     {
+        $board = $event->getBoard();
+        $color = $event->getColor();
+
         $kingPos = $this->getKingPos($board, $color);
         list($row, $col) = $kingPos;
 
@@ -71,7 +78,9 @@ class InCheckRules implements EventSubscriberInterface, CheckingMoveInterface
                     $move->setNewRow($row);
                     $move->setNewColumn($col);
 
-                    $event = new MoveEvent($board, $move, $piece->getColor());
+                    $newEvent = clone $event;
+                    $newEvent->setMove($move);
+                    $newEvent->setColor($piece->getColor());
                     if ($this->dispatcher->dispatch(MoveEvents::CHECK_MOVE, $event)->isValidMove()) {
                         return true;
                     }

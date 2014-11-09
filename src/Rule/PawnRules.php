@@ -19,16 +19,18 @@ class PawnRules implements EventSubscriberInterface, CheckingMoveInterface
 {
     public function onMoveChecking(MoveEvent $event)
     {
+        $valid = $this->checkMove($event);
+        if (is_bool($valid)) {
+          $event->setValidMove($valid);
+        }
+    }
+
+    public function checkMove(MoveEvent $event)
+    {
         $board = $event->getBoard();
         $move = $event->getMove();
         $color = $event->getColor();
 
-        $valid = $this->checkMove($board, $move, $color);
-        $event->setValidMove($valid);
-    }
-
-    public function checkMove(Board $board, Move $move, $color = 'white')
-    {
         $piece = $board->getPiece($move->getCurrentRow(), $move->getCurrentColumn());
         if (!$piece instanceof Pawn) {
             return;

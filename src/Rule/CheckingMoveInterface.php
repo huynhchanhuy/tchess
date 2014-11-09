@@ -2,10 +2,9 @@
 
 namespace Tchess\Rule;
 
-use Tchess\Entity\Board;
-use Tchess\Entity\Piece\Move;
+use Tchess\Event\MoveEvent;
 
 interface CheckingMoveInterface
 {
-    public function checkMove(Board $board, Move $move, $color = 'white');
+    public function checkMove(MoveEvent $event);
 }

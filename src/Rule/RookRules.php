@@ -6,13 +6,19 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Tchess\MoveEvents;
 use Tchess\Event\MoveEvent;
 use Tchess\Entity\Piece\Rook;
-use Tchess\Entity\Board;
-use Tchess\Entity\Piece\Move;
 use Tchess\Rule\CheckingMoveInterface;
 
 class RookRules implements EventSubscriberInterface, CheckingMoveInterface
 {
     public function onMoveChecking(MoveEvent $event)
+    {
+        $valid = $this->checkMove($event);
+        if (is_bool($valid)) {
+          $event->setValidMove($valid);
+        }
+    }
+
+    public function checkMove(MoveEvent $event)
     {
         $board = $event->getBoard();
         $move = $event->getMove();
@@ -21,12 +27,6 @@ class RookRules implements EventSubscriberInterface, CheckingMoveInterface
             return;
         }
 
-        $valid = $this->checkMove($board, $move);
-        $event->setValidMove($valid);
-    }
-
-    public function checkMove(Board $board, Move $move, $color = 'white')
-    {
         if ($move->getCurrentRow() != $move->getNewRow() && $move->getCurrentColumn() != $move->getNewColumn()) {
             // Did not move along one rank/file.
             return false;
