@@ -39,7 +39,7 @@ var conn = new ab.Session('ws://localhost:8080',
                 // TODO: show a dialog for choosing promotion.
                 promotion: 'q'
             });
-            board.move(data.source + '-' + data.target);
+            board.position(game.fen());
 
             if (!data.castling) {
                 // Highlight the move.
