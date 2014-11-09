@@ -67,6 +67,10 @@ var conn = new ab.Session('ws://localhost:8080',
             if (data.color == 'black') {
               $('.black-player').html('-');
             }
+            game.reset();
+            board.position('start');
+            removeHighlights('black');
+            removeHighlights('white');
         });
     },
     function() {
