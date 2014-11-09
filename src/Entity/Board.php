@@ -195,7 +195,7 @@ class Board implements NormalizableInterface, DenormalizableInterface
         $this->setActiveColor('white');
         $this->setCastlingAvailability('KQkq');
         $this->setEnPassantTarget('');
-        $this->setFullmoveNumber(0);
+        $this->setFullmoveNumber(1);
     }
 
     /**
@@ -240,7 +240,7 @@ class Board implements NormalizableInterface, DenormalizableInterface
                 $this->enPassantTarget = $data['ep'];
             }
         }
-        $this->fullmoveNumber = $data['fullmove'] > 0 ? $data['fullmove'] : 0;
+        $this->fullmoveNumber = $data['fullmove'] > 0 ? $data['fullmove'] : 1;
     }
 
     public function normalize(NormalizerInterface $normalizer, $format = null, array $context = array())
@@ -267,7 +267,7 @@ class Board implements NormalizableInterface, DenormalizableInterface
         else {
             $data['ep'] = '-';
         }
-        $data['fullmove'] = $this->fullmoveNumber > 0 ? $this->fullmoveNumber : 0;
+        $data['fullmove'] = $this->fullmoveNumber > 0 ? $this->fullmoveNumber : 1;
 
         return $data;
     }
