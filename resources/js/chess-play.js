@@ -25,6 +25,7 @@ var greySquare = function(square) {
 // only pick up pieces for the side to move
 var onDragStart = function(source, piece, position, orientation) {
     if (game.game_over() === true ||
+        (game.turn() !== chess_turn) ||
         (game.turn() === 'w' && piece.search(/^b/) !== -1) ||
         (game.turn() === 'b' && piece.search(/^w/) !== -1)) {
         return false;
@@ -76,6 +77,19 @@ var onDrop = function(source, target) {
 };
 
 var onMouseoverSquare = function(square, piece) {
+    if (piece === false) {
+        return;
+    }
+
+    // do not highlight the piece if the game is over
+    // or the piece is of the oppenent side.
+    if (game.game_over() === true ||
+        (game.turn() !== chess_turn) ||
+        (game.turn() === 'w' && piece.search(/^b/) !== -1) ||
+        (game.turn() === 'b' && piece.search(/^w/) !== -1)) {
+        return;
+    }
+
     // get list of possible moves for this square
     var moves = game.moves({
         square: square,
