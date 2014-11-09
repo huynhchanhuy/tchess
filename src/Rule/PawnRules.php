@@ -216,7 +216,7 @@ class PawnRules implements EventSubscriberInterface, CheckingMoveInterface
                     }
 
                     // Check if there is still an en passant target.
-                    if (epPiece instanceof Pawn && $epPiece->isEpAble()) {
+                    if ($epPiece instanceof Pawn && $epPiece->isEpAble()) {
                         $enPassantCount++;
                     }
                 }
