@@ -32,12 +32,12 @@
             <tr>
               <td>{{ room.id }}</td>
               {% if (room.players[0]) %}
-                <td>{{ (room.players[0]).name }} ({{ (room.players[0]).color }}{{ (room.players[0]).started ? ' - started' : '' }})</td>
+                <td>{{ (room.players[0]).name }} ({{ (room.players[0]).color }})</td>
               {% else %}
                 <td>-</td>
               {% endif %}
               {% if (room.players[1]) %}
-                <td>{{ (room.players[1]).name }} ({{ (room.players[1]).color }}{{ (room.players[1]).started ? ' - started' : '' }})</td>
+                <td>{{ (room.players[1]).name }} ({{ (room.players[1]).color }})</td>
               {% else %}
                 <td>-</td>
               {% endif %}
@@ -48,7 +48,7 @@
                 <span>Current Room</span>
                 {% set inroom = true %}
               {% endif %}
-              {% if room.players[0].started and room.players[1].started %}
+              {% if room.players[0] and room.players[1] %}
                 <a href="{{ path('watch_game', { 'room': room.id }) }}">Watch</a>
               {% endif %}
               </td>

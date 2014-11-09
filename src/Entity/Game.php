@@ -37,11 +37,6 @@ class Game
     protected $board;
 
     /**
-     * @ORM\Column(type="boolean")
-     */
-    protected $started;
-
-    /**
      * @ORM\Column(type="string", nullable=true, options={"default":""})
      */
     protected $highlights;
@@ -132,29 +127,6 @@ class Game
     public function getBoard()
     {
         return $this->board;
-    }
-
-    /**
-     * Set started
-     *
-     * @param boolean $started
-     * @return Game
-     */
-    public function setStarted($started)
-    {
-        $this->started = $started;
-
-        return $this;
-    }
-
-    /**
-     * Get started
-     *
-     * @return boolean
-     */
-    public function getStarted()
-    {
-        return $this->started;
     }
 
     /**

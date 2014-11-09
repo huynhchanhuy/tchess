@@ -4,8 +4,8 @@ namespace Tchess\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Doctrine\ORM\EntityManagerInterface;
-use Tchess\GameEvents;
-use Tchess\Event\GameEvent;
+use Tchess\RoomEvents;
+use Tchess\Event\RoomEvent;
 use Tchess\Entity\Game;
 use Tchess\Entity\Board;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -30,28 +30,32 @@ class GameListener implements EventSubscriberInterface
         $this->moveManager = $moveManager;
     }
 
-    public function onGameStart(GameEvent $event)
+    public function onRoomJoin(RoomEvent $event)
     {
-        $room = $event->getPlayer()->getRoom();
-        $players = $room->getPlayers();
+        $room = $event->getRoom();
 
-        if (count($players) != 2 || $players[0]->getColor() == $players[1]->getColor()) {
-            return;
-        }
-
-        if ($players[0]->getStarted() && $players[1]->getStarted()) {
+        if (count($room->getPlayers()) == 2) {
             $board = new Board();
             $board->initialize();
 
             $game = new Game();
             $game->setRoom($room);
-            $game->setStarted(true);
             $game->setBoard($board);
             $game->saveGame($this->serializer);
 
             $this->em->persist($game);
 
             $room->setGame($game);
+            $this->em->flush();
+        }
+    }
+
+    public function onRoomLeave(RoomEvent $event)
+    {
+        $room = $event->getRoom();
+
+        if (count($room->getPlayers()) == 0) {
+            $this->em->remove($room);
             $this->em->flush();
         }
     }
@@ -96,7 +100,11 @@ class GameListener implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            GameEvents::START => array(array('onGameStart', 0)),
+            RoomEvents::CREATE => array(array('onRoomCreate', 0)),
+            // The second player join start game.
+            RoomEvents::JOIN => array(array('onRoomJoin', 0)),
+            // The last player leave delete room.
+            RoomEvents::LEAVE => array(array('onRoomLeave', 0)),
             KernelEvents::TERMINATE => array('onKernelTerminateLogMoves', -1024),
             KernelEvents::TERMINATE => array('onKernelTerminateBroadcastMoves', -1024),
         );

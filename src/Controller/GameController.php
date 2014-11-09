@@ -6,8 +6,8 @@ namespace Tchess\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Tchess\Entity\Player;
 use Tchess\Entity\Room;
-use Tchess\GameEvents;
-use Tchess\Event\GameEvent;
+use Tchess\RoomEvents;
+use Tchess\Event\RoomEvent;
 use Tchess\MoveEvents;
 use Tchess\Event\MoveEvent;
 use Tchess\Entity\Piece\Move;
@@ -41,11 +41,10 @@ class GameController extends BaseController
             return $this->redirect($this->generateUrl('rooms'));
         }
 
-        $variables['started'] = $player->getStarted();
         $variables['color'] = $player->getColor();
         $game = $player->getRoom()->getGame();
 
-        if (empty($game) || !$game instanceof Game || !$game->getStarted()) {
+        if (empty($game) || !$game instanceof Game) {
             $variables['start_position'] = 'start';
             $variables['highlights'] = '';
         }
@@ -76,7 +75,7 @@ class GameController extends BaseController
         $variables = array();
         $game = $room->getGame();
 
-        if (empty($game) || !$game instanceof Game || !$game->getStarted()) {
+        if (empty($game) || !$game instanceof Game) {
             $variables['start_position'] = 'start';
             $variables['highlights'] = '';
         }
@@ -196,6 +195,9 @@ class GameController extends BaseController
         $player->setRoom($room);
         $em->flush();
 
+        $event = new RoomEvent($room, $player);
+        $this->framework->getEventDispatcher()->dispatch(RoomEvents::JOIN, $event);
+
         return $this->redirect($this->generateUrl('homepage'));
     }
 
@@ -223,7 +225,8 @@ class GameController extends BaseController
             $player->setRoom(null);
             $em->flush();
 
-            $this->framework->getEventDispatcher()->dispatch(GameEvents::LEAVE, new GameEvent($player, $em));
+            $event = new RoomEvent($room, $player);
+            $this->framework->getEventDispatcher()->dispatch(RoomEvents::LEAVE, $event);
         }
 
         return $this->redirect($this->generateUrl('rooms'));
@@ -254,6 +257,9 @@ class GameController extends BaseController
             $em->persist($room);
             $player->setRoom($room);
             $em->flush();
+
+            $event = new RoomEvent($room, $player);
+            $this->framework->getEventDispatcher()->dispatch(RoomEvents::CREATE, $event);
         }
 
         return $this->redirect($this->generateUrl('homepage'));
@@ -280,7 +286,7 @@ class GameController extends BaseController
 
         $game = $player->getRoom()->getGame();
 
-        if (empty($game) || !$game instanceof Game || !$game->getStarted()) {
+        if (empty($game) || !$game instanceof Game) {
             return json_encode(array(
                 'code' => 500,
                 'message' => 'Both players did not start the game'

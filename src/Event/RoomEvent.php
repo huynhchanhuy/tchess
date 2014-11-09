@@ -2,20 +2,20 @@
 
 namespace Tchess\Event;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Tchess\Entity\Player;
+use Tchess\Entity\Room;
 use Symfony\Component\EventDispatcher\Event;
 
-class GameEvent extends Event
+class RoomEvent extends Event
 {
 
     private $player;
-    private $em;
+    private $room;
 
-    public function __construct(Player $player, EntityManagerInterface $em)
+    public function __construct(Room $room, Player $player)
     {
         $this->setPlayer($player);
-        $this->setEntityManager($em);
+        $this->setRoom($room);
     }
 
     public function getPlayer()
@@ -28,14 +28,14 @@ class GameEvent extends Event
         $this->player = $player;
     }
 
-    public function getEntityManager()
+    public function getRoom()
     {
-        return $this->em;
+        return $this->room;
     }
 
-    public function setEntityManager($em)
+    public function setRoom($room)
     {
-        $this->em = $em;
+        $this->room = $room;
     }
 
 }

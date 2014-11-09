@@ -35,11 +35,6 @@ class Player
     protected $color;
 
     /**
-     * @ORM\Column(type="boolean")
-     */
-    protected $started;
-
-    /**
      * @ORM\Column(type="string")
      */
     protected $name;
@@ -98,29 +93,6 @@ class Player
     public function getColor()
     {
         return $this->color;
-    }
-
-    /**
-     * Set started
-     *
-     * @param boolean $started
-     * @return Player
-     */
-    public function setStarted($started)
-    {
-        $this->started = $started;
-
-        return $this;
-    }
-
-    /**
-     * Get started
-     *
-     * @return boolean
-     */
-    public function getStarted()
-    {
-        return $this->started;
     }
 
     /**
