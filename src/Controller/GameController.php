@@ -296,7 +296,7 @@ class GameController extends BaseController
 
         $player = $em->getRepository('Tchess\Entity\Player')->findOneBy(array('sid' => $sid));
 
-        if (empty($player) || ($player instanceof Player)) {
+        if (empty($player) || !($player instanceof Player)) {
             return json_encode(array(
                 'code' => 500,
                 'message' => 'Player did not register'

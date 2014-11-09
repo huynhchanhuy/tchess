@@ -1,3 +1,12 @@
-<h2><span id="white-player">{{ players.white ? players.white : '-' }}</span> <img style="height: 49px; width: 49px;" src="/js-vendor/tienvx/chessboardjs/img/chesspieces/wikipedia/wP.png"> vs <span id="black-player">{{ players.black ? players.black : '-' }}</span> <img style="height: 49px; width: 49px;" src="/js-vendor/tienvx/chessboardjs/img/chesspieces/wikipedia/bP.png"></h2>
+<div id="message">
+</div>
+<div id="message-template" style="display: none;">
+    <div class="alert alert-danger alert-dismissible" role="alert">
+        <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <span class="message"></span>
+    </div>
+</div>
+
+<h2><img style="height: 49px; width: 49px;" src="/js-vendor/tienvx/chessboardjs/img/chesspieces/wikipedia/wP.png"><span id="white-player">{{ players.white ? players.white : '-' }}</span> vs <span id="black-player">{{ players.black ? players.black : '-' }}</span><img style="height: 49px; width: 49px;" src="/js-vendor/tienvx/chessboardjs/img/chesspieces/wikipedia/bP.png"></h2>
 
 <p>Status: <span id="status"></span></p>

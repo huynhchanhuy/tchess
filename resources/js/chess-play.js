@@ -63,6 +63,9 @@ var onDrop = function(source, target) {
                 // Move piece back.
                 game.undo();
                 board.position(game.fen());
+
+                $('#message').html($('#message-template').html());
+                $('#message .message').html(data.message);
             }
 
             updateStatus();

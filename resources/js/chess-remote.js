@@ -1,5 +1,5 @@
 var boardEl = $('#board'),
-squareClass = 'square-55d63'
+    squareClass = 'square-55d63'
 ;
 
 var removeHighlights = function(color) {
