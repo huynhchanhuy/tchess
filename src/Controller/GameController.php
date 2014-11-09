@@ -53,6 +53,10 @@ class GameController extends BaseController
             $variables['highlights'] = trim($game->getHighlights());
         }
 
+        foreach ($room->getPlayers() as $roomPlayer) {
+            $variables['players'][$roomPlayer->getColor()] = $roomPlayer->getName();
+        }
+
         return $this->render('homepage.html.twig', $variables);
     }
 
@@ -84,6 +88,10 @@ class GameController extends BaseController
         else {
             $variables['start_position'] = $game->getState();
             $variables['highlights'] = trim($game->getHighlights());
+        }
+
+        foreach ($room->getPlayers() as $roomPlayer) {
+            $variables['players'][$roomPlayer->getColor()] = $roomPlayer->getName();
         }
 
         return $this->render('watch.html.twig', $variables);

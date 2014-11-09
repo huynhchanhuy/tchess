@@ -10,9 +10,7 @@
 
 {% block body %}
 <div class="container">
-    <h2>Player1 (white) vs Player2 (black)</h2>
-
-    <p>Status: <span id="status"></span></p>
+    {% include 'status.html.twig' with players %}
 
     <div id="board"></div>
 
