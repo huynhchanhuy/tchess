@@ -165,6 +165,11 @@ class GameController extends BaseController
     public function logoutAction(Request $request)
     {
         $session = $request->getSession();
+
+        $sub_request = Request::create('/leave-room');
+        $sub_request->setSession($session);
+        $this->framework->handle($sub_request, HttpKernelInterface::SUB_REQUEST);
+
         $session->invalidate();
         return $this->redirect($this->generateUrl('register'));
     }
