@@ -320,17 +320,18 @@ class GameController extends BaseController
             ));
         }
 
-        if ($game->getBoard()->getActiveColor() != $player->getColor()) {
+        $serializer = $this->framework->getSerializer();
+        $game->loadGame($serializer);
+        $board = $game->getBoard();
+        $color = $player->getColor();
+
+        if ($board->getActiveColor() != $color) {
             return json_encode(array(
                 'code' => 500,
                 'message' => 'This is not your turn'
             ));
         }
 
-        $serializer = $this->framework->getSerializer();
-        $game->loadGame($serializer);
-        $board = $game->getBoard();
-        $color = $player->getColor();
         $move = new Move($color, $request->request->get('move'));
 
         if ($dispatcher->dispatch(MoveEvents::CHECK_MOVE, new MoveEvent($room, $board, $move, $color))->isValidMove()) {
