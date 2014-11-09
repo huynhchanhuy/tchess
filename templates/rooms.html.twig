@@ -57,10 +57,10 @@
         {% endif %}
       </tbody>
     </table>
-        <div class="btn-group game-buttons">
+        <div class="btn-group">
             {% if inroom %}
                 <a class="btn btn-primary" href="/">Go to your room</a>
-                <button type="button" class="btn btn-danger btn-leave">Leave your room</button>
+                <a class="btn btn-danger" href="{{ path('leave_room') }}">Leave room</a>
             {% else %}
                 <a class="btn btn-primary" href="{{ path('create_room') }}">Create room</a>
             {% endif %}
@@ -70,9 +70,4 @@
     {% include 'paginator.html.twig' with vars %}
 
     </div> <!-- /container -->
-{% endblock %}
-
-{% block javascripts %}
-<script src="/js-vendor/tienvx/jquery/jquery-1.11.1.min.js"></script>
-<script src="/resources/js/game-buttons.js"></script>
 {% endblock %}

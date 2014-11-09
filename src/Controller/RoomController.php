@@ -61,8 +61,8 @@ class RoomController extends BaseController
             return $this->redirect($this->generateUrl('register'));
         }
 
-        $last_room = $player->getRoom();
-        if (empty($last_room) || !$last_room instanceof Room) {
+        $joined_room = $player->getRoom();
+        if (empty($joined_room) || !$joined_room instanceof Room) {
             $room = new Room();
             $room->addPlayer($player);
             $em->persist($room);

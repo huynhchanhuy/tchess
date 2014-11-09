@@ -140,9 +140,6 @@ function register_twig_services($sc, $env)
     $sc->register('chess_play_js_asset', 'Assetic\Asset\FileAsset')
             ->setArguments(array(__DIR__ . '/../resources/js/chess-play.js'))
             ->addMethodCall('setTargetPath', array('js/chess-play.js'));
-    $sc->register('game_buttons_js_asset', 'Assetic\Asset\FileAsset')
-            ->setArguments(array(__DIR__ . '/../resources/js/game-buttons.js'))
-            ->addMethodCall('setTargetPath', array('js/game-buttons.js'));
     $sc->register('favicon_asset', 'Assetic\Asset\FileAsset')
             ->setArguments(array(__DIR__ . '/../resources/images/favicon.ico'))
             ->addMethodCall('setTargetPath', array('images/favicon.ico'));
@@ -156,7 +153,6 @@ function register_twig_services($sc, $env)
             ->addMethodCall('set', array('chess_practice_js', new Reference('chess_practice_js_asset')))
             ->addMethodCall('set', array('chess_watch_js', new Reference('chess_watch_js_asset')))
             ->addMethodCall('set', array('chess_play_js', new Reference('chess_play_js_asset')))
-            ->addMethodCall('set', array('game_buttons_js', new Reference('game_buttons_js_asset')))
             ->addMethodCall('set', array('favicon', new Reference('favicon_asset')))
     ;
 

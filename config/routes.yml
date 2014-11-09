@@ -14,10 +14,6 @@ logout:
     path:     /logout
     defaults: { _controller: 'Tchess\Controller\GameController::logoutAction' }
 
-auto_join_room:
-    path:     /auto-join-room
-    defaults: { _controller: 'Tchess\Controller\GameController::autoJoinAction' }
-
 rooms:
     path:     /rooms/{page}
     defaults: { _controller: 'Tchess\Controller\RoomController::indexAction', page: 1 }
@@ -38,25 +34,9 @@ watch_game:
     requirements:
         room:  \d+
 
-start_game:
-    path:     /start-game
-    defaults: { _controller: 'Tchess\Controller\GameController::startAction', _format: 'json' }
-    methods:  [POST]
-
-stop_game:
-    path:     /stop-game
-    defaults: { _controller: 'Tchess\Controller\GameController::stopAction', _format: 'json' }
-    methods:  [POST]
-
-restart_game:
-    path:     /restart-game
-    defaults: { _controller: 'Tchess\Controller\GameController::restartAction', _format: 'json' }
-    methods:  [POST]
-
-leave_game:
-    path:     /leave-game
-    defaults: { _controller: 'Tchess\Controller\GameController::leaveAction', _format: 'json' }
-    methods:  [POST]
+leave_room:
+    path:     /leave-room
+    defaults: { _controller: 'Tchess\Controller\GameController::leaveAction' }
 
 move_piece:
     path:     /move-piece

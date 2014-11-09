@@ -4,7 +4,6 @@ namespace Tchess\Controller;
 
 //use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Tchess\Entity\Player;
 use Tchess\Entity\Room;
 use Tchess\GameEvents;
@@ -37,8 +36,8 @@ class GameController extends BaseController
             return $this->redirect($this->generateUrl('register'));
         }
 
-        $last_room = $player->getRoom();
-        if (empty($last_room) || !$last_room instanceof Room) {
+        $room = $player->getRoom();
+        if (empty($room) || !$room instanceof Room) {
             return $this->redirect($this->generateUrl('rooms'));
         }
 
@@ -132,7 +131,6 @@ class GameController extends BaseController
                 $data = $form->getData();
                 $player = new Player();
                 $player->setSid($sid);
-                $player->setStarted(false);
                 $player->setName($data['name']);
                 // Default color for all player, will be updated later.
                 $player->setColor('white');
@@ -163,7 +161,7 @@ class GameController extends BaseController
     }
 
     /**
-     * Join game.
+     * Join room.
      *
      * @param \Symfony\Component\HttpFoundation\Request $request
      * @return string
@@ -180,20 +178,16 @@ class GameController extends BaseController
             return $this->redirect($this->generateUrl('register'));
         }
 
-        $last_room = $player->getRoom();
-        if (!empty($last_room) && $last_room instanceof Room) {
-            if ($last_room->getId() != $room) {
-                throw new \LogicException('Player already join another room', ExceptionCodes::PLAYER);
-            } else {
-                return $this->redirect($this->generateUrl('homepage'));
-            }
+        $joined_room = $player->getRoom();
+        if (!empty($joined_room) && $joined_room instanceof Room) {
+            return $this->redirect($this->generateUrl('homepage'));
         }
 
         $room = $em->getRepository('Tchess\Entity\Room')->findOneBy(array('id' => $room));
         $players = $room->getPlayers();
 
         if (count($players) != 1) {
-            throw new \LogicException('Room must have only one players to join', ExceptionCodes::PLAYER);
+            return $this->redirect($this->generateUrl('rooms'));
         }
 
         $opponent_player = current(reset($players));
@@ -206,116 +200,7 @@ class GameController extends BaseController
     }
 
     /**
-     * Start game.
-     *
-     * @param \Symfony\Component\HttpFoundation\Request $request
-     * @return string
-     */
-    public function startAction(Request $request)
-    {
-        $em = $this->framework->getEntityManager();
-        $session = $request->getSession();
-        $sid = $session->getId();
-
-        $player = $em->getRepository('Tchess\Entity\Player')->findOneBy(array('sid' => $sid));
-
-        if (empty($player) || !$player instanceof Player) {
-            throw new \LogicException('Player did not join a room', ExceptionCodes::PLAYER);
-        }
-
-        if ($player->getStarted()) {
-            throw new \LogicException('Game has been already started', ExceptionCodes::PLAYER);
-        }
-
-        $player->setStarted(true);
-        $em->flush();
-
-        $this->framework->getEventDispatcher()->dispatch(GameEvents::START, new GameEvent($player, $em));
-        return json_encode(array(
-                    'message' => 'Game started',
-                    'code' => 200
-                ));
-    }
-
-    /**
-     * Stop game.
-     *
-     * @param \Symfony\Component\HttpFoundation\Request $request
-     * @return string
-     */
-    public function stopAction(Request $request)
-    {
-        $em = $this->framework->getEntityManager();
-        $session = $request->getSession();
-        $sid = $session->getId();
-
-        $player = $em->getRepository('Tchess\Entity\Player')->findOneBy(array('sid' => $sid));
-
-        if (empty($player) || !$player instanceof Player) {
-            throw new \LogicException('Player did not join a room', ExceptionCodes::PLAYER);
-        }
-
-        if (!$player->getStarted()) {
-            throw new \LogicException('Game is not started', ExceptionCodes::PLAYER);
-        }
-
-        $player->setStarted(false);
-        $em->flush();
-
-        $this->framework->getEventDispatcher()->dispatch(GameEvents::STOP, new GameEvent($player, $em));
-        return json_encode(array(
-                    'message' => 'Game stopped',
-                    'code' => 200
-                ));
-    }
-
-    /**
-     * Restart game.
-     *
-     * @param \Symfony\Component\HttpFoundation\Request $request
-     * @return string
-     */
-    public function restartAction(Request $request)
-    {
-        $em = $this->framework->getEntityManager();
-        $session = $request->getSession();
-        $sid = $session->getId();
-
-        $player = $em->getRepository('Tchess\Entity\Player')->findOneBy(array('sid' => $sid));
-
-        if (empty($player) || !$player instanceof Player) {
-            throw new \LogicException('Player did not join a room', ExceptionCodes::PLAYER);
-        }
-
-        if ($player->getStarted()) {
-            $stop_sub_request = Request::create('/stop-game');
-            $stop_sub_request->setSession($session);
-            $this->framework->handle($stop_sub_request, HttpKernelInterface::SUB_REQUEST);
-
-            $start_sub_request = Request::create('/start-game');
-            $start_sub_request->setSession($session);
-            $this->framework->handle($start_sub_request, HttpKernelInterface::SUB_REQUEST);
-        } else {
-            $sub_request = Request::create('/start-game');
-            $sub_request->setSession($session);
-            $this->framework->handle($sub_request, HttpKernelInterface::SUB_REQUEST);
-        }
-
-        $player = $em->getRepository('Tchess\Entity\Player')->findOneBy(array('sid' => $sid));
-        if ($player->getStarted()) {
-
-            $this->framework->getEventDispatcher()->dispatch(GameEvents::RESTART, new GameEvent($player, $em));
-            return json_encode(array(
-                    'message' => 'Game re-started',
-                    'code' => 200
-                ));
-        } else {
-            throw new \Exception('There is unknown error while re-starting game');
-        }
-    }
-
-    /**
-     * Leave game.
+     * Leave room.
      *
      * @param \Symfony\Component\HttpFoundation\Request $request
      * @return string
@@ -329,23 +214,19 @@ class GameController extends BaseController
         $player = $em->getRepository('Tchess\Entity\Player')->findOneBy(array('sid' => $sid));
 
         if (empty($player) || !$player instanceof Player) {
-            throw new \LogicException('Player did not join a room', ExceptionCodes::PLAYER);
+            return $this->redirect($this->generateUrl('register'));
         }
 
-        if (!$player->getRoom()) {
-            throw new \LogicException('Player did not join a room', ExceptionCodes::PLAYER);
+        $room = $player->getRoom();
+        if (!empty($room) && $room instanceof Room) {
+            $room->removePlayer($player);
+            $player->setRoom(null);
+            $em->flush();
+
+            $this->framework->getEventDispatcher()->dispatch(GameEvents::LEAVE, new GameEvent($player, $em));
         }
 
-        $player->getRoom()->removePlayer($player);
-        $player->setRoom();
-        $player->setStarted(false);
-        $em->flush();
-
-        $this->framework->getEventDispatcher()->dispatch(GameEvents::LEAVE, new GameEvent($player, $em));
-        return json_encode(array(
-                    'message' => 'Leaved game',
-                    'code' => 200
-                ));
+        return $this->redirect($this->generateUrl('rooms'));
     }
 
     /**
