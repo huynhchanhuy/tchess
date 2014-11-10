@@ -58,7 +58,7 @@ class KingRules implements EventSubscriberInterface, CheckingMoveInterface
                 return false;
             }
 
-            if (!$this->inCheckRules->isInCheck($event)) {
+            if ($this->inCheckRules->isInCheck($event)) {
                 // The king must not be in check while castling.
                 return false;
             }

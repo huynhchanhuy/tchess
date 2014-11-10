@@ -81,7 +81,7 @@ class InCheckRules implements EventSubscriberInterface, CheckingMoveInterface
                     $newEvent = clone $event;
                     $newEvent->setMove($move);
                     $newEvent->setColor($piece->getColor());
-                    if ($this->dispatcher->dispatch(MoveEvents::CHECK_MOVE, $event)->isValidMove()) {
+                    if ($this->dispatcher->dispatch(MoveEvents::CHECK_MOVE, $newEvent)->isValidMove()) {
                         return true;
                     }
                 }
