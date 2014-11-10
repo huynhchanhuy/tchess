@@ -75,10 +75,30 @@ class RookRules implements EventSubscriberInterface, CheckingMoveInterface
         return true;
     }
 
+    public function onMoveRemoveCastlingAvailability(MoveEvent $event)
+    {
+        $board = &$event->getBoard();
+        $move = $event->getMove();
+        $color = $event->getColor();
+        $piece = &$board->getPiece($move->getNewRow(), $move->getNewColumn());
+        if (!$piece instanceof Rook) {
+            return;
+        }
+
+        if ($move->getCurrentColumn() == 0) {
+            // Queenside.
+            $board->removeCastlingAvailability($color == 'white' ? 'Q' : 'q');
+        } elseif ($move->getCurrentColumn() == 7) {
+            // Kingside.
+            $board->removeCastlingAvailability($color == 'white' ? 'K' : 'k');
+        }
+    }
+
     public static function getSubscribedEvents()
     {
         return array(
             MoveEvents::CHECK_MOVE => array(array('onMoveChecking', 0)),
+            MoveEvents::MOVE => array(array('onMoveRemoveCastlingAvailability', 0)),
         );
     }
 

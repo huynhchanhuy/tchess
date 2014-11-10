@@ -121,9 +121,6 @@ class KingRules implements EventSubscriberInterface, CheckingMoveInterface
                 $rook_move->setNewRow($move->getNewRow());
                 $rook_move->setNewColumn($move->getNewColumn() - 1);
                 $rook_move->setCastling(true);
-
-                // Remove castling availability.
-                $board->removeCastlingAvailability($color == 'white' ? 'K' : 'k');
             } else {
                 $rook = $board->getPiece($move->getNewRow(), $move->getNewColumn() - 2);
                 if (!$rook instanceof Rook || $rook->isMoved()) {
@@ -137,9 +134,6 @@ class KingRules implements EventSubscriberInterface, CheckingMoveInterface
                 $rook_move->setNewRow($move->getNewRow());
                 $rook_move->setNewColumn($move->getNewColumn() + 1);
                 $rook_move->setCastling(true);
-
-                // Remove castling availability.
-                $board->removeCastlingAvailability($color == 'white' ? 'Q' : 'q');
             }
             $rook_move->setColor($color);
 
@@ -156,11 +150,27 @@ class KingRules implements EventSubscriberInterface, CheckingMoveInterface
         }
     }
 
+    public function onMoveRemoveCastlingAvailability(MoveEvent $event)
+    {
+        $board = &$event->getBoard();
+        $move = $event->getMove();
+        $color = $event->getColor();
+        $piece = &$board->getPiece($move->getNewRow(), $move->getNewColumn());
+        if (!$piece instanceof King) {
+            return;
+        }
+
+        // Remove castling availability.
+        $board->removeCastlingAvailability($color == 'white' ? 'K' : 'k');
+        $board->removeCastlingAvailability($color == 'white' ? 'Q' : 'q');
+    }
+
     public static function getSubscribedEvents()
     {
         return array(
             MoveEvents::CHECK_MOVE => array(array('onMoveChecking', 0)),
             MoveEvents::MOVE => array(array('onMoveDoCastling', 0)),
+            MoveEvents::MOVE => array(array('onMoveRemoveCastlingAvailability', 0)),
         );
     }
 
