@@ -1,3 +1,5 @@
+var game = new Chess(chess_start_position);
+
 var cfg = {
     draggable: false,
     position: chess_start_position,
