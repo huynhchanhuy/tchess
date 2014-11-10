@@ -14,6 +14,7 @@ use Tchess\Entity\Piece\Move;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Tchess\Entity\Game;
 use Tchess\Message\Message;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class GameController extends BaseController
 {
