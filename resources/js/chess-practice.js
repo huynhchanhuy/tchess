@@ -51,6 +51,8 @@ var cfg = {
     onDragStart: onDragStart,
     onDrop: onDrop,
     onSnapEnd: onSnapEnd,
+    onMouseoutSquare: onMouseoutSquare,
+    onMouseoverSquare: onMouseoverSquare,
     pieceTheme: pieceTheme
 };
 board = new ChessBoard('board', cfg);
