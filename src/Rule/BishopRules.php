@@ -6,12 +6,21 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Tchess\MoveEvents;
 use Tchess\Event\MoveEvent;
 use Tchess\Entity\Piece\Bishop;
+use Tchess\Entity\Piece\Queen;
 use Tchess\Rule\CheckingMoveInterface;
 
 class BishopRules implements EventSubscriberInterface, CheckingMoveInterface
 {
     public function onMoveChecking(MoveEvent $event)
     {
+        $board = $event->getBoard();
+        $move = $event->getMove();
+
+        $piece = $board->getPiece($move->getCurrentRow(), $move->getCurrentColumn());
+        if (!$piece instanceof Bishop) {
+            return;
+        }
+
         $valid = $this->checkMove($event);
         if (is_bool($valid)) {
           $event->setValidMove($valid);
@@ -24,7 +33,7 @@ class BishopRules implements EventSubscriberInterface, CheckingMoveInterface
         $move = $event->getMove();
 
         $piece = $board->getPiece($move->getCurrentRow(), $move->getCurrentColumn());
-        if (!$piece instanceof Bishop) {
+        if (!$piece instanceof Bishop && !$piece instanceof Queen) {
             return;
         }
 

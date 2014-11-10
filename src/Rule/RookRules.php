@@ -6,12 +6,20 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Tchess\MoveEvents;
 use Tchess\Event\MoveEvent;
 use Tchess\Entity\Piece\Rook;
+use Tchess\Entity\Piece\Queen;
 use Tchess\Rule\CheckingMoveInterface;
 
 class RookRules implements EventSubscriberInterface, CheckingMoveInterface
 {
     public function onMoveChecking(MoveEvent $event)
     {
+        $board = $event->getBoard();
+        $move = $event->getMove();
+        $piece = $board->getPiece($move->getCurrentRow(), $move->getCurrentColumn());
+        if (!$piece instanceof Rook) {
+            return;
+        }
+
         $valid = $this->checkMove($event);
         if (is_bool($valid)) {
           $event->setValidMove($valid);
@@ -23,7 +31,7 @@ class RookRules implements EventSubscriberInterface, CheckingMoveInterface
         $board = $event->getBoard();
         $move = $event->getMove();
         $piece = $board->getPiece($move->getCurrentRow(), $move->getCurrentColumn());
-        if (!$piece instanceof Rook) {
+        if (!$piece instanceof Rook && !$piece instanceof Queen) {
             return;
         }
 
