@@ -2,38 +2,22 @@
 
 namespace Tchess\Rule;
 
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Tchess\MoveEvents;
 use Tchess\Event\MoveEvent;
 use Tchess\Entity\Piece\Bishop;
 use Tchess\Entity\Piece\Queen;
-use Tchess\Rule\CheckingMoveInterface;
+use Tchess\Rule\MoveCheckerInterface;
 
-class BishopRules implements EventSubscriberInterface, CheckingMoveInterface
+class BishopRules implements MoveCheckerInterface
 {
-    public function onMoveChecking(MoveEvent $event)
+    public function checkMove(MoveEvent $event, $fromQueen = false)
     {
         $board = $event->getBoard();
         $move = $event->getMove();
 
         $piece = $board->getPiece($move->getCurrentRow(), $move->getCurrentColumn());
-        if (!$piece instanceof Bishop) {
-            return;
-        }
 
-        $valid = $this->checkMove($event);
-        if (is_bool($valid)) {
-          $event->setValidMove($valid);
-        }
-    }
-
-    public function checkMove(MoveEvent $event)
-    {
-        $board = $event->getBoard();
-        $move = $event->getMove();
-
-        $piece = $board->getPiece($move->getCurrentRow(), $move->getCurrentColumn());
-        if (!$piece instanceof Bishop && !$piece instanceof Queen) {
+        // not (bishop or (queen and from-queen)).
+        if (!$piece instanceof Bishop && (!$piece instanceof Queen || !$fromQueen)) {
             return;
         }
 
@@ -70,11 +54,9 @@ class BishopRules implements EventSubscriberInterface, CheckingMoveInterface
         return true;
     }
 
-    public static function getSubscribedEvents()
+    public static function getRules()
     {
-        return array(
-            MoveEvents::CHECK_MOVE => array(array('onMoveChecking', 0)),
-        );
+        return array(array('checkMove', 0));
     }
 
 }

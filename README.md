@@ -25,7 +25,7 @@ Run a web browser and open example.com
 Realtime checking opponent move
 -------------------------------
 
-If you want the realtime checking move feature, you need install ZeroMQ and
+If you want the realtime move checking feature, you need install ZeroMQ and
 php-zmq. Follow these instructions:
 
  * http://zeromq.org/bindings:php

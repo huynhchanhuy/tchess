@@ -2,93 +2,131 @@
 
 namespace Tchess\Entity\Piece;
 
+use Symfony\Component\Validator\Constraints as Assert;
+
 class Move
 {
+    /**
+     * @Assert\Choice(callback = "getColors")
+     */
     protected $color;
-    protected $move;
+
+    /**
+     * @Assert\Regex("/^[a-h][1-8]$/")
+     */
     protected $source;
+
+    /**
+     * @Assert\Regex("/^[a-h][1-8]$/")
+     */
     protected $target;
+
+    /**
+     * @Assert\Choice(callback = "getPromotions")
+     */
+    protected $promotion;
+
     protected $currentRow;
     protected $currentColumn;
     protected $newRow;
     protected $newColumn;
-    protected $promotion;
+
+    /**
+     * @Assert\Type(type="bool")
+     */
     protected $castling;
 
-    public function __construct($color = 'white', $move = '')
+    /**
+     * Column map.
+     *
+     * @var array
+     */
+    protected static $map = array(
+        'a' => 0,
+        'b' => 1,
+        'c' => 2,
+        'd' => 3,
+        'e' => 4,
+        'f' => 5,
+        'g' => 6,
+        'h' => 7,
+    );
+
+    public function __construct($color = 'white', $move = '', $castling = false)
     {
         $this->setColor($color);
 
         if (!empty($move)) {
-            $this->move = $move;
             $parts = explode(' ', $move);
             if (count($parts) == 2) {
-                list($source, $target) = $parts;
-                $promotion = 'Q';
+                list($this->source, $this->target) = $parts;
+                $this->promotion = 'Q';
             }
             else if (count($parts) == 3) {
-                list($source, $target, $promotion) = $parts;
+                list($this->source, $this->target, $this->promotion) = $parts;
             }
             else {
                 throw new \InvalidArgumentException('Move must be "a1 b2" or "a1 b2 Q".');
             }
-            $this->setSource($source);
-            $this->setTarget($target);
-            $this->setPromotion($promotion);
         }
 
-        $this->castling = false;
+        $this->setCastling($castling);
     }
 
     /**
-     * Get color
+     * Get valid colors.
+     *
+     * @return array
+     */
+    public static function getColors()
+    {
+        return array('white', 'black');
+    }
+
+    /**
+     * Get valid promotions.
+     *
+     * @return array
+     */
+    public static function getPromotions()
+    {
+        return array('Q', 'K', 'B', 'R');
+    }
+
+    /**
+     * Get index from square.
+     *
+     * @param string $square
+     *
+     * @return array
+     * @throws \InvalidArgumentException
+     */
+    public static function getIndex($square = 'a1')
+    {
+        if (!preg_match("/^[a-h]{1}[1-8]{1}$/", $square)) {
+            throw new \InvalidArgumentException('Invalid square');
+        }
+        $column = static::$map[$square[0]];
+        $row = ((int) $square[1]) - 1;
+        return array($row, $column);
+    }
+
+    /**
+     * Get square from index.
+     *
+     * @param int $row
+     * @param int $column
      *
      * @return string
+     * @throws \InvalidArgumentException
      */
-    public function getMove()
+    public static function getSquare($row = 0, $column = 0)
     {
-        return $this->move;
-    }
-
-    /**
-     * Get column.
-     */
-    private function getColumn($column, $char_to_number = true)
-    {
-        $map = array(
-            'a' => 0,
-            'b' => 1,
-            'c' => 2,
-            'd' => 3,
-            'e' => 4,
-            'f' => 5,
-            'g' => 6,
-            'h' => 7,
-        );
-        if (!$char_to_number) {
-            $map = array_flip($map);
+        if ($row < 0 || $row > 7 || $column < 0 || $column > 7) {
+            throw new \InvalidArgumentException('Invalid index');
         }
-        $ch = strtolower($column);
-        if (isset($map[$ch])) {
-            return $map[$ch];
-        }
-        throw new \InvalidArgumentException('Invalid board column. It must be one of these letter (a, b, c, d, e, f, g ,h).');
-    }
-
-    /**
-     * Get row.
-     */
-    private function getRow($row, $number_to_index = true)
-    {
-        if ((($number_to_index) && ($row < 1 || $row > 8)) || (!($number_to_index) && ($row < 0 || $row > 7))) {
-            throw new \InvalidArgumentException('Invalid board row');
-        }
-        if ($number_to_index) {
-            return (int) ($row) - 1;
-        }
-        else {
-            return (int) ($row) + 1;
-        }
+        $map = array_flip(static::$map);
+        return $map[$column] . ($row + 1);
     }
 
     public function getCurrentRow()
@@ -133,39 +171,21 @@ class Move
 
     public function getSource()
     {
-        if (!empty($this->source)) {
-            return $this->source;
-        }
-        else {
-            // Build source.
-            $this->source = $this->getColumn($this->getCurrentColumn(), false) . $this->getRow($this->getCurrentRow(), false);
-        }
         return $this->source;
     }
 
     public function setSource($source)
     {
-        $this->setCurrentRow($this->getRow($source[1]));
-        $this->setCurrentColumn($this->getColumn($source[0]));
         $this->source = $source;
     }
 
     public function getTarget()
     {
-        if (!empty($this->target)) {
-            return $this->target;
-        }
-        else {
-            // Build source.
-            $this->target = $this->getColumn($this->getNewColumn(), false) . $this->getRow($this->getNewRow(), false);
-        }
         return $this->target;
     }
 
     public function setTarget($target)
     {
-        $this->setNewRow($this->getRow($target[1]));
-        $this->setNewColumn($this->getColumn($target[0]));
         $this->target = $target;
     }
 
@@ -176,10 +196,6 @@ class Move
 
     public function setPromotion($promotion)
     {
-        $promotion = strtoupper($promotion);
-        if (!in_array($promotion, array('Q', 'K', 'B', 'R'))) {
-            $promotion = 'Q';
-        }
         $this->promotion = $promotion;
     }
 
@@ -190,9 +206,6 @@ class Move
 
     public function setColor($color)
     {
-        if (!in_array($color, array('white', 'black'))) {
-            $color = 'white';
-        }
         $this->color = $color;
     }
 

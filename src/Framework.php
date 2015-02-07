@@ -5,10 +5,10 @@ namespace Tchess;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Tchess\FrameworkInterface;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Validator\ValidatorInterface;
 
 class Framework extends HttpKernel implements FrameworkInterface
 {
@@ -19,6 +19,7 @@ class Framework extends HttpKernel implements FrameworkInterface
     protected $serializer;
     protected $twig;
     protected $url_generator;
+    protected $validator;
 
     public function getEntityManager()
     {
@@ -28,6 +29,11 @@ class Framework extends HttpKernel implements FrameworkInterface
     public function getEventDispatcher()
     {
         return $this->dispatcher;
+    }
+
+    public function getValidator()
+    {
+        return $this->validator;
     }
 
     public function getFormFactory()
@@ -83,6 +89,11 @@ class Framework extends HttpKernel implements FrameworkInterface
     public function setUrlGenerator(UrlGeneratorInterface $url_generator)
     {
         $this->url_generator = $url_generator;
+    }
+
+    public function setValidator(ValidatorInterface $validator)
+    {
+        $this->validator = $validator;
     }
 
 }

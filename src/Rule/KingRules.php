@@ -8,12 +8,12 @@ use Tchess\Event\MoveEvent;
 use Tchess\Entity\Piece\King;
 use Tchess\Entity\Piece\Rook;
 use Tchess\Entity\Piece\Move;
-use Tchess\Rule\CheckingMoveInterface;
+use Tchess\Rule\MoveCheckerInterface;
 use Tchess\MessageManager;
 use Tchess\Rule\InCheckRules;
 use Tchess\Message\Message;
 
-class KingRules implements EventSubscriberInterface, CheckingMoveInterface
+class KingRules implements EventSubscriberInterface, MoveCheckerInterface
 {
 
     private $messageManager;
@@ -23,14 +23,6 @@ class KingRules implements EventSubscriberInterface, CheckingMoveInterface
     {
         $this->messageManager = $messageManager;
         $this->inCheckRules = $inCheckRules;
-    }
-
-    public function onMoveChecking(MoveEvent $event)
-    {
-        $valid = $this->checkMove($event);
-        if (is_bool($valid)) {
-          $event->setValidMove($valid);
-        }
     }
 
     public function checkMove(MoveEvent $event)
@@ -115,12 +107,9 @@ class KingRules implements EventSubscriberInterface, CheckingMoveInterface
                 }
 
                 // Kingside.
-                $rook_move = new Move();
-                $rook_move->setCurrentRow($move->getNewRow());
-                $rook_move->setCurrentColumn($move->getNewColumn() + 1);
-                $rook_move->setNewRow($move->getNewRow());
-                $rook_move->setNewColumn($move->getNewColumn() - 1);
-                $rook_move->setCastling(true);
+                $source = Move::getSquare($move->getNewRow(), $move->getNewColumn() + 1);
+                $target = Move::getSquare($move->getNewRow(), $move->getNewColumn() - 1);
+                $rook_move = new Move($color, "$source $target", true);
             } else {
                 $rook = $board->getPiece($move->getNewRow(), $move->getNewColumn() - 2);
                 if (!$rook instanceof Rook || $rook->isMoved()) {
@@ -128,14 +117,10 @@ class KingRules implements EventSubscriberInterface, CheckingMoveInterface
                 }
 
                 // Queenside.
-                $rook_move = new Move();
-                $rook_move->setCurrentRow($move->getNewRow());
-                $rook_move->setCurrentColumn($move->getNewColumn() - 2);
-                $rook_move->setNewRow($move->getNewRow());
-                $rook_move->setNewColumn($move->getNewColumn() + 1);
-                $rook_move->setCastling(true);
+                $source = Move::getSquare($move->getNewRow(), $move->getNewColumn() - 2);
+                $target = Move::getSquare($move->getNewRow(), $move->getNewColumn() + 1);
+                $rook_move = new Move($color, "$source $target", true);
             }
-            $rook_move->setColor($color);
 
             $board->movePiece($rook_move);
             $piece->setCastled(false);
@@ -168,10 +153,14 @@ class KingRules implements EventSubscriberInterface, CheckingMoveInterface
     public static function getSubscribedEvents()
     {
         return array(
-            MoveEvents::CHECK_MOVE => array(array('onMoveChecking', 0)),
             MoveEvents::MOVE => array(array('onMoveDoCastling', 0)),
             MoveEvents::MOVE => array(array('onMoveRemoveCastlingAvailability', 0)),
         );
+    }
+
+    public static function getRules()
+    {
+        return array(array('checkMove', 0));
     }
 
 }

@@ -293,6 +293,7 @@ class GameController extends BaseController
     {
         $em = $this->framework->getEntityManager();
         $dispatcher = $this->framework->getEventDispatcher();
+        $validator = $this->framework->getValidator();
         $session = $request->getSession();
         $sid = $session->getId();
 
@@ -335,7 +336,8 @@ class GameController extends BaseController
 
         $move = new Move($color, $request->request->get('move'));
 
-        if ($dispatcher->dispatch(MoveEvents::CHECK_MOVE, new MoveEvent($room, $board, $move, $color))->isValidMove()) {
+        $errors = $validator->validate($move);
+        if (count($errors) == 0) {
             $board->movePiece($move);
             $moveEvent = new MoveEvent($room, $board, $move, $color);
 
@@ -362,7 +364,7 @@ class GameController extends BaseController
         } else {
             return json_encode(array(
                 'code' => 500,
-                'message' => 'Move is not valid'
+                'message' => (string) $errors,
             ));
         }
     }

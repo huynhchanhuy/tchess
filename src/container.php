@@ -248,6 +248,8 @@ function register_chess_services($sc)
             ->addMethodCall('addSubscriber', array(new Reference('listener.game')))
     ;
 
+    $sc->register('validator.move', 'Tchess\Validator\Constraints\MoveValidator');
+
     $sc->register('move_manager', 'Tchess\MessageManager');
 }
 
@@ -305,6 +307,7 @@ function register_kernel_services($sc, $env)
             ->addMethodCall('setSerializer', array(new Reference('serializer')))
             ->addMethodCall('setTwig', array(new Reference('twig')))
             ->addMethodCall('setUrlGenerator', array(new Reference('url_generator')))
+            ->addMethodCall('setValidator', array(new Reference('validator')))
     ;
 }
 

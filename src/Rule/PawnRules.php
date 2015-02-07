@@ -10,21 +10,13 @@ use Tchess\Entity\Piece\Queen;
 use Tchess\Entity\Piece\Knight;
 use Tchess\Entity\Piece\Bishop;
 use Tchess\Entity\Piece\Rook;
-use Tchess\Rule\CheckingMoveInterface;
+use Tchess\Rule\MoveCheckerInterface;
 use Tchess\Entity\Piece\Piece;
 use Tchess\Entity\Board;
 use Tchess\Entity\Piece\Move;
 
-class PawnRules implements EventSubscriberInterface, CheckingMoveInterface
+class PawnRules implements EventSubscriberInterface, MoveCheckerInterface
 {
-    public function onMoveChecking(MoveEvent $event)
-    {
-        $valid = $this->checkMove($event);
-        if (is_bool($valid)) {
-          $event->setValidMove($valid);
-        }
-    }
-
     public function checkMove(MoveEvent $event)
     {
         $board = &$event->getBoard();
@@ -228,12 +220,16 @@ class PawnRules implements EventSubscriberInterface, CheckingMoveInterface
     public static function getSubscribedEvents()
     {
         return array(
-            MoveEvents::CHECK_MOVE => array(array('onMoveChecking', 0)),
             MoveEvents::MOVE => array(
                 array('onMoveDoQueening', 0),
                 array('onMoveCaptureEnPassant', 0),
             ),
         );
+    }
+
+    public static function getRules()
+    {
+        return array(array('checkMove', 0));
     }
 
 }

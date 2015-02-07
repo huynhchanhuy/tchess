@@ -20,6 +20,7 @@ interface FrameworkInterface extends HttpKernelInterface
     public function setUrlGenerator(UrlGeneratorInterface $url_generator);
     public function getUrlGenerator();
     public function getEventDispatcher();
+    public function getValidator();
     public function setSerializer(SerializerInterface $serializer);
     public function getSerializer();
     public function setMessageManager(MessageManager $messageManager);

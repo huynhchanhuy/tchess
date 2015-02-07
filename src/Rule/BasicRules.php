@@ -6,18 +6,10 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Tchess\MoveEvents;
 use Tchess\Event\MoveEvent;
 use Tchess\Entity\Piece\Piece;
-use Tchess\Rule\CheckingMoveInterface;
+use Tchess\Rule\MoveCheckerInterface;
 
-class BasicRules implements EventSubscriberInterface, CheckingMoveInterface
+class BasicRules implements EventSubscriberInterface, MoveCheckerInterface
 {
-    public function onMoveChecking(MoveEvent $event)
-    {
-        $valid = $this->checkMove($event);
-        if (is_bool($valid)) {
-          $event->setValidMove($valid);
-        }
-    }
-
     public function checkMove(MoveEvent $event)
     {
         $board = $event->getBoard();
@@ -59,9 +51,13 @@ class BasicRules implements EventSubscriberInterface, CheckingMoveInterface
     public static function getSubscribedEvents()
     {
         return array(
-            MoveEvents::CHECK_MOVE => array(array('onMoveChecking', 1)),
             MoveEvents::MOVE => array(array('onMoveUpdateFullmoveNumber', 0)),
         );
+    }
+
+    public static function getRules()
+    {
+        return array(array('checkMove', 1));
     }
 
 }

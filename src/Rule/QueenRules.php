@@ -2,15 +2,13 @@
 
 namespace Tchess\Rule;
 
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Tchess\MoveEvents;
 use Tchess\Event\MoveEvent;
 use Tchess\Entity\Piece\Queen;
-use Tchess\Rule\CheckingMoveInterface;
+use Tchess\Rule\MoveCheckerInterface;
 use Tchess\Rule\BishopRules;
 use Tchess\Rule\RookRules;
 
-class QueenRules implements EventSubscriberInterface, CheckingMoveInterface
+class QueenRules implements MoveCheckerInterface
 {
 
     private $bishopRules;
@@ -22,14 +20,6 @@ class QueenRules implements EventSubscriberInterface, CheckingMoveInterface
         $this->rookRules = $rookRules;
     }
 
-    public function onMoveChecking(MoveEvent $event)
-    {
-        $valid = $this->checkMove($event);
-        if (is_bool($valid)) {
-          $event->setValidMove($valid);
-        }
-    }
-
     public function checkMove(MoveEvent $event)
     {
         $board = $event->getBoard();
@@ -39,14 +29,12 @@ class QueenRules implements EventSubscriberInterface, CheckingMoveInterface
             return;
         }
 
-        return $this->bishopRules->checkMove($event) || $this->rookRules->checkMove($event);
+        return $this->bishopRules->checkMove($event, true) || $this->rookRules->checkMove($event, true);
     }
 
-    public static function getSubscribedEvents()
+    public static function getRules()
     {
-        return array(
-            MoveEvents::CHECK_MOVE => array(array('onMoveChecking', 0)),
-        );
+        return array(array('checkMove', 0));
     }
 
 }

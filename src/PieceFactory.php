@@ -60,10 +60,10 @@ class PieceFactory
                 }
 
                 if (preg_match('/^[a-h]{1}(3|6){1}$/', $ep)) {
-                    $move = new Move();
-                    $move->setSource($ep);
-                    $currentRow = $move->getCurrentRow() == 5 ? 4 : 3;
-                    if ($currentRow == $x && $move->getCurrentColumn() == $y) {
+                    list($epRow, $epColumn) = Move::getIndex($ep);
+                    $currentRow = $epRow == 5 ? 4 : 3;
+                    $currentColumn = $epColumn;
+                    if ($currentRow == $x && $currentColumn == $y) {
                         $piece->setEpAble(true);
                     }
                 }

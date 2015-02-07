@@ -7,31 +7,18 @@ use Tchess\MoveEvents;
 use Tchess\Event\MoveEvent;
 use Tchess\Entity\Piece\Rook;
 use Tchess\Entity\Piece\Queen;
-use Tchess\Rule\CheckingMoveInterface;
+use Tchess\Rule\MoveCheckerInterface;
 
-class RookRules implements EventSubscriberInterface, CheckingMoveInterface
+class RookRules implements EventSubscriberInterface, MoveCheckerInterface
 {
-    public function onMoveChecking(MoveEvent $event)
+    public function checkMove(MoveEvent $event, $fromQueen = false)
     {
         $board = $event->getBoard();
         $move = $event->getMove();
         $piece = $board->getPiece($move->getCurrentRow(), $move->getCurrentColumn());
-        if (!$piece instanceof Rook) {
-            return;
-        }
 
-        $valid = $this->checkMove($event);
-        if (is_bool($valid)) {
-          $event->setValidMove($valid);
-        }
-    }
-
-    public function checkMove(MoveEvent $event)
-    {
-        $board = $event->getBoard();
-        $move = $event->getMove();
-        $piece = $board->getPiece($move->getCurrentRow(), $move->getCurrentColumn());
-        if (!$piece instanceof Rook && !$piece instanceof Queen) {
+        // not (rook or (queen and from-queen)).
+        if (!$piece instanceof Rook && (!$piece instanceof Queen || !$fromQueen)) {
             return;
         }
 
@@ -97,9 +84,13 @@ class RookRules implements EventSubscriberInterface, CheckingMoveInterface
     public static function getSubscribedEvents()
     {
         return array(
-            MoveEvents::CHECK_MOVE => array(array('onMoveChecking', 0)),
             MoveEvents::MOVE => array(array('onMoveRemoveCastlingAvailability', 0)),
         );
+    }
+
+    public static function getRules()
+    {
+        return array(array('checkMove', 0));
     }
 
 }

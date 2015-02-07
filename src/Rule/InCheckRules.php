@@ -2,32 +2,22 @@
 
 namespace Tchess\Rule;
 
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Tchess\MoveEvents;
+use Symfony\Component\Validator\ValidatorInterface;
 use Tchess\Event\MoveEvent;
 use Tchess\Entity\Board;
 use Tchess\Entity\Piece\King;
 use Tchess\Entity\Piece\Move;
 use Tchess\Entity\Piece\Piece;
-use Tchess\Rule\CheckingMoveInterface;
+use Tchess\Rule\MoveCheckerInterface;
 
-class InCheckRules implements EventSubscriberInterface, CheckingMoveInterface
+class InCheckRules implements MoveCheckerInterface
 {
 
-    private $dispatcher;
+    private $validator;
 
-    public function __construct(EventDispatcherInterface $dispatcher)
+    public function __construct(ValidatorInterface $validator)
     {
-        $this->dispatcher = $dispatcher;
-    }
-
-    public function onMoveChecking(MoveEvent $event)
-    {
-        $valid = $this->checkMove($event);
-        if (is_bool($valid)) {
-          $event->setValidMove($valid);
-        }
+        $this->validator = $validator;
     }
 
     public function checkMove(MoveEvent $event)
@@ -52,13 +42,6 @@ class InCheckRules implements EventSubscriberInterface, CheckingMoveInterface
         return true;
     }
 
-    public static function getSubscribedEvents()
-    {
-        return array(
-            MoveEvents::CHECK_MOVE => array(array('onMoveChecking', -1)),
-        );
-    }
-
     public function isInCheck(MoveEvent $event)
     {
         $board = $event->getBoard();
@@ -81,7 +64,9 @@ class InCheckRules implements EventSubscriberInterface, CheckingMoveInterface
                     $newEvent = clone $event;
                     $newEvent->setMove($move);
                     $newEvent->setColor($piece->getColor());
-                    if ($this->dispatcher->dispatch(MoveEvents::CHECK_MOVE, $newEvent)->isValidMove()) {
+
+                    $errors = $this->validator->validate($move);
+                    if (count($errors) == 0) {
                         return true;
                     }
                 }
@@ -107,6 +92,11 @@ class InCheckRules implements EventSubscriberInterface, CheckingMoveInterface
         }
 
         return array($row, $col);
+    }
+
+    public static function getRules()
+    {
+        return array(array('checkMove', -1));
     }
 
 }
