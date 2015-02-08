@@ -153,8 +153,10 @@ class KingRules implements EventSubscriberInterface, MoveCheckerInterface
     public static function getSubscribedEvents()
     {
         return array(
-            MoveEvents::MOVE => array(array('onMoveDoCastling', 0)),
-            MoveEvents::MOVE => array(array('onMoveRemoveCastlingAvailability', 0)),
+            MoveEvents::MOVE => array(
+                array('onMoveDoCastling', 0),
+                array('onMoveRemoveCastlingAvailability', 0),
+            ),
         );
     }
 
