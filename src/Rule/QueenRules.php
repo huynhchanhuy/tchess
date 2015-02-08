@@ -2,11 +2,11 @@
 
 namespace Tchess\Rule;
 
-use Tchess\Event\MoveEvent;
 use Tchess\Entity\Piece\Queen;
 use Tchess\Rule\MoveCheckerInterface;
 use Tchess\Rule\BishopRules;
 use Tchess\Rule\RookRules;
+use Tchess\Entity\Piece\Move;
 
 class QueenRules implements MoveCheckerInterface
 {
@@ -20,16 +20,17 @@ class QueenRules implements MoveCheckerInterface
         $this->rookRules = $rookRules;
     }
 
-    public function checkMove(MoveEvent $event)
+    public function checkMove(Move $move)
     {
-        $board = $event->getBoard();
-        $move = $event->getMove();
-        $piece = $board->getPiece($move->getCurrentRow(), $move->getCurrentColumn());
+        $board = $move->getBoard();
+        list($currentRow, $currentColumn) = Move::getIndex($move->getSource());
+        $piece = $board->getPiece($currentRow, $currentColumn);
+
         if (!$piece instanceof Queen) {
             return;
         }
 
-        return $this->bishopRules->checkMove($event, true) || $this->rookRules->checkMove($event, true);
+        return $this->bishopRules->checkMove($move, true) || $this->rookRules->checkMove($move, true);
     }
 
     public static function getRules()

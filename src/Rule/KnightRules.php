@@ -2,26 +2,28 @@
 
 namespace Tchess\Rule;
 
-use Tchess\Event\MoveEvent;
 use Tchess\Entity\Piece\Knight;
 use Tchess\Rule\MoveCheckerInterface;
+use Tchess\Entity\Piece\Move;
 
 class KnightRules implements MoveCheckerInterface
 {
-    public function checkMove(MoveEvent $event)
+    public function checkMove(Move $move)
     {
-        $board = $event->getBoard();
-        $move = $event->getMove();
-        $piece = $board->getPiece($move->getCurrentRow(), $move->getCurrentColumn());
+        $board = $move->getBoard();
+        list($currentRow, $currentColumn) = Move::getIndex($move->getSource());
+        list($newRow, $newColumn) = Move::getIndex($move->getTarget());
+        $piece = $board->getPiece($currentRow, $currentColumn);
+
         if (!$piece instanceof Knight) {
             return;
         }
 
-        if (abs($move->getNewRow() - $move->getCurrentRow()) == 2 && abs($move->getNewColumn() - $move->getCurrentColumn()) == 1) {
+        if (abs($newRow - $currentRow) == 2 && abs($newColumn - $currentColumn) == 1) {
             return true;
         }
 
-        if (abs($move->getNewRow() - $move->getCurrentRow()) == 1 && abs($move->getNewColumn() - $move->getCurrentColumn()) == 2) {
+        if (abs($newRow - $currentRow) == 1 && abs($newColumn - $currentColumn) == 2) {
             return true;
         }
 

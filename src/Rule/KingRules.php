@@ -25,56 +25,57 @@ class KingRules implements EventSubscriberInterface, MoveCheckerInterface
         $this->inCheckRules = $inCheckRules;
     }
 
-    public function checkMove(MoveEvent $event)
+    public function checkMove(Move $move)
     {
-        $board = $event->getBoard();
-        $move = $event->getMove();
+        $board = $move->getBoard();
+        $color = $move->getColor();
+        list($currentRow, $currentColumn) = Move::getIndex($move->getSource());
+        list($newRow, $newColumn) = Move::getIndex($move->getTarget());
 
-        // @todo - Do we need reference sign here?
-        $piece = &$board->getPiece($move->getCurrentRow(), $move->getCurrentColumn());
+        $piece = $board->getPiece($currentRow, $currentColumn);
         if (!$piece instanceof King) {
             return;
         }
 
-        if (abs($move->getNewRow() - $move->getCurrentRow()) > 1) {
+        if (abs($newRow - $currentRow) > 1) {
             return false;
         }
 
-        if (abs($move->getNewColumn() - $move->getCurrentColumn()) > 1) {
+        if (abs($newColumn - $currentColumn) > 1) {
 
             if ($piece->isMoved()) {
                 return false;
             }
 
-            if (abs($move->getNewColumn() - $move->getCurrentColumn()) != 2 || $move->getCurrentRow() != $move->getNewRow()) {
+            if (abs($newColumn - $currentColumn) != 2 || $currentRow != $newRow) {
                 return false;
             }
 
-            if ($this->inCheckRules->isInCheck($event)) {
+            if ($this->inCheckRules->isInCheck($board, $color)) {
                 // The king must not be in check while castling.
                 return false;
             }
 
             // Do castling logic here.
-            if ($move->getNewColumn() - $move->getCurrentColumn() == 2) {
+            if ($newColumn - $currentColumn == 2) {
                 // Castle kingside.
-                $rook = $board->getPiece($move->getNewRow(), $move->getCurrentColumn() + 3);
+                $rook = $board->getPiece($newRow, $currentColumn + 3);
                 if (!$rook instanceof Rook || $rook->isMoved()) {
                     return false;
                 }
 
-                if ($board->getPiece($move->getNewRow(), $move->getCurrentColumn() + 1) != null || $board->getPiece($move->getNewRow(), $move->getCurrentColumn() + 2) != null) {
+                if ($board->getPiece($newRow, $currentColumn + 1) != null || $board->getPiece($newRow, $currentColumn + 2) != null) {
                     return false;
                 }
-            } else if ($move->getNewColumn() - $move->getCurrentColumn() == -2) {
+            } else if ($newColumn - $currentColumn == -2) {
                 // Queenside.
-                $rook = $board->getPiece($move->getNewRow(), $move->getCurrentColumn() - 4);
+                $rook = $board->getPiece($newRow, $currentColumn - 4);
                 if (!$rook instanceof Rook || $rook->isMoved()) {
                     return false;
                 }
 
                 // There are 3 squares between the king and the queenside rook.
-                if ($board->getPiece($move->getNewRow(), $move->getCurrentColumn() - 1) != null || $board->getPiece($move->getNewRow(), $move->getCurrentColumn() - 2) != null || $board->getPiece($move->getNewRow(), $move->getCurrentColumn() - 3) != null) {
+                if ($board->getPiece($newRow, $currentColumn - 1) != null || $board->getPiece($newRow, $currentColumn - 2) != null || $board->getPiece($newRow, $currentColumn - 3) != null) {
                     return false;
                 }
             }
@@ -90,46 +91,47 @@ class KingRules implements EventSubscriberInterface, MoveCheckerInterface
     public function onMoveDoCastling(MoveEvent $event)
     {
         $room = $event->getRoom();
-        $board = &$event->getBoard();
         $move = $event->getMove();
-        $color = $event->getColor();
-        $piece = &$board->getPiece($move->getNewRow(), $move->getNewColumn());
+        $board = $move->getBoard();
+        $color = $move->getColor();
+        list($currentRow, $currentColumn) = Move::getIndex($move->getSource());
+        list($newRow, $newColumn) = Move::getIndex($move->getTarget());
+        $piece = $board->getPiece($newRow, $newColumn);
+
         if (!$piece instanceof King) {
             return;
         }
 
         if ($piece->isCastled()) {
             // Move rook.
-            if ($move->getNewColumn() - $move->getCurrentColumn() == 2) {
-                $rook = $board->getPiece($move->getNewRow(), $move->getNewColumn() + 1);
+            if ($newColumn - $currentColumn == 2) {
+                $rook = $board->getPiece($newRow, $newColumn + 1);
                 if (!$rook instanceof Rook || $rook->isMoved()) {
                     return;
                 }
 
                 // Kingside.
-                $source = Move::getSquare($move->getNewRow(), $move->getNewColumn() + 1);
-                $target = Move::getSquare($move->getNewRow(), $move->getNewColumn() - 1);
-                $rook_move = new Move($color, "$source $target", true);
+                $source = Move::getSquare($newRow, $newColumn + 1);
+                $target = Move::getSquare($newRow, $newColumn - 1);
             } else {
-                $rook = $board->getPiece($move->getNewRow(), $move->getNewColumn() - 2);
+                $rook = $board->getPiece($newRow, $newColumn - 2);
                 if (!$rook instanceof Rook || $rook->isMoved()) {
                     return;
                 }
 
                 // Queenside.
-                $source = Move::getSquare($move->getNewRow(), $move->getNewColumn() - 2);
-                $target = Move::getSquare($move->getNewRow(), $move->getNewColumn() + 1);
-                $rook_move = new Move($color, "$source $target", true);
+                $source = Move::getSquare($newRow, $newColumn - 2);
+                $target = Move::getSquare($newRow, $newColumn + 1);
             }
 
-            $board->movePiece($rook_move);
+            $board->movePiece($source, $target);
             $piece->setCastled(false);
 
             $message = new Message($room->getId(), 'move', array(
-                'source' => $rook_move->getSource(),
-                'target' => $rook_move->getTarget(),
-                'color' => $rook_move->getColor(),
-                'castling' => $rook_move->getCastling(),
+                'source' => $source,
+                'target' => $target,
+                'color' => $color,
+                'castling' => true,
             ));
             $this->messageManager->addMessage($message);
         }
@@ -137,10 +139,12 @@ class KingRules implements EventSubscriberInterface, MoveCheckerInterface
 
     public function onMoveRemoveCastlingAvailability(MoveEvent $event)
     {
-        $board = &$event->getBoard();
         $move = $event->getMove();
-        $color = $event->getColor();
-        $piece = &$board->getPiece($move->getNewRow(), $move->getNewColumn());
+        $board = $move->getBoard();
+        $color = $move->getColor();
+        list($newRow, $newColumn) = Move::getIndex($move->getTarget());
+        $piece = $board->getPiece($newRow, $newColumn);
+
         if (!$piece instanceof King) {
             return;
         }

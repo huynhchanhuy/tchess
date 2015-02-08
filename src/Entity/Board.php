@@ -211,13 +211,16 @@ class Board implements NormalizableInterface, DenormalizableInterface
      *
      * @return \Tchess\Entity\Piece|null
      */
-    public function movePiece(Move $move)
+    public function movePiece($source, $target)
     {
-        //Switch the two spots on the board.
-        $this->pieces[$move->getNewRow()][$move->getNewColumn()] = $this->pieces[$move->getCurrentRow()][$move->getCurrentColumn()];
-        $this->pieces[$move->getCurrentRow()][$move->getCurrentColumn()] = null;
+        list($currentRow, $currentColumn) = Move::getIndex($source);
+        list($newRow, $newColumn) = Move::getIndex($target);
 
-        $piece = &$this->pieces[$move->getNewRow()][$move->getNewColumn()];
+        //Switch the two spots on the board.
+        $this->pieces[$newRow][$newColumn] = $this->pieces[$currentRow][$currentColumn];
+        $this->pieces[$currentRow][$currentColumn] = null;
+
+        $piece = &$this->pieces[$newRow][$newColumn];
         $piece->setHasMoved(true);
     }
 

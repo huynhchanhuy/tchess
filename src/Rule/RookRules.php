@@ -11,49 +11,50 @@ use Tchess\Rule\MoveCheckerInterface;
 
 class RookRules implements EventSubscriberInterface, MoveCheckerInterface
 {
-    public function checkMove(MoveEvent $event, $fromQueen = false)
+    public function checkMove(Move $move, $fromQueen = false)
     {
-        $board = $event->getBoard();
-        $move = $event->getMove();
-        $piece = $board->getPiece($move->getCurrentRow(), $move->getCurrentColumn());
+        $board = $move->getBoard();
+        list($currentRow, $currentColumn) = Move::getIndex($move->getSource());
+        list($newRow, $newColumn) = Move::getIndex($move->getTarget());
+        $piece = $board->getPiece($currentRow, $currentColumn);
 
         // not (rook or (queen and from-queen)).
         if (!$piece instanceof Rook && (!$piece instanceof Queen || !$fromQueen)) {
             return;
         }
 
-        if ($move->getCurrentRow() != $move->getNewRow() && $move->getCurrentColumn() != $move->getNewColumn()) {
+        if ($currentRow != $newRow && $currentColumn != $newColumn) {
             // Did not move along one rank/file.
             return false;
         }
 
         // First I will assumed the Rook is moving along the rows.
-        if ($move->getCurrentRow() != $move->getNewRow()) {
-            if ($move->getCurrentRow() < $move->getNewRow()) {
+        if ($currentRow != $newRow) {
+            if ($currentRow < $newRow) {
                 $offset = 1;
             } else {
                 $offset = -1;
             }
 
-            for($x = $move->getCurrentRow() + $offset; $x != $move->getNewRow(); $x += $offset) {
+            for($x = $currentRow + $offset; $x != $newRow; $x += $offset) {
                 // Go from currentRow to newRow, and check every space.
-                if($board->getPiece($x, $move->getCurrentColumn()) != null) {
+                if($board->getPiece($x, $currentColumn) != null) {
                     return false;
                 }
             }
         }
 
         // Now do the same for columns.
-        if ($move->getCurrentColumn() != $move->getNewColumn()) {
-            if ($move->getCurrentColumn() < $move->getNewColumn()) {
+        if ($currentColumn != $newColumn) {
+            if ($currentColumn < $newColumn) {
                 $offset = 1;
             } else {
                 $offset = -1;
             }
 
-            for($x = $move->getCurrentColumn() + $offset; $x != $move->getNewColumn(); $x += $offset) {
+            for($x = $currentColumn + $offset; $x != $newColumn; $x += $offset) {
                 // Go from currentCol to newCol, and check every space.
-                if($board->getPiece($move->getCurrentRow(), $x) != null) {
+                if($board->getPiece($currentRow, $x) != null) {
                     return false;
                 }
             }
@@ -64,18 +65,20 @@ class RookRules implements EventSubscriberInterface, MoveCheckerInterface
 
     public function onMoveRemoveCastlingAvailability(MoveEvent $event)
     {
-        $board = &$event->getBoard();
         $move = $event->getMove();
-        $color = $event->getColor();
-        $piece = &$board->getPiece($move->getNewRow(), $move->getNewColumn());
+        $board = $move->getBoard();
+        $color = $move->getColor();
+        list($currentRow, $currentColumn) = Move::getIndex($move->getSource());
+        list($newRow, $newColumn) = Move::getIndex($move->getTarget());
+        $piece = $board->getPiece($newRow, $newColumn);
         if (!$piece instanceof Rook) {
             return;
         }
 
-        if ($move->getCurrentColumn() == 0) {
+        if ($currentColumn == 0) {
             // Queenside.
             $board->removeCastlingAvailability($color == 'white' ? 'Q' : 'q');
-        } elseif ($move->getCurrentColumn() == 7) {
+        } elseif ($currentColumn == 7) {
             // Kingside.
             $board->removeCastlingAvailability($color == 'white' ? 'K' : 'k');
         }
@@ -84,7 +87,9 @@ class RookRules implements EventSubscriberInterface, MoveCheckerInterface
     public static function getSubscribedEvents()
     {
         return array(
-            MoveEvents::MOVE => array(array('onMoveRemoveCastlingAvailability', 0)),
+            MoveEvents::MOVE => array(
+                array('onMoveRemoveCastlingAvailability', 0),
+            ),
         );
     }
 

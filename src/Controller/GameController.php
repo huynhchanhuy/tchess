@@ -334,16 +334,15 @@ class GameController extends BaseController
             ));
         }
 
-        $move = new Move($color, $request->request->get('move'));
+        $move = new Move($board, $color, $request->request->get('move'));
 
         $errors = $validator->validate($move);
         if (count($errors) == 0) {
-            $board->movePiece($move);
-            $moveEvent = new MoveEvent($room, $board, $move, $color);
+            $board->movePiece($move->getSource(), $move->getTarget());
+            $moveEvent = new MoveEvent($room, $move);
 
             $dispatcher->dispatch(MoveEvents::MOVE, $moveEvent);
 
-            $board->setActiveColor($color == 'white' ? 'black' : 'white');
             $game->saveGame($serializer);
             $game->addHighlight($move->getSource(), $move->getTarget(), $color);
             $em->flush();

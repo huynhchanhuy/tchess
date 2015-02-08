@@ -17,78 +17,79 @@ use Tchess\Entity\Piece\Move;
 
 class PawnRules implements EventSubscriberInterface, MoveCheckerInterface
 {
-    public function checkMove(MoveEvent $event)
+    public function checkMove(Move $move)
     {
-        $board = &$event->getBoard();
-        $move = $event->getMove();
-        $color = $event->getColor();
+        $board = $move->getBoard();
+        list($currentRow, $currentColumn) = Move::getIndex($move->getSource());
+        list($newRow, $newColumn) = Move::getIndex($move->getTarget());
+        $color = $move->getColor();
+        $piece = $board->getPiece($currentRow, $currentColumn);
 
-        $piece = &$board->getPiece($move->getCurrentRow(), $move->getCurrentColumn());
         if (!$piece instanceof Pawn) {
             return;
         }
 
         if ($color == "white") {
-            if ($move->getCurrentRow() >= $move->getNewRow()) {
+            if ($currentRow >= $newRow) {
                 return false;
             }
         } else {
-            if ($move->getNewRow() >= $move->getCurrentRow()) {
+            if ($newRow >= $currentRow) {
                 return false;
             }
         }
 
-        if ($move->getCurrentColumn() == $move->getNewColumn()) {
+        if ($currentColumn == $newColumn) {
             // Not taking a piece.
             if ($color == "white") {
-                if ($board->getPiece($move->getCurrentRow() + 1, $move->getCurrentColumn()) != null) {
+                if ($board->getPiece($currentRow + 1, $currentColumn) != null) {
                     return false;
                 }
             } else {
-                if ($board->getPiece($move->getCurrentRow() - 1, $move->getCurrentColumn()) != null) {
+                if ($board->getPiece($currentRow - 1, $currentColumn) != null) {
                     return false;
                 }
             }
 
-            if (abs($move->getNewRow() - $move->getCurrentRow()) > 2) {
+            if (abs($newRow - $currentRow) > 2) {
                 return false;
-            } else if (abs($move->getNewRow() - $move->getCurrentRow()) == 2) {
+            } else if (abs($newRow - $currentRow) == 2) {
                 // Advancing two spaces at beginning.
                 if ($piece->isMoved()) {
                     return false;
                 }
 
                 if ($piece->getColor() == 'white') {
-                    if($board->getPiece($move->getCurrentRow() + 2, $move->getCurrentColumn()) != null) {
+                    if($board->getPiece($currentRow + 2, $currentColumn) != null) {
                         return false;
                     }
                 } else {
-                    if($board->getPiece($move->getCurrentRow() - 2, $move->getCurrentColumn()) != null) {
+                    if($board->getPiece($currentRow - 2, $currentColumn) != null) {
                         return false;
                     }
                 }
 
                 // En passant.
-                if (in_array($move->getNewRow(), array(3, 4))) {
+                if (in_array($newRow, array(3, 4))) {
                     // Just for sure.
                     $piece->setEpAble(true);
                     $this->updateEnPassantTarget($board, $move, $piece);
                 }
-            } else if (abs($move->getNewRow() - $move->getCurrentRow()) == 1) {
+            } else if (abs($newRow - $currentRow) == 1) {
                 // Allowed to move.
             }
         } else {
             // Taking a piece.
-            if (abs($move->getNewColumn() - $move->getCurrentColumn()) != 1 || abs($move->getNewRow() - $move->getCurrentRow()) != 1) {
+            if (abs($newColumn - $currentColumn) != 1 || abs($newRow - $currentRow) != 1) {
                 return false;
             }
 
-            if($board->getPiece($move->getNewRow(), $move->getNewColumn()) == null) {
-                if ($color == 'white' && $move->getNewRow() == 5) {
-                    $epPiece = $board->getPiece($move->getNewRow() - 1, $move->getNewColumn());
+            if($board->getPiece($newRow, $newColumn) == null) {
+                if ($color == 'white' && $newRow == 5) {
+                    $epPiece = $board->getPiece($newRow - 1, $newColumn);
                 }
-                else if ($color == 'black' && $move->getNewRow() == 2) {
-                    $epPiece = $board->getPiece($move->getNewRow() + 1, $move->getNewColumn());
+                else if ($color == 'black' && $newRow == 2) {
+                    $epPiece = $board->getPiece($newRow + 1, $newColumn);
                 }
                 if (!empty($epPiece) && $epPiece instanceof Pawn && $epPiece->getColor() != $color && $epPiece->isEpAble()) {
                     return true;
@@ -105,47 +106,51 @@ class PawnRules implements EventSubscriberInterface, MoveCheckerInterface
     private function updateEnPassantTarget(Board $board, Move $move, Piece $piece)
     {
         // Update en passant target.
-        $newMove = new Move();
-        $newMove->setNewColumn($move->getNewColumn());
+        list($newRow, $newColumn) = Move::getIndex($move->getTarget());
+
         if ($piece->getColor() == 'white') {
-            $newMove->setNewRow($move->getNewRow() - 1);
+            $newRow = $newRow - 1;
         }
         else {
-            $newMove->setNewRow($move->getNewRow() + 1);
+            $newRow = $newRow + 1;
         }
-        $board->setEnPassantTarget($newMove->getTarget());
+
+        $target = Move::getSquare($newRow, $newColumn);
+        $board->setEnPassantTarget($target);
     }
 
     public function onMoveDoQueening(MoveEvent $event)
     {
-        $board = &$event->getBoard();
         $move = $event->getMove();
-        $color = $event->getColor();
-        $piece = &$board->getPiece($move->getNewRow(), $move->getNewColumn());
+        $board = $move->getBoard();
+        $color = $move->getColor();
+        list($newRow, $newColumn) = Move::getIndex($move->getTarget());
+        $piece = $board->getPiece($newRow, $newColumn);
+
         if (!$piece instanceof Pawn) {
             return;
         }
 
-        if (($color == 'white' && $move->getNewRow() == 7) || ($color == 'black' && $move->getNewRow() == 0)) {
+        if (($color == 'white' && $newRow == 7) || ($color == 'black' && $newRow == 0)) {
             switch ($move->getPromotion()) {
                 case 'Q':
                     // 96.9% people choose a queen for promotion.
-                    $board->setPiece(new Queen($color), $move->getNewRow(), $move->getNewColumn());
+                    $board->setPiece(new Queen($color), $newRow, $newColumn);
                     break;
 
                 case 'K':
                     // 1.8% people choose a knight for promotion.
-                    $board->setPiece(new Knight($color), $move->getNewRow(), $move->getNewColumn());
+                    $board->setPiece(new Knight($color), $newRow, $newColumn);
                     break;
 
                 case 'B':
                     // 1.1% people choose a bishop for promotion.
-                    $board->setPiece(new Bishop($color), $move->getNewRow(), $move->getNewColumn());
+                    $board->setPiece(new Bishop($color), $newRow, $newColumn);
                     break;
 
                 case 'R':
                     // 0.2% people choose a rook for promotion.
-                    $board->setPiece(new Rook($color), $move->getNewRow(), $move->getNewColumn());
+                    $board->setPiece(new Rook($color), $newRow, $newColumn);
                     break;
 
                 default:
@@ -164,26 +169,27 @@ class PawnRules implements EventSubscriberInterface, MoveCheckerInterface
 
     public function onMoveCaptureEnPassant(MoveEvent $event)
     {
-        $board = &$event->getBoard();
         $move = $event->getMove();
-        $color = $event->getColor();
-        $piece = $board->getPiece($move->getNewRow(), $move->getNewColumn());
+        $board = $move->getBoard();
+        $color = $move->getColor();
+        list($newRow, $newColumn) = Move::getIndex($move->getTarget());
+        $piece = $board->getPiece($newRow, $newColumn);
 
         if ($piece instanceof Pawn) {
             // Only pawn can capture en passant.
-            if ($this->inSixthRank($color, $move->getNewRow())) {
-                if ($move->getNewRow() == 2) {
-                    if($board->getPiece($move->getNewRow() + 1, $move->getNewColumn()) != null) {
-                        $epPiece = $board->getPiece($move->getNewRow() + 1, $move->getNewColumn());
+            if ($this->inSixthRank($color, $newRow)) {
+                if ($newRow == 2) {
+                    if($board->getPiece($newRow + 1, $newColumn) != null) {
+                        $epPiece = $board->getPiece($newRow + 1, $newColumn);
                         if($epPiece instanceof Pawn && $epPiece->isEpAble() && $epPiece->getColor() != $color) {
-                            $board->removePiece($move->getNewRow() + 1, $move->getNewColumn());
+                            $board->removePiece($newRow + 1, $newColumn);
                         }
                     }
-                } else if ($move->getNewRow() == 5) {
-                    if($board->getPiece($move->getNewRow() - 1, $move->getNewColumn()) != null) {
-                        $epPiece = $board->getPiece($move->getNewRow() - 1, $move->getNewColumn());
+                } else if ($newRow == 5) {
+                    if($board->getPiece($newRow - 1, $newColumn) != null) {
+                        $epPiece = $board->getPiece($newRow - 1, $newColumn);
                         if($epPiece instanceof Pawn && $epPiece->isEpAble() && $epPiece->getColor() != $color) {
-                            $board->removePiece($move->getNewRow() - 1, $move->getNewColumn());
+                            $board->removePiece($newRow - 1, $newColumn);
                         }
                     }
                 }
@@ -195,7 +201,7 @@ class PawnRules implements EventSubscriberInterface, MoveCheckerInterface
         for ($row = 3; $row <= 4; $row++) {
             for ($column = 0; $column < 8; $column++) {
                 if($board->getPiece($row, $column) != null) {
-                    $epPiece = &$board->getPiece($row, $column);
+                    $epPiece = $board->getPiece($row, $column);
 
                     // Disable en passant able on opponent pawns.
                     if($epPiece instanceof Pawn && $epPiece->isEpAble() && $epPiece->getColor() != $color) {

@@ -3,6 +3,7 @@
 namespace Tchess\Entity\Piece;
 
 use Symfony\Component\Validator\Constraints as Assert;
+use Tchess\Entity\Board;
 
 class Move
 {
@@ -26,15 +27,17 @@ class Move
      */
     protected $promotion;
 
-    protected $currentRow;
-    protected $currentColumn;
-    protected $newRow;
-    protected $newColumn;
-
     /**
      * @Assert\Type(type="bool")
      */
     protected $castling;
+
+    /**
+     * Chess board.
+     *
+     * @var Tchess\Entity\Board
+     */
+    private $board;
 
     /**
      * Column map.
@@ -52,8 +55,9 @@ class Move
         'h' => 7,
     );
 
-    public function __construct($color = 'white', $move = '', $castling = false)
+    public function __construct(Board $board, $color = 'white', $move = '', $castling = false)
     {
+        $this->setBoard($board);
         $this->setColor($color);
 
         if (!empty($move)) {
@@ -71,6 +75,16 @@ class Move
         }
 
         $this->setCastling($castling);
+    }
+
+    public function getBoard()
+    {
+        return $this->board;
+    }
+
+    public function setBoard(Board $board)
+    {
+        $this->board = $board;
     }
 
     /**
@@ -127,46 +141,6 @@ class Move
         }
         $map = array_flip(static::$map);
         return $map[$column] . ($row + 1);
-    }
-
-    public function getCurrentRow()
-    {
-        return $this->currentRow;
-    }
-
-    public function setCurrentRow($currentRow)
-    {
-        $this->currentRow = $currentRow;
-    }
-
-    public function getCurrentColumn()
-    {
-        return $this->currentColumn;
-    }
-
-    public function setCurrentColumn($currentColumn)
-    {
-        $this->currentColumn = $currentColumn;
-    }
-
-    public function getNewRow()
-    {
-        return $this->newRow;
-    }
-
-    public function setNewRow($newRow)
-    {
-        $this->newRow = $newRow;
-    }
-
-    public function getNewColumn()
-    {
-        return $this->newColumn;
-    }
-
-    public function setNewColumn($newColumn)
-    {
-        $this->newColumn = $newColumn;
     }
 
     public function getSource()

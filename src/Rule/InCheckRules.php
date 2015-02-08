@@ -3,7 +3,6 @@
 namespace Tchess\Rule;
 
 use Symfony\Component\Validator\ValidatorInterface;
-use Tchess\Event\MoveEvent;
 use Tchess\Entity\Board;
 use Tchess\Entity\Piece\King;
 use Tchess\Entity\Piece\Move;
@@ -20,21 +19,18 @@ class InCheckRules implements MoveCheckerInterface
         $this->validator = $validator;
     }
 
-    public function checkMove(MoveEvent $event)
+    public function checkMove(Move $move)
     {
-        $board = $event->getBoard();
-        $move = $event->getMove();
+        $board = $move->getBoard();
+        $color = $move->getColor();
 
         $newBoard = clone $board;
-        $newBoard->movePiece($move);
-
-        $newEvent = clone $event;
-        $newEvent->setBoard($newBoard);
+        $newBoard->movePiece($move->getSource(), $move->getTarget());
 
         // We wont dispatch MoveEvents::MOVE event, because we are checking King
         // is in check, not really move the piece.
 
-        if ($this->isInCheck($newEvent)) {
+        if ($this->isInCheck($newBoard, $color)) {
             // The king is still in check.
             return false;
         }
@@ -42,11 +38,8 @@ class InCheckRules implements MoveCheckerInterface
         return true;
     }
 
-    public function isInCheck(MoveEvent $event)
+    public function isInCheck(Board $board, $color)
     {
-        $board = $event->getBoard();
-        $color = $event->getColor();
-
         $kingPos = $this->getKingPos($board, $color);
         list($row, $col) = $kingPos;
 
@@ -54,16 +47,9 @@ class InCheckRules implements MoveCheckerInterface
             for ($y = 0; $y < 8; $y++) {
                 $piece = $board->getPiece($x, $y);
                 if ($piece instanceof Piece && $piece->getColor() != $color) {
-                    $move = new Move();
-                    $move->setColor($color);
-                    $move->setCurrentRow($x);
-                    $move->setCurrentColumn($y);
-                    $move->setNewRow($row);
-                    $move->setNewColumn($col);
-
-                    $newEvent = clone $event;
-                    $newEvent->setMove($move);
-                    $newEvent->setColor($piece->getColor());
+                    $source = Move::getSquare($x, $y);
+                    $target = Move::getSquare($row, $col);
+                    $move = new Move($board, $piece->getColor(), "$source $target");
 
                     $errors = $this->validator->validate($move);
                     if (count($errors) == 0) {
