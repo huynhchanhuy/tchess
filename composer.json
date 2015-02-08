@@ -34,10 +34,10 @@
         "type": "package",
         "package": {
             "name": "tienvx/jquery",
-            "version": "v1.11.1",
+            "version": "v1.11.2",
             "type": "js-vendor",
             "dist": {
-                "url": "http://code.jquery.com/jquery-1.11.1.min.js",
+                "url": "http://code.jquery.com/jquery-1.11.2.min.js",
                 "type": "file"
             }
         }
@@ -46,10 +46,10 @@
         "type": "package",
         "package": {
             "name": "tienvx/bootstrap",
-            "version": "v3.3.0",
+            "version": "v3.3.2",
             "type": "js-vendor",
             "dist": {
-                "url": "https://github.com/twbs/bootstrap/releases/download/v3.3.0/bootstrap-3.3.0-dist.zip",
+                "url": "https://github.com/twbs/bootstrap/releases/download/v3.3.2/bootstrap-3.3.2-dist.zip",
                 "type": "zip"
             }
         }
@@ -69,47 +69,50 @@
     {
         "type": "package",
         "package": {
-            "version": "v0.9.3",
+            "version": "v0.9.5",
             "name": "tienvx/autobahnjs",
             "type": "js-vendor",
             "dist": {
-                "url": "http://autobahn.s3.amazonaws.com/js/autobahn.min.js",
+                "url": "http://autobahn.s3.amazonaws.com/autobahnjs/0.9.5/autobahn.min.js",
                 "type": "file"
             }
         }
     }],
     "require": {
         "php": ">=5.4.0",
-        "symfony/class-loader": "v2.5.6",
-        "symfony/http-foundation": "v2.5.6",
-        "symfony/routing": "v2.5.6",
-        "symfony/http-kernel": "v2.5.6",
-        "symfony/event-dispatcher": "v2.5.6",
-        "symfony/dependency-injection": "v2.5.6",
-        "symfony/config": "v2.5.6",
-        "symfony/yaml": "v2.5.6",
-        "doctrine/orm": "v2.4.3",
-        "symfony/serializer": "v2.5.6",
-        "twig/twig": "v1.16.0",
-        "symfony/twig-bridge": "v2.5.6",
-        "symfony/form": "v2.5.6",
-        "kriswallsmith/assetic": "v1.1.2",
-        "symfony/validator": "v2.5.6",
+        "symfony/class-loader": "v2.6.4",
+        "symfony/http-foundation": "v2.6.4",
+        "symfony/routing": "v2.6.4",
+        "symfony/http-kernel": "v2.6.4",
+        "symfony/event-dispatcher": "v2.6.4",
+        "symfony/dependency-injection": "v2.6.4",
+        "symfony/config": "v2.6.4",
+        "symfony/yaml": "v2.6.4",
+        "doctrine/orm": "v2.4.7",
+        "symfony/serializer": "v2.6.4",
+        "twig/twig": "v1.18.0",
+        "symfony/twig-bridge": "v2.6.4",
+        "symfony/form": "v2.6.4",
+        "kriswallsmith/assetic": "v1.2.1",
+        "symfony/validator": "v2.6.4",
         "tienvx/js-vendor-installer-plugin": "v1.1.1",
         "tienvx/chessboardjs": "v0.3.0",
-        "tienvx/jquery": "v1.11.1",
-        "tienvx/bootstrap": "v3.3.0",
+        "tienvx/jquery": "v1.11.2",
+        "tienvx/bootstrap": "v3.3.2",
         "packagist/yuicompressor-bin": "v2.4.8",
-        "monolog/monolog": "1.10.0",
+        "monolog/monolog": "1.12.0",
         "cboden/ratchet": "v0.3.2",
         "react/zmq": "v0.3.0",
-        "tienvx/autobahnjs": "v0.9.3",
+        "tienvx/autobahnjs": "v0.9.5",
         "tienvx/chessjs": "dev-master"
     },
     "autoload": {
         "psr-4": {
             "Tchess\\": "src/"
         }
+    },
+    "autoload-dev": {
+        "psr-4": { "Tchess\\Tests\\": "tests/" }
     },
     "extra": {
         "installer-paths": {

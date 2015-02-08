@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/../vendor/autoload.php';
+namespace Tchess\Tests;
 
 use Doctrine\ORM\Tools\SchemaTool;
 use Symfony\Component\HttpFoundation\Request;
@@ -8,9 +8,9 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
 /**
- * Tchess test base class
+ * Tchess web test base class.
  */
-class TchessTestBase extends PHPUnit_Framework_TestCase
+class WebTestBase extends \PHPUnit_Framework_TestCase
 {
 
     public static $sc;

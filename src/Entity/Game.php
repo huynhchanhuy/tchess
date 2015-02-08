@@ -32,11 +32,6 @@ class Game
     protected $state;
 
     /**
-     * Tchess\Entity\Board
-     */
-    protected $board;
-
-    /**
      * @ORM\Column(type="string", nullable=true, options={"default":""})
      */
     protected $highlights;
@@ -104,54 +99,6 @@ class Game
     public function getRoom()
     {
         return $this->room;
-    }
-
-    /**
-     * Set board
-     *
-     * @param \Tchess\Entity\Board $board
-     * @return Game
-     */
-    public function setBoard(Board $board = null)
-    {
-        $this->board = $board;
-
-        return $this;
-    }
-
-    /**
-     * Get board
-     *
-     * @return \Tchess\Entity\Board
-     */
-    public function getBoard()
-    {
-        return $this->board;
-    }
-
-    /**
-     * Save state of the board.
-     *
-     * @return Game
-     */
-    public function saveGame($serializer)
-    {
-        $boardString = $serializer->serialize($this->board, 'fen');
-        $this->state = $boardString;
-
-        return $this;
-    }
-
-    /**
-     * Load state of the board.
-     *
-     * @return Game
-     */
-    public function loadGame($serializer)
-    {
-        $this->board = $serializer->deserialize($this->state, 'Tchess\Entity\Board', 'fen');
-
-        return $this;
     }
 
     /**

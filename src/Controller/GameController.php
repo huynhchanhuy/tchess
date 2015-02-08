@@ -323,8 +323,7 @@ class GameController extends BaseController
         }
 
         $serializer = $this->framework->getSerializer();
-        $game->loadGame($serializer);
-        $board = $game->getBoard();
+        $board = $serializer->deserialize($game->getState(), 'Tchess\Entity\Board', 'fen');
         $color = $player->getColor();
 
         if ($board->getActiveColor() != $color) {
@@ -343,7 +342,8 @@ class GameController extends BaseController
 
             $dispatcher->dispatch(MoveEvents::MOVE, $moveEvent);
 
-            $game->saveGame($serializer);
+            $state = $serializer->serialize($board, 'fen');
+            $game->setState($state);
             $game->addHighlight($move->getSource(), $move->getTarget(), $color);
             $em->flush();
 

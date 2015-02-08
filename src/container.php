@@ -9,46 +9,6 @@ use Tchess\DependencyInjection\Compiler\RegisterRulesPass;
 
 $file = __DIR__ . '/../cache/container.php';
 
-if (file_exists($file)) {
-    require_once $file;
-    $sc = new ProjectServiceContainer();
-} else {
-    $sc = new ContainerBuilder();
-
-    register_db_services($sc, $config);
-
-    register_kernel_services($sc, $env);
-
-    register_chess_services($sc);
-
-    register_twig_services($sc, $env);
-
-    register_form_services($sc);
-
-    register_serializer_services($sc);
-
-    register_logger_services($sc);
-
-    register_socket_services($sc);
-
-    add_compiler_passes($sc);
-
-    $sc->compile();
-
-    $dumper = new PhpDumper($sc);
-    file_put_contents($file, $dumper->dump());
-}
-
-function add_compiler_passes($sc)
-{
-    $sc->addCompilerPass(new RegisterRulesPass());
-}
-
-// @todo - Run it using service container?
-AnnotationRegistry::registerLoader('class_exists');
-
-return $sc;
-
 function register_logger_services($sc)
 {
     $sc->register('logger', 'Monolog\Logger')
@@ -360,3 +320,43 @@ function register_socket_services($sc)
             ->addMethodCall('connect', array('tcp://localhost:5555'))
     ;
 }
+
+function add_compiler_passes($sc)
+{
+    $sc->addCompilerPass(new RegisterRulesPass());
+}
+
+if (file_exists($file)) {
+    require_once $file;
+    $sc = new ProjectServiceContainer();
+} else {
+    $sc = new ContainerBuilder();
+
+    register_db_services($sc, $config);
+
+    register_kernel_services($sc, $env);
+
+    register_chess_services($sc);
+
+    register_twig_services($sc, $env);
+
+    register_form_services($sc);
+
+    register_serializer_services($sc);
+
+    register_logger_services($sc);
+
+    register_socket_services($sc);
+
+    add_compiler_passes($sc);
+
+    $sc->compile();
+
+    $dumper = new PhpDumper($sc);
+    file_put_contents($file, $dumper->dump());
+}
+
+// @todo - Run it using service container?
+AnnotationRegistry::registerLoader('class_exists');
+
+return $sc;

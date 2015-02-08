@@ -1,9 +1,13 @@
 <?php
 
+namespace Tchess\Tests\Controller;
+
+use Tchess\Tests\WebTestBase;
+
 /**
  * Test team
  */
-class GameControllerTest extends TchessTestBase
+class GameControllerTest extends WebTestBase
 {
 
     public function tearDown()

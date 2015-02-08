@@ -46,10 +46,11 @@ class GameListener implements EventSubscriberInterface
             $board = new Board();
             $board->initialize();
 
+            $state = $this->serializer->serialize($board, 'fen');
+
             $game = new Game();
             $game->setRoom($room);
-            $game->setBoard($board);
-            $game->saveGame($this->serializer);
+            $game->setSate($state);
 
             $this->em->persist($game);
 
