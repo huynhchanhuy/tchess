@@ -14,6 +14,8 @@ class UnitTestBase extends \PHPUnit_Framework_TestCase
 
     public static function setUpBeforeClass()
     {
+        $config = array();
+        $env = 'test';
         static::$sc = include __DIR__ . '/../src/container.php';
     }
 

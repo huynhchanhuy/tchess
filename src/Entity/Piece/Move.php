@@ -3,8 +3,12 @@
 namespace Tchess\Entity\Piece;
 
 use Symfony\Component\Validator\Constraints as Assert;
+use Tchess\Validator\Constraints as TchessAssert;
 use Tchess\Entity\Board;
 
+/**
+ * @TchessAssert\Move
+ */
 class Move
 {
     /**

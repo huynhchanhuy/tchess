@@ -157,7 +157,7 @@ class Board implements NormalizableInterface, DenormalizableInterface
 
     public function initialize()
     {
-        for ($x = 0; $x < 8; $x++) {
+        for ($x = 2; $x < 6; $x++) {
             for ($y = 0; $y < 8; $y++) {
                 $this->pieces[$x][$y] = null;
             }

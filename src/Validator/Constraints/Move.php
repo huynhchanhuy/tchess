@@ -17,4 +17,9 @@ class Move extends Constraint
     {
         return 'validator.move';
     }
+
+    public function getTargets()
+    {
+        return self::CLASS_CONSTRAINT;
+    }
 }

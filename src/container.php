@@ -6,6 +6,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use Monolog\Logger;
 use Tchess\DependencyInjection\Compiler\RegisterRulesPass;
+use Tchess\DependencyInjection\Compiler\AddConstraintValidatorsPass;
 
 $file = __DIR__ . '/../cache/container.php';
 
@@ -27,12 +28,34 @@ function register_serializer_services($sc)
             ->setArguments(array(array(new Reference('board_pieces_normalizer')), array(new Reference('fen_encoder'))));
 }
 
+function register_validator_services($sc)
+{
+    $sc->setParameter('validator.class', 'Symfony\Component\Validator\ValidatorInterface');
+    $sc->setParameter('validator.builder.class', 'Symfony\Component\Validator\ValidatorBuilderInterface');
+    $sc->setParameter('validator.builder.factory.class', 'Symfony\Component\Validator\Validation');
+    $sc->setParameter('validator.validator_factory.class', 'Tchess\Validator\ConstraintValidatorFactory');
+    $sc->register('validator')
+            ->setClass('%validator.class%')
+            ->setFactoryService(new Reference('validator.builder'))
+            ->setFactoryMethod('getValidator');
+    $sc->register('validator.validator_factory')
+            ->setClass('%validator.validator_factory.class%')
+            ->setPublic(false)
+            ->setArguments(array(new Reference('service_container'), array()));
+    $sc->register('validator.builder')
+            ->setClass('%validator.builder.class%')
+            ->setFactoryClass('Symfony\Component\Validator\Validation')
+            ->setFactoryMethod('createValidatorBuilder')
+            ->addMethodCall('setTranslator', array(new Reference('translator')))
+            ->addMethodCall('enableAnnotationMapping', array(new Reference('annotation_reader')))
+            ->addMethodCall('setConstraintValidatorFactory', array(new Reference('validator.validator_factory')));
+
+    $sc->register('validator.move', 'Tchess\Validator\Constraints\MoveValidator')
+            ->addTag('validator.constraint_validator', array('alias' => 'validator.move'));
+}
+
 function register_form_services($sc)
 {
-    $sc->register('validator')
-            ->setFactoryClass('Symfony\Component\Validator\Validation')
-            ->setFactoryMethod('createValidator')
-            ->setClass('Symfony\Component\Validator\Validator');
     $sc->register('form_validator_extension', 'Symfony\Component\Form\Extension\Validator\ValidatorExtension')
             ->setArguments(array(new Reference('validator')));
 
@@ -208,8 +231,6 @@ function register_chess_services($sc)
             ->addMethodCall('addSubscriber', array(new Reference('listener.game')))
     ;
 
-    $sc->register('validator.move', 'Tchess\Validator\Constraints\MoveValidator');
-
     $sc->register('move_manager', 'Tchess\MessageManager');
 }
 
@@ -324,6 +345,7 @@ function register_socket_services($sc)
 function add_compiler_passes($sc)
 {
     $sc->addCompilerPass(new RegisterRulesPass());
+    $sc->addCompilerPass(new AddConstraintValidatorsPass());
 }
 
 if (file_exists($file)) {
@@ -340,6 +362,8 @@ if (file_exists($file)) {
 
     register_twig_services($sc, $env);
 
+    register_validator_services($sc);
+
     register_form_services($sc);
 
     register_serializer_services($sc);
@@ -349,6 +373,12 @@ if (file_exists($file)) {
     register_socket_services($sc);
 
     add_compiler_passes($sc);
+
+//    $sc->loadFromExtension('framework', array(
+//        'validation' => array(
+//            'enable_annotations' => true,
+//        ),
+//    ));
 
     $sc->compile();
 
