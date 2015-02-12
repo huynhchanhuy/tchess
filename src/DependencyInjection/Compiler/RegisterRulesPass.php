@@ -21,7 +21,7 @@ class RegisterRulesPass implements CompilerPassInterface
             }
         }
 
-        if (!$container->hasDefinition('validator.move')) {
+        if ($container->hasDefinition('validator.move')) {
             $validator = $container->getDefinition('validator.move');
             foreach ($container->findTaggedServiceIds('rules') as $id => $attributes) {
                 $validator->addMethodCall('addRules', array(new Reference($id)));

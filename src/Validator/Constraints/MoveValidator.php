@@ -26,13 +26,15 @@ class MoveValidator extends ConstraintValidator implements MoveValidatorInterfac
         }
 
         krsort($this->rules);
-        foreach ($this->rules as $rule) {
-            $message = call_user_func($rule, $move);
-            if (!empty($message)) {
-                $this->buildViolation($message)
-                    // Currently we do not support parameters in message.
-                    //->setParameter('%string%', $value)
-                    ->addViolation();
+        foreach ($this->rules as $priority => $rules) {
+            foreach ($rules as $rule) {
+                $message = call_user_func($rule, $move);
+                if (!empty($message)) {
+                    $this->buildViolation($message)
+                        // Currently we do not support parameters in message.
+                        //->setParameter('%string%', $value)
+                        ->addViolation();
+                }
             }
         }
     }
