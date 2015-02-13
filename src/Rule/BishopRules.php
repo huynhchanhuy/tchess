@@ -2,12 +2,13 @@
 
 namespace Tchess\Rule;
 
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Tchess\Entity\Piece\Bishop;
 use Tchess\Entity\Piece\Queen;
 use Tchess\Rule\MoveCheckerInterface;
 use Tchess\Entity\Piece\Move;
 
-class BishopRules implements MoveCheckerInterface
+class BishopRules implements EventSubscriberInterface, MoveCheckerInterface
 {
     public function checkMove(Move $move, $fromQueen = false)
     {
@@ -57,6 +58,11 @@ class BishopRules implements MoveCheckerInterface
     public static function getRules()
     {
         return array(array('checkMove', 0));
+    }
+
+    public static function getSubscribedEvents()
+    {
+        return array();
     }
 
 }

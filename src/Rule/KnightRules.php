@@ -2,11 +2,12 @@
 
 namespace Tchess\Rule;
 
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Tchess\Entity\Piece\Knight;
 use Tchess\Rule\MoveCheckerInterface;
 use Tchess\Entity\Piece\Move;
 
-class KnightRules implements MoveCheckerInterface
+class KnightRules implements EventSubscriberInterface, MoveCheckerInterface
 {
     public function checkMove(Move $move)
     {
@@ -33,6 +34,11 @@ class KnightRules implements MoveCheckerInterface
     public static function getRules()
     {
         return array(array('checkMove', 0));
+    }
+
+    public static function getSubscribedEvents()
+    {
+        return array();
     }
 
 }

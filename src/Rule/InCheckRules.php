@@ -2,6 +2,7 @@
 
 namespace Tchess\Rule;
 
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Validator\ValidatorInterface;
 use Tchess\Entity\Board;
 use Tchess\Entity\Piece\King;
@@ -9,7 +10,7 @@ use Tchess\Entity\Piece\Move;
 use Tchess\Entity\Piece\Piece;
 use Tchess\Rule\MoveCheckerInterface;
 
-class InCheckRules implements MoveCheckerInterface
+class InCheckRules implements EventSubscriberInterface, MoveCheckerInterface
 {
 
     private $validator;
@@ -83,6 +84,11 @@ class InCheckRules implements MoveCheckerInterface
     public static function getRules()
     {
         return array(array('checkMove', -1));
+    }
+
+    public static function getSubscribedEvents()
+    {
+        return array();
     }
 
 }
