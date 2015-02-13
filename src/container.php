@@ -224,7 +224,7 @@ function register_chess_services($sc)
             ->setArguments(array(new Reference('rules.bishop'), new Reference('rules.rook')))
             ->addTag('rules');
     $sc->register('rules.in_check', 'Tchess\Rule\InCheckRules')
-            ->setArguments(array(new Reference('dispatcher')))
+            ->setArguments(array(new Reference('validator')))
             ->addTag('rules');
 
     $sc->getDefinition('dispatcher')
