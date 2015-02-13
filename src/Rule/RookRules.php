@@ -8,6 +8,7 @@ use Tchess\Event\MoveEvent;
 use Tchess\Entity\Piece\Rook;
 use Tchess\Entity\Piece\Queen;
 use Tchess\Rule\MoveCheckerInterface;
+use Tchess\Entity\Piece\Move;
 
 class RookRules implements EventSubscriberInterface, MoveCheckerInterface
 {
