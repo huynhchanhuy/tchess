@@ -14,7 +14,9 @@ class UnitTestBase extends \PHPUnit_Framework_TestCase
 
     public static function setUpBeforeClass()
     {
-        $config = array();
+        $config = array(
+            'driver' => 'pdo_sqlite',
+        );
         $env = 'test';
         static::$sc = include __DIR__ . '/../src/container.php';
     }
