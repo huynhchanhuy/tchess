@@ -17,7 +17,7 @@ Fix permission errors:
  4. sudo chown myaccount:www-data -R cache/
  5. sudo chown myaccount:www-data -R logs/
  6. sudo chown myaccount:www-data -R db/
- 7. chmod 777 -R db/
+ 7. sudo chmod 777 -R db/
  8. sudo chown myaccount:www-data -R files/
 
 Run a web browser and open example.com
