@@ -22,13 +22,8 @@ class BishopRules implements EventSubscriberInterface, MoveCheckerInterface
             return;
         }
 
-        if ($currentRow == $newRow || $currentColumn == $newColumn) {
-            // Did not move diagonally.
-            return false;
-        }
-
         if (abs($newRow - $currentRow) != abs($newColumn - $currentColumn)) {
-            return false;
+            return 'Did not move diagonally';
         }
 
         if ($currentRow < $newRow) {
@@ -46,13 +41,11 @@ class BishopRules implements EventSubscriberInterface, MoveCheckerInterface
         $y = $currentColumn + $colOffset;
         for($x = $currentRow + $rowOffset; $x != $newRow; $x += $rowOffset) {
             if($board->getPiece($x, $y) != null) {
-                return false;
+                return 'Can not move through another piece';
             }
 
             $y += $colOffset;
         }
-
-        return true;
     }
 
     public static function getRules()
