@@ -19,25 +19,23 @@ class BasicRules implements EventSubscriberInterface, MoveCheckerInterface
         list($newRow, $newColumn) = Move::getIndex($move->getTarget());
 
         if ($currentRow == $newRow && $currentColumn == $newColumn) {
-            return false;
+            return 'Can not move to the same square';
         }
 
         $source_piece = $board->getPiece($currentRow, $currentColumn);
         $target_piece = $board->getPiece($newRow, $newColumn);
 
         if ($source_piece == null) {
-            return false;
+            return 'Can not move empty square';
         }
 
         if (!$source_piece instanceof Piece || $source_piece->getColor() != $color) {
-            return false;
+            return 'Can not move opponent piece';
         }
 
         if ($target_piece instanceof Piece && $target_piece->getColor() == $color) {
-            return false;
+            return 'Can not take your own piece';
         }
-
-        return true;
     }
 
     public function onMoveUpdateFullmoveNumber(MoveEvent $event)

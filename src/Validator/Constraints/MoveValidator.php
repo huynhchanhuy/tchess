@@ -34,6 +34,8 @@ class MoveValidator extends ConstraintValidator implements MoveValidatorInterfac
                         // Currently we do not support parameters in message.
                         //->setParameter('%string%', $value)
                         ->addViolation();
+                    // Stop propagation.
+                    break 2;
                 }
             }
         }
