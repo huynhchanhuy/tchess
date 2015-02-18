@@ -17,16 +17,18 @@ class WebTestBase extends \PHPUnit_Framework_TestCase
 
     public static function setUpBeforeClass()
     {
-        // @todo - Use in memory sqlite to speed up the test.
-        $config = array(
-            'driver' => 'pdo_sqlite',
-            'path' => '%root_dir%/db/sqlite_test.db',
-            'charset' => 'UTF-8',
-        );
-        $config['path'] = str_replace('%root_dir%', __DIR__ . '/..', $config['path']);
+        if (empty(static::$sc)) {
+            // @todo - Use in memory sqlite to speed up the test.
+            $config = array(
+                'driver' => 'pdo_sqlite',
+                'path' => '%root_dir%/db/sqlite_test.db',
+                'charset' => 'UTF-8',
+            );
+            $config['path'] = str_replace('%root_dir%', __DIR__ . '/..', $config['path']);
 
-        $env = 'test';
-        static::$sc = include __DIR__ . '/../src/container.php';
+            $env = 'test';
+            static::$sc = require_once __DIR__ . '/../src/container.php';
+        }
 
         // getting objects.
         $entityManager = static::$sc->get('entity_manager');
