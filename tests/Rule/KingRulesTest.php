@@ -54,4 +54,18 @@ class KingRulesTest extends UnitTestBase
         $this->assertTrue(count($errors) > 0, 'Can not move 2 squares if both rooks are moved');
     }
 
+    public function testInvalidCastlingMove()
+    {
+        /* @var $board Board */
+        $board = $this->serializer->deserialize('rnbqkbnr/pp6/2pppppp/8/1PP5/N1B5/P1QPPPPP/R3KBNR w KQkq - 0 7', 'Tchess\Entity\Board', 'fen');
+
+        $move = new Move($board, 'white', 'e1 b1');
+        $errors = $this->validator->validate($move);
+        $this->assertTrue(count($errors) > 0, 'Can not move more than 2 columns while castling');
+
+        $move = new Move($board, 'white', 'e1 b2');
+        $errors = $this->validator->validate($move);
+        $this->assertTrue(count($errors) > 0, 'Can not move to different row while castling');
+    }
+
 }

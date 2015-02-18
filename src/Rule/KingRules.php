@@ -48,7 +48,7 @@ class KingRules implements EventSubscriberInterface, MoveCheckerInterface
             }
 
             if (abs($newColumn - $currentColumn) != 2 || $currentRow != $newRow) {
-                return false;
+                return 'Invalid castling move';
             }
 
             if ($this->inCheckRules->isInCheck($board, $color)) {
