@@ -199,6 +199,12 @@ class Board implements NormalizableInterface, DenormalizableInterface
         $this->pieces[0][4] = new King("white");
         $this->pieces[7][4] = new King("black");
 
+        for ($x = 0; $x < 8; $x+=7) {
+            for ($y = 0; $y < 8; $y++) {
+                $this->pieces[$x][$y]->setHasMoved(false);
+            }
+        }
+
         // Other attributes.
         $this->setActiveColor('white');
         $this->setCastlingAvailability('KQkq');
@@ -230,7 +236,7 @@ class Board implements NormalizableInterface, DenormalizableInterface
     {
         for ($x = 0; $x < 8; $x++) {
             for ($y = 0; $y < 8; $y++) {
-                $this->pieces[$x][$y] = (isset($data['pieces'][$x][$y]) && !empty($data['pieces'][$x][$y])) ? PieceFactory::create($data['pieces'][$x][$y], $x, $y, $data['ep']) : null;
+                $this->pieces[$x][$y] = (isset($data['pieces'][$x][$y]) && !empty($data['pieces'][$x][$y])) ? PieceFactory::create($data['pieces'][$x][$y], $x, $y, $data['castling'], $data['ep']) : null;
             }
         }
 

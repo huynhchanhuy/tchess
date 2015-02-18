@@ -12,51 +12,43 @@ use Tchess\Entity\Piece\Move;
 
 class PieceFactory
 {
-    public static function create($serialized, $x, $y, $ep)
+    public static function create($serialized, $x, $y, $castling, $ep)
     {
         if (empty($serialized)) {
             return null;
         }
+        $moved = false;
 
         $color = ctype_upper($serialized) ? 'white' : 'black';
         switch (strtoupper($serialized)) {
             case 'B':
                 $piece = new Bishop($color);
-                if ($color == 'white') {
-                    $notMoved = $x == 0 && ($y == 2 || $y == 5);
-                }
-                else {
-                    $notMoved = $x == 7 && ($y == 2 || $y == 5);
-                }
+                // We don't care about moved value.
                 break;
 
             case 'K':
                 $piece = new King($color);
+                // If both rooks were moved, moved value is not important.
                 if ($color == 'white') {
-                    $notMoved = $x == 0 && $y == 4;
+                    $moved = ($x != 0) || ($y != 4) || (strpos($castling, 'K') === false && strpos($castling, 'Q') === false);
                 }
                 else {
-                    $notMoved = $x == 7 && $y == 4;
+                    $moved = ($x != 7) || ($y != 4) || (strpos($castling, 'k') === false && strpos($castling, 'q') === false);
                 }
                 break;
 
             case 'N':
                 $piece = new Knight($color);
-                if ($color == 'white') {
-                    $notMoved = $x == 0 && ($y == 1 || $y == 6);
-                }
-                else {
-                    $notMoved = $x == 7 && ($y == 1 || $y == 6);
-                }
+                // We don't care about moved value.
                 break;
 
             case 'P':
                 $piece = new Pawn($color);
                 if ($color == 'white') {
-                    $notMoved = $x == 1;
+                    $moved = $x != 1;
                 }
                 else {
-                    $notMoved = $x == 6;
+                    $moved = $x != 6;
                 }
 
                 if (preg_match('/^[a-h]{1}(3|6){1}$/', $ep)) {
@@ -72,21 +64,17 @@ class PieceFactory
 
             case 'Q':
                 $piece = new Queen($color);
-                if ($color == 'white') {
-                    $notMoved = $x == 0 && $y == 3;
-                }
-                else {
-                    $notMoved = $x == 7 && $y == 3;
-                }
+                // We don't care about moved value.
                 break;
 
             case 'R':
                 $piece = new Rook($color);
+                // If the king was moved, moved value is not important.
                 if ($color == 'white') {
-                    $notMoved = $x == 0 && ($y == 0 || $y == 7);
+                    $moved = $x != 0 || (($y != 0 || strpos($castling, 'Q') === false) && ($y != 7 || strpos($castling, 'K') === false));
                 }
                 else {
-                    $notMoved = $x == 7 && ($y == 0 || $y == 7);
+                    $moved = $x != 7 || (($y != 0 || strpos($castling, 'q') === false) && ($y != 7 || strpos($castling, 'k') === false));
                 }
                 break;
 
@@ -94,7 +82,7 @@ class PieceFactory
                 $piece = null;
                 break;
         }
-        $piece->setHasMoved(!$notMoved);
+        $piece->setHasMoved($moved);
         return $piece;
     }
 }

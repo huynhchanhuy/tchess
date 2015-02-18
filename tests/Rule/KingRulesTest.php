@@ -27,7 +27,31 @@ class KingRulesTest extends UnitTestBase
 
         $move = new Move($board, 'white', 'e1 h3');
         $errors = $this->validator->validate($move);
-        $this->assertTrue(count($errors) > 0, 'Can not move to a square that no piece type can reach');
+        $this->assertTrue(count($errors) > 0, 'Can not move to a square that no piece type can reach in one move');
+    }
+
+    public function testKingMoved()
+    {
+        /* @var $board Board */
+        $board = $this->serializer->deserialize('rnbqkbnr/ppp5/3ppppp/8/2PPPP2/8/PP2K1PP/RNBQ1BNR w kq - 0 6', 'Tchess\Entity\Board', 'fen');
+
+        $move = new Move($board, 'white', 'e2 c2');
+        $errors = $this->validator->validate($move);
+        $this->assertTrue(count($errors) > 0, 'Can not move 2 squares if the king is moved');
+    }
+
+    public function testBothRooksMoved()
+    {
+        /* @var $board Board */
+        $board = $this->serializer->deserialize('rnbqkbnr/8/p7/1ppppppp/PPPPPPPP/R1N2N1R/1BQ3B1/4K3 w kq - 0 16', 'Tchess\Entity\Board', 'fen');
+
+        $move = new Move($board, 'white', 'e1 c1');
+        $errors = $this->validator->validate($move);
+        $this->assertTrue(count($errors) > 0, 'Can not move 2 squares if both rooks are moved');
+
+        $move = new Move($board, 'white', 'e1 g1');
+        $errors = $this->validator->validate($move);
+        $this->assertTrue(count($errors) > 0, 'Can not move 2 squares if both rooks are moved');
     }
 
 }

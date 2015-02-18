@@ -44,7 +44,7 @@ class KingRules implements EventSubscriberInterface, MoveCheckerInterface
         if (abs($newColumn - $currentColumn) > 1) {
 
             if ($piece->isMoved()) {
-                return false;
+                return 'Can not do castling if king or both rooks is moved';
             }
 
             if (abs($newColumn - $currentColumn) != 2 || $currentRow != $newRow) {
