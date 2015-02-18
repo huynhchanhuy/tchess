@@ -374,12 +374,6 @@ if (file_exists($file)) {
 
     add_compiler_passes($sc);
 
-//    $sc->loadFromExtension('framework', array(
-//        'validation' => array(
-//            'enable_annotations' => true,
-//        ),
-//    ));
-
     $sc->compile();
 
     $dumper = new PhpDumper($sc);
