@@ -38,7 +38,7 @@ class KingRules implements EventSubscriberInterface, MoveCheckerInterface
         }
 
         if (abs($newRow - $currentRow) > 1) {
-            return false;
+            return 'Can not move more than one row';
         }
 
         if (abs($newColumn - $currentColumn) > 1) {
