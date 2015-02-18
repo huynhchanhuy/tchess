@@ -20,15 +20,10 @@ class KnightRules implements EventSubscriberInterface, MoveCheckerInterface
             return;
         }
 
-        if (abs($newRow - $currentRow) == 2 && abs($newColumn - $currentColumn) == 1) {
-            return true;
+        if ((abs($newRow - $currentRow) != 2 || abs($newColumn - $currentColumn) != 1) &&
+                (abs($newRow - $currentRow) != 1 || abs($newColumn - $currentColumn) != 2)) {
+            return 'Invalid knight move';
         }
-
-        if (abs($newRow - $currentRow) == 1 && abs($newColumn - $currentColumn) == 2) {
-            return true;
-        }
-
-        return false;
     }
 
     public static function getRules()
