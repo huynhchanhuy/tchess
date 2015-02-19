@@ -51,7 +51,8 @@ function register_validator_services($sc)
             ->addMethodCall('setConstraintValidatorFactory', array(new Reference('validator.validator_factory')));
 
     $sc->register('validator.move', 'Tchess\Validator\Constraints\MoveValidator')
-            ->addTag('validator.constraint_validator', array('alias' => 'validator.move'));
+            ->addTag('validator.constraint_validator', array('alias' => 'validator.move'))
+            ->setScope('prototype');
 }
 
 function register_form_services($sc)

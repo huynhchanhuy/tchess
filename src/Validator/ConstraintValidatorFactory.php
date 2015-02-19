@@ -45,7 +45,11 @@ class ConstraintValidatorFactory implements ConstraintValidatorFactoryInterface
         if (!isset($this->validators[$name])) {
             $this->validators[$name] = new $name();
         } elseif (is_string($this->validators[$name])) {
-            $this->validators[$name] = $this->container->get($this->validators[$name]);
+            // $this->validators[$name] = $this->container->get($this->validators[$name]);
+            // @hack - The service with prototype scope is created only one time,
+            // so that only one instance will be returned. This hack will return
+            // new instance of the service every time it is requested.
+            return $this->container->get($this->validators[$name]);
         }
 
         if (!$this->validators[$name] instanceof ConstraintValidatorInterface) {
