@@ -30,7 +30,7 @@ class MoveValidator extends ConstraintValidator implements MoveValidatorInterfac
             foreach ($rules as $rule) {
                 $message = call_user_func($rule, $move);
                 if (!empty($message)) {
-                    $this->buildViolation($message)
+                    $this->context->buildViolation($message)
                         // Currently we do not support parameters in message.
                         //->setParameter('%string%', $value)
                         ->addViolation();
