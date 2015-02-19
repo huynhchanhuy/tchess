@@ -31,7 +31,11 @@ class QueenRules implements EventSubscriberInterface, MoveCheckerInterface
             return;
         }
 
-        return $this->bishopRules->checkMove($move, true) || $this->rookRules->checkMove($move, true);
+        $bishopViolation = $this->bishopRules->checkMove($move, true);
+        $rookViolation = $this->rookRules->checkMove($move, true);
+        if ($bishopViolation && $rookViolation) {
+            return 'Invalid queen move';
+        }
     }
 
     public static function getRules()

@@ -33,23 +33,21 @@ class InCheckRules implements EventSubscriberInterface, MoveCheckerInterface
 
         if ($this->isInCheck($newBoard, $color)) {
             // The king is still in check.
-            return false;
+            return 'The king does not end up in check';
         }
-
-        return true;
     }
 
     public function isInCheck(Board $board, $color)
     {
         $kingPos = $this->getKingPos($board, $color);
         list($row, $col) = $kingPos;
+        $target = Move::getSquare($row, $col);
 
         for ($x = 0; $x < 8; $x++) {
             for ($y = 0; $y < 8; $y++) {
                 $piece = $board->getPiece($x, $y);
                 if ($piece instanceof Piece && $piece->getColor() != $color) {
                     $source = Move::getSquare($x, $y);
-                    $target = Move::getSquare($row, $col);
                     $move = new Move($board, $piece->getColor(), "$source $target");
 
                     $errors = $this->validator->validate($move);

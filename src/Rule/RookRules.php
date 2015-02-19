@@ -25,8 +25,7 @@ class RookRules implements EventSubscriberInterface, MoveCheckerInterface
         }
 
         if ($currentRow != $newRow && $currentColumn != $newColumn) {
-            // Did not move along one rank/file.
-            return false;
+            return 'Did not move along one row/column';
         }
 
         // First I will assumed the Rook is moving along the rows.
@@ -40,7 +39,7 @@ class RookRules implements EventSubscriberInterface, MoveCheckerInterface
             for($x = $currentRow + $offset; $x != $newRow; $x += $offset) {
                 // Go from currentRow to newRow, and check every space.
                 if($board->getPiece($x, $currentColumn) != null) {
-                    return false;
+                    return 'There is a piece between source and target squares';
                 }
             }
         }
@@ -56,12 +55,10 @@ class RookRules implements EventSubscriberInterface, MoveCheckerInterface
             for($x = $currentColumn + $offset; $x != $newColumn; $x += $offset) {
                 // Go from currentCol to newCol, and check every space.
                 if($board->getPiece($currentRow, $x) != null) {
-                    return false;
+                    return 'There is a piece between source and target squares';
                 }
             }
         }
-
-        return true;
     }
 
     public function onMoveRemoveCastlingAvailability(MoveEvent $event)

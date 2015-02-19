@@ -31,41 +31,40 @@ class PawnRules implements EventSubscriberInterface, MoveCheckerInterface
 
         if ($color == "white") {
             if ($currentRow >= $newRow) {
-                return false;
+                return 'Can not move a pawn backward';
             }
         } else {
             if ($newRow >= $currentRow) {
-                return false;
+                return 'Can not move a pawn backward';
             }
         }
 
         if ($currentColumn == $newColumn) {
-            // Not taking a piece.
             if ($color == "white") {
                 if ($board->getPiece($currentRow + 1, $currentColumn) != null) {
-                    return false;
+                    return 'A pawn can not take a piece in front of it';
                 }
             } else {
                 if ($board->getPiece($currentRow - 1, $currentColumn) != null) {
-                    return false;
+                    return 'A pawn can not take a piece in front of it';
                 }
             }
 
             if (abs($newRow - $currentRow) > 2) {
-                return false;
+                return 'Can not move more than 2 rows';
             } else if (abs($newRow - $currentRow) == 2) {
                 // Advancing two spaces at beginning.
                 if ($piece->isMoved()) {
-                    return false;
+                    return 'Can not move 2 rows if the pawn is moved';
                 }
 
                 if ($piece->getColor() == 'white') {
                     if($board->getPiece($currentRow + 2, $currentColumn) != null) {
-                        return false;
+                        return 'Can not take a piece while advancing 2 rows at beginning';
                     }
                 } else {
                     if($board->getPiece($currentRow - 2, $currentColumn) != null) {
-                        return false;
+                        return 'Can not take a piece while advancing 2 rows at beginning';
                     }
                 }
 
@@ -81,26 +80,22 @@ class PawnRules implements EventSubscriberInterface, MoveCheckerInterface
         } else {
             // Taking a piece.
             if (abs($newColumn - $currentColumn) != 1 || abs($newRow - $currentRow) != 1) {
-                return false;
+                return 'Invalid taking piece move';
             }
 
             if($board->getPiece($newRow, $newColumn) == null) {
+                // Capture en passant.
                 if ($color == 'white' && $newRow == 5) {
                     $epPiece = $board->getPiece($newRow - 1, $newColumn);
                 }
                 else if ($color == 'black' && $newRow == 2) {
                     $epPiece = $board->getPiece($newRow + 1, $newColumn);
                 }
-                if (!empty($epPiece) && $epPiece instanceof Pawn && $epPiece->getColor() != $color && $epPiece->isEpAble()) {
-                    return true;
-                }
-                else {
-                    return false;
+                if (empty($epPiece) || !$epPiece instanceof Pawn || $epPiece->getColor() == $color || !$epPiece->isEpAble()) {
+                    return 'Invalid capture en passant move';
                 }
             }
         }
-
-        return true;
     }
 
     private function updateEnPassantTarget(Board $board, Move $move, Piece $piece)

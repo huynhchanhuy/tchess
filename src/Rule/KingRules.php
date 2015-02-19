@@ -53,8 +53,11 @@ class KingRules implements EventSubscriberInterface, MoveCheckerInterface
 
             if ($this->inCheckRules->isInCheck($board, $color)) {
                 // The king must not be in check while castling.
-                return false;
+                return 'The king is in check, can not do castling';
             }
+
+            // The king does not end up in check.
+            // @see InCheckRules::checkMove().
 
             // Do castling logic here.
             if ($newColumn - $currentColumn == 2) {
