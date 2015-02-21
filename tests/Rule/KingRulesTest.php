@@ -82,4 +82,18 @@ class KingRulesTest extends UnitTestBase
         $this->assertTrue(count($errors) > 0, 'Can not do (kingside) castling while in check');
     }
 
+    public function testDoCastlingEndUpInCheck()
+    {
+        /* @var $board Board */
+        $board = $this->serializer->deserialize('1nbqkbn1/2ppppp1/2r3r1/p7/3PP3/Np1BBQ1p/P4P1P/R3K2R w KQ - 0 12', 'Tchess\Entity\Board', 'fen');
+
+        $move = new Move($board, 'white', 'e1 c1');
+        $errors = $this->validator->validate($move);
+        $this->assertTrue(count($errors) > 0, 'Can not do (queenside) castling end up in check');
+
+        $move = new Move($board, 'white', 'e1 g1');
+        $errors = $this->validator->validate($move);
+        $this->assertTrue(count($errors) > 0, 'Can not do (kingside) castling end up in check');
+    }
+
 }
