@@ -77,7 +77,7 @@ class KingRulesTest extends UnitTestBase
         $errors = $this->validator->validate($move);
         $this->assertTrue(count($errors) > 0, 'Can not do (queenside) castling while in check');
 
-        $move = new Move($board, 'white', 'e1 g2');
+        $move = new Move($board, 'white', 'e1 g1');
         $errors = $this->validator->validate($move);
         $this->assertTrue(count($errors) > 0, 'Can not do (kingside) castling while in check');
     }
