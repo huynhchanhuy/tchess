@@ -33,7 +33,7 @@ class InCheckRules implements EventSubscriberInterface, MoveCheckerInterface
 
         if ($this->isInCheck($newBoard, $color)) {
             // The king is still in check.
-            return 'The king does not end up in check';
+            return 'The king end up in check';
         }
     }
 

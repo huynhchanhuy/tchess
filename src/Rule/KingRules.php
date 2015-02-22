@@ -44,7 +44,7 @@ class KingRules implements EventSubscriberInterface, MoveCheckerInterface
         if (abs($newColumn - $currentColumn) > 1) {
 
             if ($piece->isMoved()) {
-                return 'Can not do castling if king or both rooks is moved';
+                return 'Can not do castling if the king is moved';
             }
 
             if (abs($newColumn - $currentColumn) != 2 || $currentRow != $newRow) {
@@ -64,22 +64,22 @@ class KingRules implements EventSubscriberInterface, MoveCheckerInterface
                 // Castle kingside.
                 $rook = $board->getPiece($newRow, $currentColumn + 3);
                 if (!$rook instanceof Rook || $rook->isMoved()) {
-                    return false;
+                    return 'Kingside rook is moved';
                 }
 
                 if ($board->getPiece($newRow, $currentColumn + 1) != null || $board->getPiece($newRow, $currentColumn + 2) != null) {
-                    return false;
+                    return 'There are pieces between the king and kingside rook';
                 }
             } else if ($newColumn - $currentColumn == -2) {
                 // Queenside.
                 $rook = $board->getPiece($newRow, $currentColumn - 4);
                 if (!$rook instanceof Rook || $rook->isMoved()) {
-                    return false;
+                    return 'Queenside rook is moved';
                 }
 
                 // There are 3 squares between the king and the queenside rook.
                 if ($board->getPiece($newRow, $currentColumn - 1) != null || $board->getPiece($newRow, $currentColumn - 2) != null || $board->getPiece($newRow, $currentColumn - 3) != null) {
-                    return false;
+                    return 'There are pieces between the king and queenside rook';
                 }
             }
 
@@ -87,8 +87,6 @@ class KingRules implements EventSubscriberInterface, MoveCheckerInterface
             // actually move.
             $piece->setCastled(true);
         }
-
-        return true;
     }
 
     public function onMoveDoCastling(MoveEvent $event)

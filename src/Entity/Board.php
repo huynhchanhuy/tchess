@@ -56,6 +56,14 @@ class Board implements NormalizableInterface, DenormalizableInterface
     }
 
     /**
+     * Set piece.
+     */
+    public function setPieces($pieces)
+    {
+        $this->pieces = $pieces;
+    }
+
+    /**
      * Set active color
      *
      * @param string $activeColor
@@ -285,6 +293,21 @@ class Board implements NormalizableInterface, DenormalizableInterface
         $data['fullmove'] = $this->fullmoveNumber > 0 ? $this->fullmoveNumber : 1;
 
         return $data;
+    }
+
+    /**
+     * Deep clone board object.
+     *
+     * @return \Tchess\Entity\Board
+     */
+    public function __clone() {
+        for ($x = 0; $x < 8; $x++) {
+            for ($y = 0; $y < 8; $y++) {
+                if (is_object($this->pieces[$x][$y])) {
+                    $this->pieces[$x][$y] = clone $this->pieces[$x][$y];
+                }
+            }
+        }
     }
 
 }

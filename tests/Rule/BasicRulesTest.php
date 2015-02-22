@@ -12,8 +12,8 @@ class BasicRulesTest extends UnitTestBase
     {
         $board = new Board();
         $board->initialize();
-        $move = new Move($board, 'white', 'a1 a1');
 
+        $move = new Move($board, 'white', 'a1 a1');
         $errors = $this->validator->validate($move);
         $this->assertTrue(count($errors) > 0, 'Can not move piece to the same square');
     }
@@ -22,8 +22,8 @@ class BasicRulesTest extends UnitTestBase
     {
         $board = new Board();
         $board->initialize();
-        $move = new Move($board, 'white', 'a3 a4');
 
+        $move = new Move($board, 'white', 'a3 a4');
         $errors = $this->validator->validate($move);
         $this->assertTrue(count($errors) > 0, 'There are no piece at a3');
     }
@@ -32,8 +32,8 @@ class BasicRulesTest extends UnitTestBase
     {
         $board = new Board();
         $board->initialize();
-        $move = new Move($board, 'white', 'a7 a6');
 
+        $move = new Move($board, 'white', 'a7 a6');
         $errors = $this->validator->validate($move);
         $this->assertTrue(count($errors) > 0, 'Can not move opponent piece');
     }
@@ -42,8 +42,8 @@ class BasicRulesTest extends UnitTestBase
     {
         $board = new Board();
         $board->initialize();
-        $move = new Move($board, 'white', 'a1 a2');
 
+        $move = new Move($board, 'white', 'a1 a2');
         $errors = $this->validator->validate($move);
         $this->assertTrue(count($errors) > 0, 'Can not take your own piece');
     }
