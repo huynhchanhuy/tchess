@@ -230,8 +230,8 @@ class Board implements NormalizableInterface, DenormalizableInterface
         list($currentRow, $currentColumn) = Move::getIndex($source);
         list($newRow, $newColumn) = Move::getIndex($target);
 
-        //Switch the two spots on the board.
-        if ($newRow != $currentRow && $newColumn != $currentColumn) {
+        // Switch the two spots on the board.
+        if ($newRow != $currentRow || $newColumn != $currentColumn) {
             $this->pieces[$newRow][$newColumn] = $this->pieces[$currentRow][$currentColumn];
             $this->pieces[$currentRow][$currentColumn] = null;
         }
