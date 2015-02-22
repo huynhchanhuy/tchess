@@ -56,6 +56,7 @@ class BasicRulesTest extends UnitTestBase
     public function testActiveColor($board, $color, $source, $target, $expected)
     {
         $board->movePiece($source, $target);
+
         $move = new Move($board, $color, "$source $target");
         $moveEvent = new MoveEvent(0, $move);
         $this->dispatcher->dispatch(MoveEvents::MOVE, $moveEvent);
@@ -85,6 +86,7 @@ class BasicRulesTest extends UnitTestBase
     public function testFullmoveNumber($board, $color, $source, $target, $expected)
     {
         $board->movePiece($source, $target);
+
         $move = new Move($board, $color, "$source $target");
         $moveEvent = new MoveEvent(0, $move);
         $this->dispatcher->dispatch(MoveEvents::MOVE, $moveEvent);
