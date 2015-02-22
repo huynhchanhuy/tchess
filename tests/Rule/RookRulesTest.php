@@ -18,4 +18,22 @@ class RookRulesTest extends UnitTestBase
         $this->assertTrue(count($errors) > 0, 'Did not move along one row or column');
     }
 
+    public function testMoveThroughPieces()
+    {
+
+        $board = new Board();
+        $board->initialize();
+
+        $move = new Move($board, 'white', 'h1 h5');
+        $errors = $this->validator->validate($move);
+        $this->assertTrue(count($errors) > 0, 'Can not move through pieces');
+
+        /* @var $board Board */
+        $board = $this->serializer->deserialize('rnbqkbnr/ppppp3/5ppp/8/7P/5P1R/PPPPP1P1/RNBQKBN1 w Qkq - 0 4', 'Tchess\Entity\Board', 'fen');
+
+        $move = new Move($board, 'white', 'h3 c3');
+        $errors = $this->validator->validate($move);
+        $this->assertTrue(count($errors) > 0, 'Can not move through pieces');
+    }
+
 }
