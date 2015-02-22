@@ -58,4 +58,14 @@ class PawnRulesTest extends UnitTestBase
         $this->assertTrue(count($errors) > 0, 'Can not take a piece while advancing 2 rows at beginning');
     }
 
+    public function testTakingNoPieceInEmptySquare()
+    {
+        $board = new Board();
+        $board->initialize();
+
+        $move = new Move($board, 'white', 'a2 b3');
+        $errors = $this->validator->validate($move);
+        $this->assertTrue(count($errors) > 0, 'Take no piece in empty square');
+    }
+
 }

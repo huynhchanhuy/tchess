@@ -84,6 +84,10 @@ class PawnRules implements EventSubscriberInterface, MoveCheckerInterface
             }
 
             if($board->getPiece($newRow, $newColumn) == null) {
+                if (!(($color == 'white' && $newRow == 5) || ($color == 'black' && $newRow == 2))) {
+                    return 'Taking no piece in empty square';
+                }
+
                 // Capture en passant.
                 if ($color == 'white' && $newRow == 5) {
                     $epPiece = $board->getPiece($newRow - 1, $newColumn);
