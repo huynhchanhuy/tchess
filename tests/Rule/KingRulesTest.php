@@ -137,4 +137,14 @@ class KingRulesTest extends UnitTestBase
         $this->assertTrue(count($errors) > 0, 'Can not do castling if there is a piece between king and rook');
     }
 
+    public function testValidMove()
+    {
+        /* @var $board Board */
+        $board = $this->serializer->deserialize('rnbqkbnr/1ppppppp/p7/8/3P4/8/PPP1PPPP/RNBQKBNR w KQkq - 0 2', 'Tchess\Entity\Board', 'fen');
+
+        $move = new Move($board, 'white', 'e1 d2');
+        $errors = $this->validator->validate($move);
+        $this->assertEquals(0, count($errors), 'Valid move');
+    }
+
 }
