@@ -22,4 +22,14 @@ class KnightRulesTest extends UnitTestBase
         $this->assertTrue(count($errors) > 0, 'Can not move piece to the same square');
     }
 
+    public function testValidMove()
+    {
+        $board = new Board();
+        $board->initialize();
+
+        $move = new Move($board, 'white', 'g1 f3');
+        $errors = $this->validator->validate($move);
+        $this->assertEquals(0, count($errors), 'Valid move');
+    }
+
 }
