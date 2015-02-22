@@ -48,4 +48,14 @@ class PawnRulesTest extends UnitTestBase
         $this->assertTrue(count($errors) > 0, 'Can not move 2 rows if the pawn is moved');
     }
 
+    public function testTakePieceWhileAdvancing2RowsAtBeginning()
+    {
+        /* @var $board Board */
+        $board = $this->serializer->deserialize('rnbqkbnr/1ppppppp/8/8/p6P/8/PPPPPPP1/RNBQKBNR w KQkq - 0 3', 'Tchess\Entity\Board', 'fen');
+
+        $move = new Move($board, 'white', 'a2 a4');
+        $errors = $this->validator->validate($move);
+        $this->assertTrue(count($errors) > 0, 'Can not take a piece while advancing 2 rows at beginning');
+    }
+
 }
