@@ -115,4 +115,14 @@ class PawnRulesTest extends UnitTestBase
 
     }
 
+    public function testValidMove()
+    {
+        $board = new Board();
+        $board->initialize();
+
+        $move = new Move($board, 'white', 'a2 a3');
+        $errors = $this->validator->validate($move);
+        $this->assertEquals(0, count($errors), 'Valid move');
+    }
+
 }
