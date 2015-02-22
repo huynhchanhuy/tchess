@@ -8,6 +8,7 @@ use Tchess\Entity\Board;
 use Tchess\Entity\Piece\Queen;
 use Tchess\Event\MoveEvent;
 use Tchess\MoveEvents;
+use Tchess\Entity\Piece\Pawn;
 
 class PawnRulesTest extends UnitTestBase
 {
@@ -151,6 +152,32 @@ class PawnRulesTest extends UnitTestBase
         $queen = $board->getPiece($newRow, $newColumn);
         $this->assertTrue($queen instanceof Queen, 'Pawn is promoted to a queen.');
         $this->assertEquals('white', $queen->getColor(), 'Queen is of white player.');
+    }
+
+    public function testCaptureEnPassant()
+    {
+        $source = 'a5';
+        $target = 'b6';
+        $color = 'white';
+        $board = $this->serializer->deserialize('rnbqkbnr/p1ppppp1/7p/Pp6/8/8/1PPPPPPP/RNBQKBNR w KQkq b6 0 3', 'Tchess\Entity\Board', 'fen');
+
+        $move = new Move($board, $color, "$source $target");
+        $errors = $this->validator->validate($move);
+        $this->assertEquals(0, count($errors), 'Valid move');
+
+        $board->movePiece($source, $target);
+
+        $moveEvent = new MoveEvent(0, $move);
+        $this->dispatcher->dispatch(MoveEvents::MOVE, $moveEvent);
+
+        // Captured pawn.
+        list($row, $column) = Move::getIndex('b5');
+        $this->assertNull($board->getPiece($row, $column));
+
+        list($newRow, $newColumn) = Move::getIndex($target);
+        $pawn = $board->getPiece($newRow, $newColumn);
+        $this->assertTrue($pawn instanceof Pawn, 'Pawn captured en passant.');
+        $this->assertEquals('white', $pawn->getColor(), 'Pawn is of white player.');
     }
 
 }
