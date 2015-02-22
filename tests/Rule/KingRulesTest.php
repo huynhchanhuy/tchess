@@ -184,6 +184,8 @@ class KingRulesTest extends UnitTestBase
         $rook = $board->getPiece($newRow, $newColumn);
         $this->assertTrue($rook instanceof Rook, 'King is castled.');
         $this->assertEquals('white', $rook->getColor(), 'Rook is of white player.');
+
+        $this->assertSame(false, strpos($board->getCastlingAvailability(), 'Q'), 'Castling availability is removed');
     }
 
     public function testDoKingsideCastling()
@@ -219,6 +221,8 @@ class KingRulesTest extends UnitTestBase
         $rook = $board->getPiece($newRow, $newColumn);
         $this->assertTrue($rook instanceof Rook, 'King is castled.');
         $this->assertEquals('white', $rook->getColor(), 'Rook is of white player.');
+
+        $this->assertSame(false, strpos($board->getCastlingAvailability(), 'K'), 'Castling availability is removed');
     }
 
 }
