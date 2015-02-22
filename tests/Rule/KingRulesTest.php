@@ -147,4 +147,14 @@ class KingRulesTest extends UnitTestBase
         $this->assertEquals(0, count($errors), 'Valid move');
     }
 
+    public function testValidQueensideCastlingMove()
+    {
+        /* @var $board Board */
+        $board = $this->serializer->deserialize('rnbqkbnr/5ppp/ppppp3/8/1PP5/N7/PBQPPPPP/R3KBNR w KQkq - 0 6', 'Tchess\Entity\Board', 'fen');
+
+        $move = new Move($board, 'white', 'e1 c1');
+        $errors = $this->validator->validate($move);
+        $this->assertEquals(0, count($errors), 'Valid queenside castling move');
+    }
+
 }
