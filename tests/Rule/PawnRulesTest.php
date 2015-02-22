@@ -38,4 +38,14 @@ class PawnRulesTest extends UnitTestBase
         $this->assertTrue(count($errors) > 0, 'Can not move more than 2 rows');
     }
 
+    public function testMove2RowsIfMoved()
+    {
+        /* @var $board Board */
+        $board = $this->serializer->deserialize('rnbqkbnr/1ppppppp/p7/8/8/P7/1PPPPPPP/RNBQKBNR w KQkq - 0 2', 'Tchess\Entity\Board', 'fen');
+
+        $move = new Move($board, 'white', 'a3 a5');
+        $errors = $this->validator->validate($move);
+        $this->assertTrue(count($errors) > 0, 'Can not move 2 rows if the pawn is moved');
+    }
+
 }
