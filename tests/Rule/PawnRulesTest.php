@@ -58,6 +58,16 @@ class PawnRulesTest extends UnitTestBase
         $this->assertTrue(count($errors) > 0, 'Can not take a piece while advancing 2 rows at beginning');
     }
 
+    public function testInvalidTakingMove()
+    {
+        /* @var $board Board */
+        $board = $this->serializer->deserialize('rnbqkbnr/ppppppp1/7p/8/8/P7/1PPPPPPP/RNBQKBNR w KQkq - 0 2', 'Tchess\Entity\Board', 'fen');
+
+        $move = new Move($board, 'white', 'a3 c5');
+        $errors = $this->validator->validate($move);
+        $this->assertTrue(count($errors) > 0, 'Invalid taking move');
+    }
+
     public function testTakingNoPieceInEmptySquare()
     {
         $board = new Board();
