@@ -5,6 +5,9 @@ namespace Tchess\Tests\Rule;
 use Tchess\Tests\UnitTestBase;
 use Tchess\Entity\Piece\Move;
 use Tchess\Entity\Board;
+use Tchess\Entity\Piece\Queen;
+use Tchess\Event\MoveEvent;
+use Tchess\MoveEvents;
 
 class PawnRulesTest extends UnitTestBase
 {
@@ -123,6 +126,31 @@ class PawnRulesTest extends UnitTestBase
         $move = new Move($board, 'white', 'a2 a3');
         $errors = $this->validator->validate($move);
         $this->assertEquals(0, count($errors), 'Valid move');
+    }
+
+    public function testDoQueening()
+    {
+        $source = 'b7';
+        $target = 'a8';
+        $color = 'white';
+        $board = $this->serializer->deserialize('rn1qkbnr/1Ppppppp/8/8/8/8/1PPPPPPP/RNBQKBNR b KQkq - 0 4', 'Tchess\Entity\Board', 'fen');
+
+        $move = new Move($board, $color, "$source $target");
+        $errors = $this->validator->validate($move);
+        $this->assertEquals(0, count($errors), 'Valid move');
+
+        $board->movePiece($source, $target);
+
+        $moveEvent = new MoveEvent(0, $move);
+        $this->dispatcher->dispatch(MoveEvents::MOVE, $moveEvent);
+
+        list($currentRow, $currentColumn) = Move::getIndex($source);
+        $this->assertNull($board->getPiece($currentRow, $currentColumn));
+
+        list($newRow, $newColumn) = Move::getIndex($target);
+        $queen = $board->getPiece($newRow, $newColumn);
+        $this->assertTrue($queen instanceof Queen, 'Pawn is promoted to a queen.');
+        $this->assertEquals('white', $queen->getColor(), 'Queen is of white player.');
     }
 
 }
