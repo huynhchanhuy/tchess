@@ -96,4 +96,45 @@ class KingRulesTest extends UnitTestBase
         $this->assertTrue(count($errors) > 0, 'Can not do (kingside) castling end up in check');
     }
 
+    public function testDoCastlingWhileRooksAreMoved()
+    {
+        /* @var $board Board */
+        $board = $this->serializer->deserialize('rnbqkbnr/7p/ppppppp1/8/PPP5/N7/RBQPPPPP/4KBNR w Kkq - 0 8', 'Tchess\Entity\Board', 'fen');
+
+        $move = new Move($board, 'white', 'e1 c1');
+        $errors = $this->validator->validate($move);
+        $this->assertTrue(count($errors) > 0, 'Can not do castling if queenside rook is moved');
+
+        /* @var $board Board */
+        $board = $this->serializer->deserialize('rnbqkbnr/pp6/2pppppp/8/6PP/7N/PPPPPPB1/RNBQK2R w Qkq - 0 7', 'Tchess\Entity\Board', 'fen');
+
+        $move = new Move($board, 'white', 'e1 g1');
+        $errors = $this->validator->validate($move);
+        $this->assertTrue(count($errors) > 0, 'Can not do castling if kingside rook is moved');
+    }
+
+    public function testDoCastlingWhileThereArePiecesBetweenKingAndRook()
+    {
+        /* @var $board Board */
+        $board = $this->serializer->deserialize('rnbqkbnr/3ppppp/ppp5/6B1/3P4/N7/PPP1PPPP/R2QKBNR w KQkq - 0 4', 'Tchess\Entity\Board', 'fen');
+
+        $move = new Move($board, 'white', 'e1 c1');
+        $errors = $this->validator->validate($move);
+        $this->assertTrue(count($errors) > 0, 'Can not do castling if there is a piece between king and rook');
+
+        /* @var $board Board */
+        $board = $this->serializer->deserialize('rnbqkbnr/3ppppp/ppp5/8/3P1B2/3Q4/PPP1PPPP/RN2KBNR w KQkq - 0 4', 'Tchess\Entity\Board', 'fen');
+
+        $move = new Move($board, 'white', 'e1 c1');
+        $errors = $this->validator->validate($move);
+        $this->assertTrue(count($errors) > 0, 'Can not do castling if there is a piece between king and rook');
+
+        /* @var $board Board */
+        $board = $this->serializer->deserialize('rnbqkbnr/1ppppppp/p7/8/8/7N/PPPPPPPP/RNBQKB1R w KQkq - 0 2', 'Tchess\Entity\Board', 'fen');
+
+        $move = new Move($board, 'white', 'e1 g1');
+        $errors = $this->validator->validate($move);
+        $this->assertTrue(count($errors) > 0, 'Can not do castling if there is a piece between king and rook');
+    }
+
 }
