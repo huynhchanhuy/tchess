@@ -5,6 +5,10 @@ namespace Tchess\Tests\Rule;
 use Tchess\Tests\UnitTestBase;
 use Tchess\Entity\Piece\Move;
 use Tchess\Entity\Board;
+use Tchess\Event\MoveEvent;
+use Tchess\MoveEvents;
+use Tchess\Entity\Piece\King;
+use Tchess\Entity\Piece\Rook;
 
 class KingRulesTest extends UnitTestBase
 {
@@ -147,24 +151,74 @@ class KingRulesTest extends UnitTestBase
         $this->assertEquals(0, count($errors), 'Valid move');
     }
 
-    public function testValidQueensideCastlingMove()
+    public function testDoQueensideCastling()
     {
+        $source = 'e1';
+        $target = 'c1';
         /* @var $board Board */
         $board = $this->serializer->deserialize('rnbqkbnr/5ppp/ppppp3/8/1PP5/N7/PBQPPPPP/R3KBNR w KQkq - 0 6', 'Tchess\Entity\Board', 'fen');
 
-        $move = new Move($board, 'white', 'e1 c1');
+        $move = new Move($board, 'white', "$source $target");
         $errors = $this->validator->validate($move);
         $this->assertEquals(0, count($errors), 'Valid queenside castling move');
+
+        $board->movePiece($source, $target);
+
+        $moveEvent = new MoveEvent(0, $move);
+        $this->dispatcher->dispatch(MoveEvents::MOVE, $moveEvent);
+
+        // King is moved.
+        list($currentRow, $currentColumn) = Move::getIndex($source);
+        $this->assertNull($board->getPiece($currentRow, $currentColumn));
+
+        list($newRow, $newColumn) = Move::getIndex($target);
+        $king = $board->getPiece($newRow, $newColumn);
+        $this->assertTrue($king instanceof King, 'King is castled.');
+        $this->assertEquals('white', $king->getColor(), 'King is of white player.');
+
+        // Rook is moved.
+        list($currentRow, $currentColumn) = Move::getIndex('a1');
+        $this->assertNull($board->getPiece($currentRow, $currentColumn));
+
+        list($newRow, $newColumn) = Move::getIndex('d1');
+        $rook = $board->getPiece($newRow, $newColumn);
+        $this->assertTrue($rook instanceof Rook, 'King is castled.');
+        $this->assertEquals('white', $rook->getColor(), 'Rook is of white player.');
     }
 
-    public function testValidKingsideCastlingMove()
+    public function testDoKingsideCastling()
     {
+        $source = 'e1';
+        $target = 'g1';
         /* @var $board Board */
         $board = $this->serializer->deserialize('rnbqkbnr/ppppp3/5ppp/8/6P1/7N/PPPPPPBP/RNBQK2R w KQkq - 0 4', 'Tchess\Entity\Board', 'fen');
 
-        $move = new Move($board, 'white', 'e1 g1');
+        $move = new Move($board, 'white', "$source $target");
         $errors = $this->validator->validate($move);
         $this->assertEquals(0, count($errors), 'Valid kingside castling move');
+
+        $board->movePiece($source, $target);
+
+        $moveEvent = new MoveEvent(0, $move);
+        $this->dispatcher->dispatch(MoveEvents::MOVE, $moveEvent);
+
+        // King is moved.
+        list($currentRow, $currentColumn) = Move::getIndex($source);
+        $this->assertNull($board->getPiece($currentRow, $currentColumn));
+
+        list($newRow, $newColumn) = Move::getIndex($target);
+        $king = $board->getPiece($newRow, $newColumn);
+        $this->assertTrue($king instanceof King, 'King is castled.');
+        $this->assertEquals('white', $king->getColor(), 'King is of white player.');
+
+        // Rook is moved.
+        list($currentRow, $currentColumn) = Move::getIndex('h1');
+        $this->assertNull($board->getPiece($currentRow, $currentColumn));
+
+        list($newRow, $newColumn) = Move::getIndex('f1');
+        $rook = $board->getPiece($newRow, $newColumn);
+        $this->assertTrue($rook instanceof Rook, 'King is castled.');
+        $this->assertEquals('white', $rook->getColor(), 'Rook is of white player.');
     }
 
 }
