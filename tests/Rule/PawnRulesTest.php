@@ -28,4 +28,14 @@ class PawnRulesTest extends UnitTestBase
         $this->assertTrue(count($errors) > 0, 'Can not take a piece in front of it');
     }
 
+    public function testMoveMoreThan2Rows()
+    {
+        $board = new Board();
+        $board->initialize();
+
+        $move = new Move($board, 'white', 'a2 a5');
+        $errors = $this->validator->validate($move);
+        $this->assertTrue(count($errors) > 0, 'Can not move more than 2 rows');
+    }
+
 }
