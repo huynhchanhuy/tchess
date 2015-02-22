@@ -236,7 +236,7 @@ class Board implements NormalizableInterface, DenormalizableInterface
             $this->pieces[$currentRow][$currentColumn] = null;
         }
 
-        $piece = &$this->pieces[$newRow][$newColumn];
+        $piece = $this->pieces[$newRow][$newColumn];
         $piece->setHasMoved(true);
     }
 
