@@ -91,7 +91,7 @@ class KingRules implements EventSubscriberInterface, MoveCheckerInterface
 
     public function onMoveDoCastling(MoveEvent $event)
     {
-        $room = $event->getRoom();
+        $roomId = $event->getRoomId();
         $move = $event->getMove();
         $board = $move->getBoard();
         $color = $move->getColor();
@@ -128,7 +128,7 @@ class KingRules implements EventSubscriberInterface, MoveCheckerInterface
             $board->movePiece($source, $target);
             $piece->setCastled(false);
 
-            $message = new Message($room->getId(), 'move', array(
+            $message = new Message($roomId, 'move', array(
                 'source' => $source,
                 'target' => $target,
                 'color' => $color,

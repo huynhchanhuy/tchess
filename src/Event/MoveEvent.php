@@ -2,31 +2,29 @@
 
 namespace Tchess\Event;
 
-use Tchess\Entity\Room;
 use Symfony\Component\EventDispatcher\Event;
 use Tchess\Entity\Piece\Move;
 
 class MoveEvent extends Event
 {
 
-    private $room;
+    private $roomId;
     private $move;
-    private $message;
 
-    public function __construct(Room $room, $move)
+    public function __construct($roomId, $move)
     {
-        $this->setRoom($room);
+        $this->setRoomId($roomId);
         $this->setMove($move);
     }
 
-    public function getRoom()
+    public function getRoomId()
     {
-        return $this->room;
+        return $this->roomId;
     }
 
-    public function setRoom(Room $room)
+    public function setRoomId($roomId)
     {
-        $this->room = $room;
+        $this->roomId = $roomId;
     }
 
     public function getMove()
@@ -37,16 +35,6 @@ class MoveEvent extends Event
     public function setMove(Move $move)
     {
         $this->move = $move;
-    }
-
-    public function getMessage()
-    {
-        return $this->message;
-    }
-
-    public function setMessage($message)
-    {
-        $this->message = $message;
     }
 
 }

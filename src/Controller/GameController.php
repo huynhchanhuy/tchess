@@ -338,8 +338,8 @@ class GameController extends BaseController
         $errors = $validator->validate($move);
         if (count($errors) == 0) {
             $board->movePiece($move->getSource(), $move->getTarget());
-            $moveEvent = new MoveEvent($room, $move);
 
+            $moveEvent = new MoveEvent($room->getId(), $move);
             $dispatcher->dispatch(MoveEvents::MOVE, $moveEvent);
 
             $state = $serializer->serialize($board, 'fen');

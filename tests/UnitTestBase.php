@@ -11,6 +11,7 @@ class UnitTestBase extends \PHPUnit_Framework_TestCase
     public static $sc;
     protected $serializer;
     protected $validator;
+    protected $dispatcher;
 
     public static function setUpBeforeClass()
     {
@@ -27,6 +28,7 @@ class UnitTestBase extends \PHPUnit_Framework_TestCase
     {
         $this->serializer = static::$sc->get('serializer');
         $this->validator = static::$sc->get('validator');
+        $this->dispatcher = static::$sc->get('dispatcher');
     }
 
 }
