@@ -51,6 +51,35 @@ class BasicRulesTest extends UnitTestBase
     }
 
     /**
+     * @dataProvider activeColorDataProvider
+     */
+    public function testActiveColor($board, $color, $source, $target, $expected)
+    {
+        $board->movePiece($source, $target);
+        $move = new Move($board, $color, "$source $target");
+        $moveEvent = new MoveEvent(0, $move);
+        $this->dispatcher->dispatch(MoveEvents::MOVE, $moveEvent);
+        $this->assertEquals($expected, $board->getActiveColor(), "$color's turn");
+    }
+
+    public function activeColorDataProvider()
+    {
+        $board = new Board();
+        $board->initialize();
+
+        $this->assertEquals('white', $board->getActiveColor(), 'Init active color');
+
+        return array(
+          array($board, 'white', 'a2', 'a3', 'black'),
+          array($board, 'black', 'g8', 'h6', 'white'),
+          array($board, 'white', 'd2', 'd4', 'black'),
+          array($board, 'black', 'b8', 'c6', 'white'),
+          array($board, 'white', 'c1', 'h6', 'black'),
+          array($board, 'black', 'c6', 'd4', 'white'),
+        );
+    }
+
+    /**
      * @dataProvider fullmoveDataProvider
      */
     public function testFullmoveNumber($board, $color, $source, $target, $expected)

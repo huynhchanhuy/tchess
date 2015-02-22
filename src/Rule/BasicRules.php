@@ -49,7 +49,7 @@ class BasicRules implements EventSubscriberInterface, MoveCheckerInterface
         }
     }
 
-    public function onMoveUpdateTurn(MoveEvent $event)
+    public function onMoveUpdateActiveColor(MoveEvent $event)
     {
         $move = $event->getMove();
         $board = $move->getBoard();
@@ -62,7 +62,7 @@ class BasicRules implements EventSubscriberInterface, MoveCheckerInterface
         return array(
             MoveEvents::MOVE => array(
                 array('onMoveUpdateFullmoveNumber', 0),
-                array('onMoveUpdateTurn', -1),
+                array('onMoveUpdateActiveColor', -1),
             ),
         );
     }
