@@ -78,4 +78,41 @@ class PawnRulesTest extends UnitTestBase
         $this->assertTrue(count($errors) > 0, 'Take no piece in empty square');
     }
 
+    public function testInvalidCaptureEnPassantMove()
+    {
+
+        /* @var $board Board */
+        $board = $this->serializer->deserialize('rnbqkbnr/p1pppppp/8/Pp6/8/8/1PPPPPPP/RNBQKBNR w KQkq - 0 3', 'Tchess\Entity\Board', 'fen');
+
+        // Pawn is not epable.
+        $move = new Move($board, 'white', 'a5 b6');
+        $errors = $this->validator->validate($move);
+        $this->assertTrue(count($errors) > 0, 'Invalid capture en passant move');
+
+        /* @var $board Board */
+        $board = $this->serializer->deserialize('r1bqkbnr/pppppppp/8/3Pn3/8/8/PPP1PPPP/RNBQKBNR w KQkq - 1 3', 'Tchess\Entity\Board', 'fen');
+
+        // Not a pawn.
+        $move = new Move($board, 'white', 'd5 e6');
+        $errors = $this->validator->validate($move);
+        $this->assertTrue(count($errors) > 0, 'Invalid capture en passant move');
+
+        /* @var $board Board */
+        $board = $this->serializer->deserialize('rnbqkbnr/pppppp2/6pp/P7/8/8/1PPPPPPP/RNBQKBNR w KQkq - 0 3', 'Tchess\Entity\Board', 'fen');
+
+        // Empty square.
+        $move = new Move($board, 'white', 'a5 b6');
+        $errors = $this->validator->validate($move);
+        $this->assertTrue(count($errors) > 0, 'Invalid capture en passant move');
+
+        /* @var $board Board */
+        $board = $this->serializer->deserialize('rnbqkbnr/pppp4/4pppp/PP6/8/8/2PPPPPP/RNBQKBNR w KQkq - 0 5', 'Tchess\Entity\Board', 'fen');
+
+        // Same color pawn.
+        $move = new Move($board, 'white', 'a5 b6');
+        $errors = $this->validator->validate($move);
+        $this->assertTrue(count($errors) > 0, 'Invalid capture en passant move');
+
+    }
+
 }
