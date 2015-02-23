@@ -6,8 +6,6 @@ namespace Tchess\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Tchess\Entity\Player;
 use Tchess\Entity\Room;
-use Tchess\RoomEvents;
-use Tchess\Event\RoomEvent;
 use Tchess\MoveEvents;
 use Tchess\Event\MoveEvent;
 use Tchess\Entity\Piece\Move;
