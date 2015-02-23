@@ -30,7 +30,7 @@ var prepareHighlights = function() {
     }
 };
 
-var conn = new ab.Session('ws://localhost:8080',
+var conn = new ab.Session('ws://' + chess_base_url + ':8080',
     function() {
         conn.subscribe(chess_room_id + '.move', function(topic, data) {
             game.move({

@@ -42,6 +42,7 @@ class GameController extends BaseController
             return $this->redirect($this->generateUrl('rooms'));
         }
 
+        $variables['base_url'] = $request->getHttpHost();
         $variables['room_id'] = $room->getId();
         $variables['color'] = $player->getColor();
         $game = $room->getGame();
@@ -79,7 +80,8 @@ class GameController extends BaseController
         }
 
         $variables = array(
-            'room_id' => $room->getId()
+            'room_id' => $room->getId(),
+            'base_url' => $request->getHttpHost(),
         );
         $game = $room->getGame();
 
