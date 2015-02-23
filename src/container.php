@@ -272,14 +272,6 @@ function register_kernel_services($sc, $env)
             ->addMethodCall('addSubscriber', array(new Reference('listener.controller')))
     ;
 
-
-    if ($env == 'prod') {
-        $sc->register('listener.exception', 'Symfony\Component\HttpKernel\EventListener\ExceptionListener')
-                ->setArguments(array('Tchess\\Controller\\ErrorController::exceptionAction'))
-        ;
-        $sc->getDefinition('dispatcher')->addMethodCall('addSubscriber', array(new Reference('listener.exception')));
-    }
-
     $sc->register('framework', 'Tchess\Framework')
             ->setArguments(array(new Reference('dispatcher'), new Reference('resolver')))
             // @todo - Don't inject the container.
