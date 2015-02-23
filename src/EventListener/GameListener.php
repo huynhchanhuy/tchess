@@ -50,7 +50,7 @@ class GameListener implements EventSubscriberInterface
 
             $game = new Game();
             $game->setRoom($room);
-            $game->setSate($state);
+            $game->setState($state);
 
             $this->em->persist($game);
 
