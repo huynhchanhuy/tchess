@@ -6,3 +6,6 @@ web/resources/
 files/proxies/*.php
 logs/*.log
 server-logs/*.log
+config/db-config.php
+db/sqlite.db
+

@@ -299,16 +299,11 @@ function register_db_services($sc, $config)
 
     $sc->setParameter('db_config', $config);
 
-    $sc->register('array_cache', 'Doctrine\Common\Cache\ArrayCache');
-
     $sc->register('entity_config')
             ->setFactoryClass('Doctrine\ORM\Tools\Setup')
             ->setFactoryMethod('createConfiguration')
             ->setClass('Doctrine\ORM\Configuration')
             ->addMethodCall('setMetadataDriverImpl', array(new Reference('annotation_driver')))
-            ->addMethodCall('setMetadataCacheImpl', array(new Reference('array_cache')))
-            ->addMethodCall('setResultCacheImpl', array(new Reference('array_cache')))
-            ->addMethodCall('setQueryCacheImpl', array(new Reference('array_cache')))
             ->addMethodCall('setProxyDir', array(__DIR__ . '/../files/proxies'))
             ->addMethodCall('setProxyNamespace', array('EntityProxy'))
             ->addMethodCall('setAutoGenerateProxyClasses', array(true))

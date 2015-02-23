@@ -9,6 +9,7 @@ if (file_exists('../config/db-config.php') && strpos(file_get_contents('../confi
 require_once __DIR__ . '/../vendor/autoload.php';
 
 use Doctrine\ORM\Tools\SchemaTool;
+use Doctrine\DBAL\DriverManager;
 
 // Get values from the form
 $driver = $_POST['driver'];
@@ -33,15 +34,23 @@ $env = 'prod';
 
 $sc = include __DIR__ . '/../src/container.php';
 
-// getting objects.
+// Create database if needed.
+// @see - https://github.com/doctrine/DoctrineBundle/blob/master/Command/CreateDatabaseDoctrineCommand.php
+$connection = DriverManager::getConnection($config);
+$name = $config['path'];
+$connection->close();
+$connection->getSchemaManager()->dropDatabase($name);
+$connection->getSchemaManager()->createDatabase($name);
+
+// Getting schema tool object.
 $entityManager = $sc->get('entity_manager');
 $metadatas = $entityManager->getMetadataFactory()->getAllMetadata();
 $schema_tool = new SchemaTool($entityManager);
 
-// drop all schemas.
+// Drop all schemas.
 $schema_tool->dropSchema($metadatas);
 
-// recreate schemas
+// Recreate schemas
 $schema_tool->createSchema($metadatas);
 
 // Write assets to web directory to avoid 404 errors.

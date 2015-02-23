@@ -19,11 +19,7 @@ class WebTestBase extends \PHPUnit_Framework_TestCase
     {
         if (empty(static::$sc)) {
             // @todo - Use in memory sqlite to speed up the test.
-            $config = array(
-                'driver' => 'pdo_sqlite',
-                'path' => '%root_dir%/db/sqlite_test.db',
-                'charset' => 'UTF-8',
-            );
+            $config = include __DIR__ . '/../config/db-config-test.php';
             $config['path'] = str_replace('%root_dir%', __DIR__ . '/..', $config['path']);
 
             $env = 'test';

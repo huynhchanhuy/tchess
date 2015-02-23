@@ -11,16 +11,18 @@ Setup virtual host:
 
 Fix permission errors:
 
- 1. sudo chown myaccount:www-data -R server-logs/
- 2. sudo chown myaccount:www-data -R web/js-vendor/
- 3. sudo chown myaccount:www-data -R web/resources/
- 4. sudo chown myaccount:www-data -R cache/
- 5. sudo chown myaccount:www-data -R logs/
- 6. sudo chown myaccount:www-data -R db/
- 7. sudo chmod 777 -R db/
- 8. sudo chown myaccount:www-data -R files/
+ 1. sudo chown www-data:www-data -R server-logs/
+ 6. sudo chown www-data:www-data -R config/
+ 2. sudo chown www-data:www-data -R web/js-vendor/
+ 3. sudo chown www-data:www-data -R web/resources/
+ 4. sudo chown www-data:www-data -R cache/
+ 5. sudo chown www-data:www-data -R logs/
+ 6. sudo chown www-data:www-data -R db/
+ 7. sudo chmod g+w -R db/
+ 8. sudo chown www-data:www-data -R files/
+ 9. Add your user to www-data group
 
-Run a web browser and open example.com
+Run a web browser and open example.com, follow instruction to install Tchess.
 
 Realtime checking opponent move
 -------------------------------
@@ -47,18 +49,11 @@ cd /path/to/example.com/bin/
 Update doctrine entities
 ------------------------
 
-If you want to edit entity class, you should go to root dir, and run this command:
-
- * vendor/bin/doctrine orm:clear-cache:metadata
- * vendor/bin/doctrine orm:clear-cache:query
- * vendor/bin/doctrine orm:clear-cache:result
-
-And then run:
+If you updated entity classes, you should go to root dir, and run these commands
+to update db schema:
 
  * vendor/bin/doctrine orm:schema-tool:update --dump-sql
  * vendor/bin/doctrine orm:schema-tool:update --force
-
-To update db schema.
 
 Troubleshooting
 =============
