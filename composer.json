@@ -69,11 +69,11 @@
     {
         "type": "package",
         "package": {
-            "version": "v0.9.5",
+            "version": "v0.9.3",
             "name": "tienvx/autobahnjs",
             "type": "js-vendor",
             "dist": {
-                "url": "http://autobahn.s3.amazonaws.com/autobahnjs/0.9.5/autobahn.min.js",
+                "url": "http://autobahn.s3.amazonaws.com/js/autobahn.min.js",
                 "type": "file"
             }
         }
@@ -103,7 +103,7 @@
         "monolog/monolog": "1.12.0",
         "cboden/ratchet": "v0.3.2",
         "react/zmq": "v0.3.0",
-        "tienvx/autobahnjs": "v0.9.5",
+        "tienvx/autobahnjs": "v0.9.3",
         "tienvx/chessjs": "dev-master"
     },
     "autoload": {

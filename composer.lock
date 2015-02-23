@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "78aae7370df7db802f881b609431b120",
+    "hash": "90dc4e8bb16bf01b78afc6e35f34ba02",
     "packages": [
         {
             "name": "cboden/ratchet",
@@ -2547,10 +2547,10 @@
         },
         {
             "name": "tienvx/autobahnjs",
-            "version": "v0.9.5",
+            "version": "v0.9.3",
             "dist": {
                 "type": "file",
-                "url": "http://autobahn.s3.amazonaws.com/autobahnjs/0.9.5/autobahn.min.js",
+                "url": "http://autobahn.s3.amazonaws.com/js/autobahn.min.js",
                 "reference": null,
                 "shasum": null
             },
