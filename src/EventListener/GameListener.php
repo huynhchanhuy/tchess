@@ -113,7 +113,7 @@ class GameListener implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            RoomEvents::CREATE => array(array('onRoomCreate', 0)),
+            // RoomEvents::CREATE => array(array('onRoomCreate', 0)),
             // The second player join start game.
             RoomEvents::JOIN => array(array('onRoomJoin', 0)),
             // The last player leave delete room.
