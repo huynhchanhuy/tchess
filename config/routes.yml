@@ -14,6 +14,17 @@ logout:
     path:     /logout
     defaults: { _controller: 'Tchess\Controller\GameController::logoutAction' }
 
+watch_game:
+    path:     /room/{room}
+    defaults: { _controller: 'Tchess\Controller\GameController::watchAction' }
+    requirements:
+        room:  \d+
+
+move_piece:
+    path:     /move-piece
+    defaults: { _controller: 'Tchess\Controller\GameController::moveAction', _format: 'json' }
+    methods:  [POST]
+
 rooms:
     path:     /rooms/{page}
     defaults: { _controller: 'Tchess\Controller\RoomController::indexAction', page: 1 }
@@ -22,25 +33,14 @@ rooms:
 
 create_room:
     path:     /create-room
-    defaults: { _controller: 'Tchess\Controller\GameController::createAction' }
+    defaults: { _controller: 'Tchess\Controller\RoomController::createAction' }
 
 join_room:
     path:     /join-room/{room}
-    defaults: { _controller: 'Tchess\Controller\GameController::joinAction' }
-    requirements:
-        room:  \d+
-
-watch_game:
-    path:     /room/{room}
-    defaults: { _controller: 'Tchess\Controller\GameController::watchAction' }
+    defaults: { _controller: 'Tchess\Controller\RoomController::joinAction' }
     requirements:
         room:  \d+
 
 leave_room:
     path:     /leave-room
-    defaults: { _controller: 'Tchess\Controller\GameController::leaveAction' }
-
-move_piece:
-    path:     /move-piece
-    defaults: { _controller: 'Tchess\Controller\GameController::moveAction', _format: 'json' }
-    methods:  [POST]
+    defaults: { _controller: 'Tchess\Controller\RoomController::leaveAction' }
