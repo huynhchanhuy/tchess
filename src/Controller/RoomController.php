@@ -70,6 +70,11 @@ class RoomController extends BaseController
         }
 
         $room = $em->getRepository('Tchess\Entity\Room')->findOneBy(array('id' => $room));
+        if (empty($room) || !$room instanceof Room) {
+            // Room does not exist.
+            return $this->redirect($this->generateUrl('rooms'));
+        }
+
         $players = $room->getPlayers();
 
         if (count($players) != 1) {
