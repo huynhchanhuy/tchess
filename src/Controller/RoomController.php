@@ -9,6 +9,7 @@ use Tchess\RoomEvents;
 use Tchess\Event\RoomEvent;
 use Tchess\Entity\Player;
 use Tchess\Entity\Room;
+use Tchess\Entity\Game;
 
 class RoomController extends BaseController
 {
@@ -107,7 +108,11 @@ class RoomController extends BaseController
 
         $room = $player->getRoom();
         if (!empty($room) && $room instanceof Room) {
-            $em->remove($room->getGame());
+            $game = $room->getGame();
+            if ($game instanceof Game) {
+                $em->remove($room->getGame());
+            }
+
             $room->removePlayer($player);
             $player->setRoom(null);
             $em->flush();
