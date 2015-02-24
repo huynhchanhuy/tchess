@@ -104,7 +104,9 @@
         "cboden/ratchet": "v0.3.2",
         "react/zmq": "v0.3.0",
         "tienvx/autobahnjs": "v0.9.3",
-        "tienvx/chessjs": "dev-master"
+        "tienvx/chessjs": "dev-master",
+        "symfony/browser-kit": "v2.6.4",
+        "symfony/css-selector": "v2.6.4"
     },
     "autoload": {
         "psr-4": {

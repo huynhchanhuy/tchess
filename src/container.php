@@ -7,6 +7,7 @@ use Doctrine\Common\Annotations\AnnotationRegistry;
 use Monolog\Logger;
 use Tchess\DependencyInjection\Compiler\RegisterRulesPass;
 use Tchess\DependencyInjection\Compiler\AddConstraintValidatorsPass;
+use Tchess\DependencyInjection\Compiler\RegisterEventSubscribersPass;
 
 $file = __DIR__ . '/../cache/container.php';
 
@@ -206,31 +207,36 @@ function register_chess_services($sc)
 {
     $sc->register('listener.game', 'Tchess\EventListener\GameListener')
             ->setArguments(array(new Reference('entity_manager'), new Reference('serializer'), new Reference('logger'), new Reference('move_manager')))
-            ->addMethodCall('setSocket', array(new Reference('socket')));
+            ->addMethodCall('setSocket', array(new Reference('socket')))
+            ->addTag('event_subscriber');
 
     $sc->register('rules.basic', 'Tchess\Rule\BasicRules')
+            ->addTag('event_subscriber')
             ->addTag('rules');
     $sc->register('rules.pawn', 'Tchess\Rule\PawnRules')
+            ->addTag('event_subscriber')
             ->addTag('rules');
     $sc->register('rules.bishop', 'Tchess\Rule\BishopRules')
+            ->addTag('event_subscriber')
             ->addTag('rules');
     $sc->register('rules.king', 'Tchess\Rule\KingRules')
             ->setArguments(array(new Reference('move_manager'), new Reference('rules.in_check')))
+            ->addTag('event_subscriber')
             ->addTag('rules');
     $sc->register('rules.knight', 'Tchess\Rule\KnightRules')
+            ->addTag('event_subscriber')
             ->addTag('rules');
     $sc->register('rules.rook', 'Tchess\Rule\RookRules')
+            ->addTag('event_subscriber')
             ->addTag('rules');
     $sc->register('rules.queen', 'Tchess\Rule\QueenRules')
             ->setArguments(array(new Reference('rules.bishop'), new Reference('rules.rook')))
+            ->addTag('event_subscriber')
             ->addTag('rules');
     $sc->register('rules.in_check', 'Tchess\Rule\InCheckRules')
             ->setArguments(array(new Reference('validator')))
+            ->addTag('event_subscriber')
             ->addTag('rules');
-
-    $sc->getDefinition('dispatcher')
-            ->addMethodCall('addSubscriber', array(new Reference('listener.game')))
-    ;
 
     $sc->register('move_manager', 'Tchess\MessageManager');
 }
@@ -256,25 +262,32 @@ function register_kernel_services($sc, $env)
 
     $sc->register('listener.router', 'Symfony\Component\HttpKernel\EventListener\RouterListener')
             ->setArguments(array(new Reference('matcher')))
+            ->addTag('event_subscriber')
     ;
     $sc->register('listener.response', 'Symfony\Component\HttpKernel\EventListener\ResponseListener')
             ->setArguments(array('UTF-8'))
+            ->addTag('event_subscriber')
     ;
-    $sc->register('listener.response.string', 'Tchess\EventListener\StringResponseListener');
-    $sc->register('listener.controller', 'Tchess\EventListener\ControllerListener');
+    $sc->register('listener.response.string', 'Tchess\EventListener\StringResponseListener')
+            ->addTag('event_subscriber');
+    $sc->register('listener.controller', 'Tchess\EventListener\ControllerListener')
+            ->addTag('event_subscriber');
+    $sc->register('listener.session', 'Tchess\EventListener\SessionListener')
+            ->addMethodCall('setStorage', array(new Reference('session.storage')))
+            ->addTag('event_subscriber');
 
-    $sc->register('dispatcher', 'Symfony\Component\EventDispatcher\EventDispatcher')
-            // @todo - This method 'addSubscriber' can be called automatically via
-            // compiler pass.
-            ->addMethodCall('addSubscriber', array(new Reference('listener.router')))
-            ->addMethodCall('addSubscriber', array(new Reference('listener.response')))
-            ->addMethodCall('addSubscriber', array(new Reference('listener.response.string')))
-            ->addMethodCall('addSubscriber', array(new Reference('listener.controller')))
-    ;
+    if ($env == 'test') {
+        $sc->register('session.storage', 'Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage');
+    }
+    else {
+        $sc->register('session.storage', 'Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage');
+    }
+
+    $sc->register('dispatcher', 'Symfony\Component\EventDispatcher\EventDispatcher');
 
     $sc->register('framework', 'Tchess\Framework')
             ->setArguments(array(new Reference('dispatcher'), new Reference('resolver')))
-            // @todo - Don't inject the container.
+            // Don't inject the container.
             ->addMethodCall('setEntityManager', array(new Reference('entity_manager')))
             ->addMethodCall('setFormFactory', array(new Reference('form_factory')))
             ->addMethodCall('setMessageManager', array(new Reference('move_manager')))
@@ -332,6 +345,7 @@ function register_socket_services($sc)
 
 function add_compiler_passes($sc)
 {
+    $sc->addCompilerPass(new RegisterEventSubscribersPass());
     $sc->addCompilerPass(new RegisterRulesPass());
     $sc->addCompilerPass(new AddConstraintValidatorsPass());
 }

@@ -3,9 +3,7 @@
 namespace Tchess\Tests;
 
 use Doctrine\ORM\Tools\SchemaTool;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
+use Symfony\Component\HttpKernel\Client;
 
 /**
  * Tchess web test base class.
@@ -14,16 +12,17 @@ class WebTestBase extends \PHPUnit_Framework_TestCase
 {
 
     public static $sc;
+    public static $client;
 
     public static function setUpBeforeClass()
     {
         if (empty(static::$sc)) {
             // @todo - Use in memory sqlite to speed up the test.
             $config = include __DIR__ . '/../config/db-config-test.php';
-            $config['path'] = str_replace('%root_dir%', __DIR__ . '/..', $config['path']);
-
             $env = 'test';
+
             static::$sc = require_once __DIR__ . '/../src/container.php';
+            static::$client = new Client(static::$sc->get('framework'));
         }
 
         // getting objects.
@@ -38,20 +37,16 @@ class WebTestBase extends \PHPUnit_Framework_TestCase
         $schema_tool->createSchema($metadatas);
     }
 
-    protected function getRequest($path, $method = 'GET', $parameters = array(), $session = null)
+    public function tearDown()
     {
-        $request = Request::create($path, $method, $parameters);
-
-        if (empty($session)) {
-          $session = new Session(new MockArraySessionStorage());
-          $session->start();
+        $entityManager = static::$sc->get('entity_manager');
+        $metadatas = $entityManager->getMetadataFactory()->getAllMetadata();
+        foreach ($metadatas as $metadata) {
+            $entityManager->createQuery('DELETE FROM ' . $metadata->getName())->execute();
         }
 
-        $request->setSession($session);
-
-        static::$sc->get('context')->fromRequest($request);
-
-        return $request;
+        // Delete doctrine's cache.
+        $entityManager->clear();
     }
 
 }

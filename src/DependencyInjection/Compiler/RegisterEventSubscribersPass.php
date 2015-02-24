@@ -6,7 +6,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Reference;
 
-class RegisterRulesPass implements CompilerPassInterface
+class RegisterEventSubscribersPass implements CompilerPassInterface
 {
 
     /**
@@ -14,10 +14,10 @@ class RegisterRulesPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        if ($container->hasDefinition('validator.move')) {
-            $validator = $container->getDefinition('validator.move');
-            foreach ($container->findTaggedServiceIds('rules') as $id => $attributes) {
-                $validator->addMethodCall('addRules', array(new Reference($id)));
+        if ($container->hasDefinition('dispatcher')) {
+            $dispatcher = $container->getDefinition('dispatcher');
+            foreach ($container->findTaggedServiceIds('event_subscriber') as $id => $attributes) {
+                $dispatcher->addMethodCall('addSubscriber', array(new Reference($id)));
             }
         }
     }
