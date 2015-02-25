@@ -9,7 +9,10 @@ use Tchess\DependencyInjection\Compiler\RegisterRulesPass;
 use Tchess\DependencyInjection\Compiler\AddConstraintValidatorsPass;
 use Tchess\DependencyInjection\Compiler\RegisterEventSubscribersPass;
 
-$file = __DIR__ . '/../cache/container.php';
+if (!in_array($env, array('prod', 'dev', 'test'))) {
+    $env = 'prod';
+}
+$file = __DIR__ . '/../cache/container_' . $env . '.php';
 
 function register_logger_services($sc)
 {
