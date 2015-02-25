@@ -5,16 +5,14 @@ namespace Tchess\EventListener;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
-use Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
  * Sets the session in the request.
  */
 class SessionListener implements EventSubscriberInterface
 {
-    protected $storage;
+    protected $session;
 
     public function onKernelRequest(GetResponseEvent $event)
     {
@@ -22,13 +20,9 @@ class SessionListener implements EventSubscriberInterface
 
         // Prepare session.
         if (!$request->getSession()) {
-            if (empty($this->storage)) {
-                $this->storage = new NativeSessionStorage();
-            }
-            $session = new Session($this->storage);
-            $session->getMetadataBag()->stampNew(0);
-            $session->start();
-            $request->setSession($session);
+            $this->session->getMetadataBag()->stampNew(0);
+            $this->session->start();
+            $request->setSession($this->session);
         }
     }
 
@@ -39,8 +33,8 @@ class SessionListener implements EventSubscriberInterface
         );
     }
 
-    public function setStorage(SessionStorageInterface $storage)
+    public function setSession(SessionInterface $session)
     {
-        $this->storage = $storage;
+        $this->session = $session;
     }
 }

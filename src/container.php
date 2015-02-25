@@ -90,8 +90,11 @@ function register_twig_services($sc, $env)
             ->setArguments(array(new Reference('url_generator')));
 
     $sc->setParameter('csrf_secret', 'c2ioeEU1n48QF2WsHGWd2HmiuUUT6dxr');
-    $sc->register('csrf_provider', 'Symfony\Component\Form\Extension\Csrf\CsrfProvider\DefaultCsrfProvider')
-            ->setArguments(array('%csrf_secret%'));
+    // Use SessionCsrfProvider make it easier to test.
+    // @see - http://stackoverflow.com/a/17223104
+    $sc->register('csrf_provider', 'Symfony\Component\Form\Extension\Csrf\CsrfProvider\SessionCsrfProvider')
+            ->setArguments(array(new Reference('session'), '%csrf_secret%'));
+
     $sc->setParameter('default_form_theme', 'form_div_layout.html.twig');
     $sc->register('twig_renderer_engine', 'Symfony\Bridge\Twig\Form\TwigRendererEngine')
             ->setArguments(array(array('%default_form_theme%')))
@@ -273,7 +276,7 @@ function register_kernel_services($sc, $env)
     $sc->register('listener.controller', 'Tchess\EventListener\ControllerListener')
             ->addTag('event_subscriber');
     $sc->register('listener.session', 'Tchess\EventListener\SessionListener')
-            ->addMethodCall('setStorage', array(new Reference('session.storage')))
+            ->addMethodCall('setSession', array(new Reference('session')))
             ->addTag('event_subscriber');
 
     if ($env == 'test') {
@@ -282,6 +285,8 @@ function register_kernel_services($sc, $env)
     else {
         $sc->register('session.storage', 'Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage');
     }
+    $sc->register('session', 'Symfony\Component\HttpFoundation\Session\Session')
+            ->setArguments(array(new Reference('session.storage')));
 
     $sc->register('dispatcher', 'Symfony\Component\EventDispatcher\EventDispatcher');
 
