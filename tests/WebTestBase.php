@@ -19,7 +19,7 @@ class WebTestBase extends \PHPUnit_Framework_TestCase
             $config = include __DIR__ . '/../config/db-config-test.php';
             $env = 'test';
 
-            static::$sc = require_once __DIR__ . '/../src/container.php';
+            static::$sc = include __DIR__ . '/../src/container.php';
         }
 
         // Getting schema tool.

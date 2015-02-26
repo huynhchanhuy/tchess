@@ -20,7 +20,7 @@ class UnitTestBase extends \PHPUnit_Framework_TestCase
                 'driver' => 'pdo_sqlite',
             );
             $env = 'test';
-            static::$sc = require_once __DIR__ . '/../src/container.php';
+            static::$sc = include __DIR__ . '/../src/container.php';
         }
     }
 
