@@ -14,10 +14,10 @@ class RegisterRulesPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        if ($container->hasDefinition('validator.move')) {
-            $validator = $container->getDefinition('validator.move');
+        if ($container->hasDefinition('constraint_validator.move')) {
+            $moveValidator = $container->getDefinition('constraint_validator.move');
             foreach ($container->findTaggedServiceIds('rules') as $id => $attributes) {
-                $validator->addMethodCall('addRules', array(new Reference($id)));
+                $moveValidator->addMethodCall('addRules', array(new Reference($id)));
             }
         }
     }

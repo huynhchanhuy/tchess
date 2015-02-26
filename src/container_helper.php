@@ -46,8 +46,8 @@ function register_validator_services($sc)
             ->addMethodCall('enableAnnotationMapping', array(new Reference('annotation_reader')))
             ->addMethodCall('setConstraintValidatorFactory', array(new Reference('validator.validator_factory')));
 
-    $sc->register('validator.move', 'Tchess\Validator\Constraints\MoveValidator')
-            ->addTag('validator.constraint_validator', array('alias' => 'validator.move'))
+    $sc->register('constraint_validator.move', 'Tchess\Validator\Constraints\MoveValidator')
+            ->addTag('validator.constraint_validator', array('alias' => 'constraint_validator.move'))
             ->setScope('prototype');
 }
 

@@ -6,7 +6,6 @@ use Symfony\Component\Validator\Constraint;
 
 /**
  * @Annotation
- * @Target({"CLASS"})
  */
 class Move extends Constraint
 {
@@ -15,7 +14,7 @@ class Move extends Constraint
      */
     public function validatedBy()
     {
-        return 'validator.move';
+        return 'constraint_validator.move';
     }
 
     public function getTargets()
