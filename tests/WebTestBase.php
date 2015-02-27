@@ -40,7 +40,7 @@ class WebTestBase extends \PHPUnit_Framework_TestCase
      */
     protected static function createClient()
     {
-        $client = new Client(static::$sc->get('framework'));
+        $client = new Client(static::$sc->get('kernel'));
 
         return $client;
     }

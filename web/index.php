@@ -27,8 +27,8 @@ $sc->get('asset_writer')->writeManagerAssets($sc->get('asset_asset_manager'));
 
 $sc->get('context')->fromRequest($request);
 
-$response = $sc->get('framework')->handle($request);
+$response = $sc->get('kernel')->handle($request);
 
 $response->send();
 
-$sc->get('framework')->terminate($request, $response);
+$sc->get('kernel')->terminate($request, $response);

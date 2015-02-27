@@ -5,20 +5,33 @@ namespace Tchess\EventListener;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Tchess\FrameworkInterface;
-use Tchess\FrameworkAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 
 class ControllerListener implements EventSubscriberInterface
 {
+    /**
+     * @var ContainerInterface
+     */
+    protected $container;
+
+    /**
+     * Constructor.
+     *
+     * @param ContainerInterface $container The service container instance
+     */
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
+    }
 
     public function onKernelController(FilterControllerEvent $event)
     {
         $controller = $event->getController();
         list($object, $method) = $controller;
-        $kernel = $event->getKernel();
 
-        if ($object instanceof FrameworkAwareInterface && $kernel instanceof FrameworkInterface) {
-            $object->setFramework($kernel);
+        if ($object instanceof ContainerAwareInterface) {
+            $object->setContainer($this->container);
         }
     }
 

@@ -23,7 +23,7 @@ class RoomController extends BaseController
      */
     public function indexAction(Request $request, $page = 1)
     {
-        $em = $this->framework->getEntityManager();
+        $em = $this->getEntityManager();
         $session = $request->getSession();
         $sid = $session->getId();
 
@@ -54,7 +54,7 @@ class RoomController extends BaseController
      */
     public function joinAction(Request $request, $room = null)
     {
-        $em = $this->framework->getEntityManager();
+        $em = $this->getEntityManager();
         $session = $request->getSession();
         $sid = $session->getId();
 
@@ -88,7 +88,7 @@ class RoomController extends BaseController
         $em->flush();
 
         $event = new RoomEvent($room, $player);
-        $this->framework->getEventDispatcher()->dispatch(RoomEvents::JOIN, $event);
+        $this->container->get('dispatcher')->dispatch(RoomEvents::JOIN, $event);
 
         return $this->redirect($this->generateUrl('homepage'));
     }
@@ -101,7 +101,7 @@ class RoomController extends BaseController
      */
     public function leaveAction(Request $request)
     {
-        $em = $this->framework->getEntityManager();
+        $em = $this->getEntityManager();
         $session = $request->getSession();
         $sid = $session->getId();
 
@@ -123,7 +123,7 @@ class RoomController extends BaseController
             $em->flush();
 
             $event = new RoomEvent($room, $player);
-            $this->framework->getEventDispatcher()->dispatch(RoomEvents::LEAVE, $event);
+            $this->container->get('dispatcher')->dispatch(RoomEvents::LEAVE, $event);
         }
 
         return $this->redirect($this->generateUrl('rooms'));
@@ -137,7 +137,7 @@ class RoomController extends BaseController
      */
     public function createAction(Request $request)
     {
-        $em = $this->framework->getEntityManager();
+        $em = $this->getEntityManager();
         $session = $request->getSession();
         $sid = $session->getId();
 
@@ -156,7 +156,7 @@ class RoomController extends BaseController
             $em->flush();
 
             $event = new RoomEvent($room, $player);
-            $this->framework->getEventDispatcher()->dispatch(RoomEvents::CREATE, $event);
+            $this->container->get('dispatcher')->dispatch(RoomEvents::CREATE, $event);
         }
 
         return $this->redirect($this->generateUrl('homepage'));

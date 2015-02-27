@@ -2,13 +2,13 @@
 
 namespace Tchess\Controller;
 
-use Tchess\FrameworkAware;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Tchess\Entity\Player;
+use Symfony\Component\DependencyInjection\ContainerAware;
 
-class BaseController extends FrameworkAware
+class BaseController extends ContainerAware
 {
 
     /**
@@ -16,7 +16,7 @@ class BaseController extends FrameworkAware
      */
     public function isLoggedIn(Request $request)
     {
-        $em = $this->framework->getEntityManager();
+        $em = $this->getEntityManager();
         $session = $request->getSession();
         $sid = $session->getId();
         $player = $em->getRepository('Tchess\Entity\Player')->findOneBy(array('sid' => $sid));
@@ -27,12 +27,17 @@ class BaseController extends FrameworkAware
         return true;
     }
 
+    public function getEntityManager()
+    {
+        return $this->container->get('entity_manager');
+    }
+
     /**
      * Render a template
      */
     public function render($template, $variables = array())
     {
-        $twig = $this->framework->getTwig();
+        $twig = $this->container->get('twig');
         return $twig->render($template, $variables);
     }
 
@@ -41,7 +46,7 @@ class BaseController extends FrameworkAware
      */
     public function getFormFactory()
     {
-        return $this->framework->getFormFactory();
+        return $this->container->get('form_factory');
     }
 
     /**
@@ -57,7 +62,7 @@ class BaseController extends FrameworkAware
      */
     public function generateUrl($route, $parameters = array(), $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH)
     {
-        return $this->framework->getUrlGenerator()->generate($route, $parameters, $referenceType);
+        return $this->container->get('url_generator')->generate($route, $parameters, $referenceType);
     }
 
     /**

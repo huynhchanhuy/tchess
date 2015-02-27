@@ -204,7 +204,7 @@ function register_twig_services($sc, $env)
 function register_chess_services($sc)
 {
     $sc->register('listener.game', 'Tchess\EventListener\GameListener')
-            ->setArguments(array(new Reference('entity_manager'), new Reference('serializer'), new Reference('logger'), new Reference('move_manager')))
+            ->setArguments(array(new Reference('entity_manager'), new Reference('serializer'), new Reference('logger'), new Reference('message_manager')))
             ->addMethodCall('setSocket', array(new Reference('socket')))
             ->addTag('event_subscriber');
 
@@ -218,7 +218,7 @@ function register_chess_services($sc)
             ->addTag('event_subscriber')
             ->addTag('rules');
     $sc->register('rules.king', 'Tchess\Rule\KingRules')
-            ->setArguments(array(new Reference('move_manager'), new Reference('rules.in_check')))
+            ->setArguments(array(new Reference('message_manager'), new Reference('rules.in_check')))
             ->addTag('event_subscriber')
             ->addTag('rules');
     $sc->register('rules.knight', 'Tchess\Rule\KnightRules')
@@ -236,7 +236,7 @@ function register_chess_services($sc)
             ->addTag('event_subscriber')
             ->addTag('rules');
 
-    $sc->register('move_manager', 'Tchess\MessageManager');
+    $sc->register('message_manager', 'Tchess\MessageManager');
 }
 
 function register_kernel_services($sc, $env)
@@ -269,6 +269,7 @@ function register_kernel_services($sc, $env)
     $sc->register('listener.response.string', 'Tchess\EventListener\StringResponseListener')
             ->addTag('event_subscriber');
     $sc->register('listener.controller', 'Tchess\EventListener\ControllerListener')
+            ->setArguments(array(new Reference('service_container')))
             ->addTag('event_subscriber');
     $sc->register('listener.session', 'Tchess\EventListener\SessionListener')
             ->addMethodCall('setSession', array(new Reference('session')))
@@ -285,16 +286,8 @@ function register_kernel_services($sc, $env)
 
     $sc->register('dispatcher', 'Symfony\Component\EventDispatcher\EventDispatcher');
 
-    $sc->register('framework', 'Tchess\Framework')
+    $sc->register('kernel', 'Symfony\Component\HttpKernel\HttpKernel')
             ->setArguments(array(new Reference('dispatcher'), new Reference('resolver')))
-            // Don't inject the container.
-            ->addMethodCall('setEntityManager', array(new Reference('entity_manager')))
-            ->addMethodCall('setFormFactory', array(new Reference('form_factory')))
-            ->addMethodCall('setMessageManager', array(new Reference('move_manager')))
-            ->addMethodCall('setSerializer', array(new Reference('serializer')))
-            ->addMethodCall('setTwig', array(new Reference('twig')))
-            ->addMethodCall('setUrlGenerator', array(new Reference('url_generator')))
-            ->addMethodCall('setValidator', array(new Reference('validator')))
     ;
 }
 

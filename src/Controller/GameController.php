@@ -25,7 +25,7 @@ class GameController extends BaseController
      */
     public function indexAction(Request $request)
     {
-        $em = $this->framework->getEntityManager();
+        $em = $this->getEntityManager();
         $session = $request->getSession();
         $sid = $session->getId();
         $player = $em->getRepository('Tchess\Entity\Player')->findOneBy(array('sid' => $sid));
@@ -70,7 +70,7 @@ class GameController extends BaseController
      */
     public function watchAction(Request $request, $room)
     {
-        $em = $this->framework->getEntityManager();
+        $em = $this->getEntityManager();
         $room = $em->getRepository('Tchess\Entity\Room')->findOneBy(array('id' => $room));
 
         if (empty($room) || !$room instanceof Room) {
@@ -121,7 +121,7 @@ class GameController extends BaseController
      */
     public function registerAction(Request $request)
     {
-        $em = $this->framework->getEntityManager();
+        $em = $this->getEntityManager();
         $session = $request->getSession();
         $sid = $session->getId();
         $player = $em->getRepository('Tchess\Entity\Player')->findOneBy(array('sid' => $sid));
@@ -170,7 +170,7 @@ class GameController extends BaseController
 
         $sub_request = Request::create('/leave-room');
         $sub_request->setSession($session);
-        $this->framework->handle($sub_request, HttpKernelInterface::SUB_REQUEST);
+        $this->container->get('kernel')->handle($sub_request, HttpKernelInterface::SUB_REQUEST);
 
         $session->invalidate();
         return $this->redirect($this->generateUrl('register'));
@@ -184,9 +184,9 @@ class GameController extends BaseController
      */
     public function moveAction(Request $request)
     {
-        $em = $this->framework->getEntityManager();
-        $dispatcher = $this->framework->getEventDispatcher();
-        $validator = $this->framework->getValidator();
+        $em = $this->getEntityManager();
+        $dispatcher = $this->container->get('dispatcher');
+        $validator = $this->container->get('validator');
         $session = $request->getSession();
         $sid = $session->getId();
 
@@ -215,7 +215,7 @@ class GameController extends BaseController
             ));
         }
 
-        $serializer = $this->framework->getSerializer();
+        $serializer = $this->container->get('serializer');
         $board = $serializer->deserialize($game->getState(), 'Tchess\Entity\Board', 'fen');
         $color = $player->getColor();
 
@@ -246,7 +246,7 @@ class GameController extends BaseController
                 'color' => $move->getColor(),
                 'castling' => $move->getCastling(),
             ));
-            $this->framework->getMessageManager()->addMessage($message);
+            $this->container->get('message_manager')->addMessage($message);
 
             return json_encode(array(
                 'code' => 200,
