@@ -1,4 +1,4 @@
-Angular [![Build Status](https://travis-ci.org/tienvx/tchess.svg?branch=master)](https://travis-ci.org/tienvx/tchess)
+Tchess [![Build Status](https://travis-ci.org/tienvx/tchess.svg?branch=master)](https://travis-ci.org/tienvx/tchess)
 =========
 
 Installation
